@@ -1,7 +1,8 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:antd="clr-namespace:Antd.Wpf.Controls">
+    xmlns:antd="clr-namespace:Antd.Wpf.Controls"
+    xmlns:theme="clr-namespace:Antd.Wpf.Theme.Markup;assembly=Antd.Wpf.Theme">
 
     <!-- ============================================================ Button -->
 
@@ -651,6 +652,565 @@
     <Style TargetType="{x:Type antd:Skeleton}">
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <!-- ============================================================ FloatButton -->
+
+    <Style TargetType="{x:Type antd:FloatButton}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:FloatButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <StackPanel x:Name="FloatContent" Orientation="Horizontal"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Margin="12,8">
+                            <ContentPresenter Content="{TemplateBinding Icon}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                            <TextBlock x:Name="FloatDescription" Text="{TemplateBinding Description}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       Margin="6,0,0,0" VerticalAlignment="Center"
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowsDescription" Value="True">
+                            <Setter TargetName="FloatDescription" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="FloatContent" Property="Orientation" Value="Vertical" />
+                        </Trigger>
+                        <Trigger Property="ShowsDescription" Value="False">
+                            <Setter TargetName="FloatDescription" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="FloatContent" Property="Orientation" Value="Horizontal" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Watermark -->
+
+    <Style TargetType="{x:Type antd:Watermark}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Watermark}">
+                    <Border Background="{TemplateBinding TileBrush}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Grid -->
+
+    <Style TargetType="{x:Type antd:Col}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Col}">
+                    <ContentPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Row}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style TargetType="{x:Type antd:Flex}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!-- ============================================================ Layout -->
+
+    <Style TargetType="{x:Type antd:Layout}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style TargetType="{x:Type antd:Sider}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Sider}">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Header}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Header}">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center"
+                                          TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Footer}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Footer}">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Content}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Content}">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ InputNumber -->
+
+    <Style x:Key="Antd.Spinner.Up" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" CornerRadius="2,2,0,0">
+                        <Path Data="M0,4 L3.5,0.5 L7,4" Stretch="None"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=antd:InputNumber}}"
+                              StrokeThickness="1.2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Antd.Spinner.Down" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" CornerRadius="0,0,2,2">
+                        <Path Data="M0,0.5 L3.5,4 L7,0.5" Stretch="None"
+                              Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=antd:InputNumber}}"
+                              StrokeThickness="1.2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:InputNumber}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:InputNumber}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{theme:CornerRadius borderRadius}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ScrollViewer x:Name="PART_ContentHost" Grid.Column="0"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden" />
+
+                            <Grid Grid.Column="1" Width="18" Margin="0,1,1,1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <RepeatButton x:Name="PART_UpButton" Grid.Row="0" Style="{StaticResource Antd.Spinner.Up}" />
+                                <RepeatButton x:Name="PART_DownButton" Grid.Row="1" Style="{StaticResource Antd.Spinner.Down}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Checkbox -->
+
+    <Style TargetType="{x:Type antd:Checkbox}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Checkbox}">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <Border Width="{TemplateBinding BoxSize}" Height="{TemplateBinding BoxSize}"
+                                Background="{TemplateBinding BoxBrush}"
+                                BorderBrush="{TemplateBinding BoxBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{theme:CornerRadius borderRadiusXS}"
+                                VerticalAlignment="Center">
+                            <Grid>
+                                <Path x:Name="CheckMark" Data="M2.5,6 L5,8.5 L9.5,3.5" Stretch="None"
+                                      Stroke="{TemplateBinding CheckBrush}" StrokeThickness="1.4"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Path x:Name="Indeterminate" Data="M3,6 L9,6" Stretch="None"
+                                      Stroke="{TemplateBinding CheckBrush}" StrokeThickness="1.4"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Indeterminate" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Indeterminate" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Radio -->
+
+    <Style TargetType="{x:Type antd:Radio}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Radio}">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <Grid Width="{TemplateBinding RingSize}" Height="{TemplateBinding RingSize}" VerticalAlignment="Center">
+                            <Ellipse Stroke="{TemplateBinding RingBrush}" StrokeThickness="1" Fill="Transparent" />
+                            <Ellipse x:Name="RadioDot" Width="8" Height="8" Fill="{TemplateBinding DotBrush}" />
+                        </Grid>
+                        <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="RadioDot" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Switch -->
+
+    <Style TargetType="{x:Type antd:Switch}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Switch}">
+                    <Border Width="{TemplateBinding TrackWidth}" Height="{TemplateBinding TrackHeight}"
+                            Background="{TemplateBinding TrackBrush}"
+                            CornerRadius="{Binding TrackHeight, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static theme:DoubleToCornerRadiusConverter.Instance}}">
+                        <Grid>
+                            <TextBlock x:Name="SwitchText" Text="{TemplateBinding ActiveText}"
+                                       Foreground="White" FontSize="{TemplateBinding FontSize}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Ellipse x:Name="SwitchThumb" Width="{TemplateBinding ThumbSize}" Height="{TemplateBinding ThumbSize}"
+                                     Fill="{TemplateBinding ThumbBrush}"
+                                     HorizontalAlignment="Left" Margin="2,0,0,0"
+                                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0" />
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="SwitchThumb" Property="Margin" Value="0,0,2,0" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="SwitchText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Rate -->
+
+    <Style TargetType="{x:Type antd:Rate}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <!-- ============================================================ Slider -->
+
+    <Style x:Key="Antd.Slider.Decrease" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="{DynamicResource Antd.colorPrimary}"
+                            Height="{Binding TrackThickness, RelativeSource={RelativeSource AncestorType=antd:Slider}}"
+                            CornerRadius="2" VerticalAlignment="Center" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Antd.Slider.Increase" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="{DynamicResource Antd.colorFillSecondary}"
+                            Height="{Binding TrackThickness, RelativeSource={RelativeSource AncestorType=antd:Slider}}"
+                            CornerRadius="2" VerticalAlignment="Center" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Antd.Slider.Thumb" TargetType="{x:Type Thumb}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse Fill="{DynamicResource Antd.colorPrimary}"
+                             Stroke="{DynamicResource Antd.colorBgContainer}" StrokeThickness="2"
+                             Width="{Binding ThumbSize, RelativeSource={RelativeSource AncestorType=antd:Slider}}"
+                             Height="{Binding ThumbSize, RelativeSource={RelativeSource AncestorType=antd:Slider}}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Slider}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Slider}">
+                    <Grid VerticalAlignment="Center">
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource Antd.Slider.Decrease}" Command="Slider.DecreaseLarge" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource Antd.Slider.Thumb}" />
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource Antd.Slider.Increase}" Command="Slider.IncreaseLarge" />
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Select -->
+
+    <Style x:Key="Antd.Select.Item" TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="ItemRoot" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemRoot" Property="Background" Value="{DynamicResource Antd.controlItemBgHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemRoot" Property="Background" Value="{DynamicResource Antd.controlItemBgActive}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Select}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Antd.Select.Item}" />
+        <Setter Property="MaxDropDownHeight" Value="256" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Select}">
+                    <Grid>
+                        <Border x:Name="SelectRoot"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{theme:CornerRadius borderRadius}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter x:Name="SelectionHost" Grid.Column="0"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  VerticalAlignment="Center" />
+
+                                <TextBlock x:Name="PlaceholderHost" Grid.Column="0"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{TemplateBinding PlaceholderBrush}"
+                                           Margin="{TemplateBinding Padding}"
+                                           VerticalAlignment="Center" Visibility="Collapsed" />
+
+                                <Button x:Name="PART_ClearButton" Grid.Column="1"
+                                        Style="{StaticResource Antd.Input.ClearButton}"
+                                        Width="12" Height="12" Margin="0,0,4,0" Visibility="Collapsed" />
+
+                                <Path Grid.Column="2" Data="M0,0 L4,4 L8,0" Stretch="None"
+                                      Stroke="{TemplateBinding ArrowBrush}" StrokeThickness="1.2"
+                                      Margin="0,1,10,0" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"
+                               Focusable="False" StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1" CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0" Padding="4">
+                                <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasSelection" Value="False">
+                            <Setter TargetName="PlaceholderHost" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SelectionHost" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="HasSelection" Value="True">
+                            <Setter TargetName="PlaceholderHost" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="SelectionHost" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClearSelection" Value="True">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClearSelection" Value="False">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="SelectRoot" Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Form -->
+
+    <Style TargetType="{x:Type antd:Form}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style TargetType="{x:Type antd:FormItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:FormItem}">
+                    <StackPanel>
+                        <StackPanel x:Name="LabelRow" Orientation="Horizontal" Margin="0,0,0,8"
+                                    Visibility="Collapsed">
+                            <TextBlock x:Name="RequiredMark" Text="*" Margin="0,0,4,0"
+                                       Foreground="{TemplateBinding RequiredBrush}" Visibility="Collapsed" />
+                            <TextBlock Text="{TemplateBinding Label}"
+                                       Foreground="{TemplateBinding LabelBrush}"
+                                       FontSize="{TemplateBinding FontSize}" />
+                        </StackPanel>
+
+                        <ContentPresenter HorizontalAlignment="Stretch" />
+
+                        <TextBlock x:Name="MessageText" Text="{TemplateBinding ActiveMessage}"
+                                   Foreground="{TemplateBinding MessageBrush}"
+                                   FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
+                                   Visibility="Collapsed" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasLabel" Value="True">
+                            <Setter TargetName="LabelRow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="Required" Value="True">
+                            <Setter TargetName="RequiredMark" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="HasMessage" Value="True">
+                            <Setter TargetName="MessageText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

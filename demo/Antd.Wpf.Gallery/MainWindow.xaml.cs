@@ -28,6 +28,9 @@ namespace Antd.Wpf.Gallery
             RangeSegmented.ItemsSource = new[] { "Daily", "Weekly", "Monthly" };
             RangeSegmented.SelectedIndex = 0;
 
+            FrameworkSelect.ItemsSource = new[] { "WPF", "Avalonia", "WinUI", "MAUI" };
+            FrameworkSelect.SelectedIndex = 0;
+
             Loaded += delegate { RefreshTokens(); };
             ThemeManager.Current.ThemeChanged += OnThemeChanged;
             Closed += delegate { ThemeManager.Current.ThemeChanged -= OnThemeChanged; };
@@ -37,6 +40,17 @@ namespace Antd.Wpf.Gallery
         {
             RefreshTokens();
             UpdateThemeButton();
+        }
+
+        private void OnSubmitForm(object sender, RoutedEventArgs e)
+        {
+            DemoForm.Validate();
+        }
+
+        private void OnResetForm(object sender, RoutedEventArgs e)
+        {
+            DemoForm.ResetErrors();
+            NameInput.Text = string.Empty;
         }
 
         private void OnToggleTheme(object sender, RoutedEventArgs e)

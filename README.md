@@ -2,8 +2,9 @@
 
 Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 与 **.NET 8+**。
 
-当前状态：**M1 进行中**。已完成 M0（主题引擎 + Button + Input）与 M1 第一批
-（compact 算法、图标管线、Icon/Divider/Space/Tag/Badge/Avatar/Empty/Spin/Progress/Statistic/Skeleton/Segmented）。
+当前状态：**M2 进行中（36 个控件）**。M0/M1 已完成；M2 已交付表单控件
+（InputNumber/Checkbox/Radio/Switch/Rate/Slider/Select/Form）。
+日期选择、级联、上传等 8 个复杂组件待做，见 `docs/m2-implementation-notes.md`。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
 M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-notes.md)。
 
@@ -39,7 +40,7 @@ cd tools/token-sync && npm install && node dump-tokens.js
 src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，无 WPF 依赖
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
 src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
-src/Antd.Wpf.Controls   net48;net8        14 个控件 + Generic.xaml
+src/Antd.Wpf.Controls   net48;net8        36 个控件 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        演示程序
 tests/                  两个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token

@@ -50,6 +50,7 @@ namespace Antd.Wpf.SmokeTests
             CheckControls();
             CheckThemeSwitch();
             CheckM1Components();
+            CheckM2Components();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -291,6 +292,92 @@ namespace Antd.Wpf.SmokeTests
                 segmented.SelectedItem as string ?? "null");
         }
 
+        // ---------------------------------------------------------------- M2 components
+
+        private static void CheckM2Components()
+        {
+            ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
+            AliasToken t = snapshot.Tokens;
+
+            var text = new Antd.Wpf.Controls.Text { Text = "hi", Type = TextType.Secondary };
+            Check("secondary text uses colorTextSecondary",
+                SameBrush(text.Foreground, snapshot.Brush("colorTextSecondary")), Describe(text.Foreground));
+
+            var title = new Antd.Wpf.Controls.Title { Text = "h1", Level = 1 };
+            Check("title level 1 uses fontSizeHeading1",
+                Math.Abs(title.FontSize - t.FontSizeHeading1) < 0.01, title.FontSize.ToString());
+
+            var paragraph = new Antd.Wpf.Controls.Paragraph { Text = "p" };
+            Check("paragraph line height equals fontHeight",
+                Math.Abs(paragraph.LineHeight - t.FontHeight) < 0.01, paragraph.LineHeight.ToString());
+
+            var number = new Antd.Wpf.Controls.InputNumber { Value = 3.5, Precision = 2 };
+            Check("input number formats with precision", number.Text == "3.50", number.Text);
+
+            var checkbox = new Antd.Wpf.Controls.Checkbox { Content = "x", IsChecked = true };
+            Check("checked checkbox is primary",
+                SameBrush(checkbox.BoxBrush, snapshot.Brush("colorPrimary")), Describe(checkbox.BoxBrush));
+
+            var radio = new Antd.Wpf.Controls.Radio { Content = "r", IsChecked = true };
+            Check("checked radio ring is primary",
+                SameBrush(radio.RingBrush, snapshot.Brush("colorPrimary")), Describe(radio.RingBrush));
+
+            var toggle = new Antd.Wpf.Controls.Switch { IsChecked = true };
+            Check("switch on uses colorPrimary",
+                SameBrush(toggle.TrackBrush, snapshot.Brush("colorPrimary")), Describe(toggle.TrackBrush));
+            Check("switch track width 44", Math.Abs(toggle.TrackWidth - 44) < 0.01, toggle.TrackWidth.ToString());
+
+            var rate = new Antd.Wpf.Controls.Rate { Count = 5, StarSize = 20, Gap = 8 };
+            rate.Measure(new Size(500, 100));
+            Check("rate width = count*star + gaps", Math.Abs(rate.DesiredSize.Width - 132) < 0.01,
+                rate.DesiredSize.Width.ToString());
+
+            var slider = new Antd.Wpf.Controls.Slider();
+            Check("slider track thickness 4", Math.Abs(slider.TrackThickness - 4) < 0.01,
+                slider.TrackThickness.ToString());
+
+            var select = new Antd.Wpf.Controls.Select { AllowClear = true };
+            select.ItemsSource = new[] { "a", "b" };
+            select.SelectedIndex = 0;
+            Check("select reports selection", select.HasSelection && select.CanClearSelection,
+                select.HasSelection + "/" + select.CanClearSelection);
+
+            var formItem = new Antd.Wpf.Controls.FormItem
+            {
+                Label = "Name",
+                Required = true,
+                Content = new AntdInput { Placeholder = "x" }
+            };
+            bool valid = formItem.Validate();
+            Check("required form item fails when empty", !valid && formItem.Error != null,
+                formItem.Error ?? "no error");
+            formItem.Content = new AntdInput { Text = "filled" };
+            Check("required form item passes when filled", formItem.Validate() && formItem.Error == null,
+                formItem.Error ?? "ok");
+
+            var row = new Antd.Wpf.Controls.Row { Gutter = 16 };
+            row.Measure(new Size(800, 200));
+            Check("row breakpoint at 800 is Md",
+                row.CurrentBreakpoint == Antd.Wpf.Controls.Breakpoint.Md, row.CurrentBreakpoint.ToString());
+
+            var col = new Antd.Wpf.Controls.Col { Span = 24, Md = 12 };
+            Check("col responsive span resolves", col.ResolveSpan(Antd.Wpf.Controls.Breakpoint.Md) == 12,
+                col.ResolveSpan(Antd.Wpf.Controls.Breakpoint.Md).ToString());
+            Check("col falls back to Span below breakpoint",
+                col.ResolveSpan(Antd.Wpf.Controls.Breakpoint.Sm) == 24,
+                col.ResolveSpan(Antd.Wpf.Controls.Breakpoint.Sm).ToString());
+
+            var headerProbe = new Antd.Wpf.Controls.Header();
+            Check("header padding is paddingLG", Math.Abs(headerProbe.Padding.Left - t.PaddingLG) < 0.01,
+                headerProbe.Padding.ToString() + " paddingLG=" + t.PaddingLG);
+            var contentProbe = new Antd.Wpf.Controls.Content();
+            Check("content padding is paddingLG", Math.Abs(contentProbe.Padding.Left - t.PaddingLG) < 0.01,
+                contentProbe.Padding.ToString());
+
+            var watermark = new Antd.Wpf.Controls.Watermark { Text = "draft" };
+            Check("watermark builds a tile brush", watermark.TileBrush != null, "null");
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -347,6 +434,9 @@ namespace Antd.Wpf.SmokeTests
             DoEvents();
             CaptureCard(FindDescendant<Progress>(window), Path.Combine(directory, "zoom-progress.png"));
             CaptureCard(FindDescendant<Badge>(window), Path.Combine(directory, "zoom-display.png"));
+            CaptureCard(FindDescendant<FormItem>(window), Path.Combine(directory, "zoom-form.png"));
+            var layoutPreview = FindDescendant<Antd.Wpf.Controls.Layout>(window);
+            if (layoutPreview != null) RenderElement(layoutPreview, Path.Combine(directory, "zoom-layout.png"), 1.0);
             Render(window, Path.Combine(directory, "gallery-light.png"));
             Console.WriteLine("captured: gallery-light.png");
 

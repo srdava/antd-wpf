@@ -139,6 +139,8 @@ namespace Antd.Wpf.Tokens
         public double LineHeightHeading1 { get { return Number("lineHeightHeading1"); } }
         public double LineHeightHeading2 { get { return Number("lineHeightHeading2"); } }
         public double LineHeightHeading3 { get { return Number("lineHeightHeading3"); } }
+        public double LineHeightHeading4 { get { return Number("lineHeightHeading4"); } }
+        public double LineHeightHeading5 { get { return Number("lineHeightHeading5"); } }
 
         public double LineHeight { get { return Number("lineHeight"); } }
         public double LineHeightSM { get { return Number("lineHeightSM"); } }

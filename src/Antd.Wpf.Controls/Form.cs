@@ -1,0 +1,347 @@
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Antd.Wpf.Controls.Internal;
+using Antd.Wpf.Theme;
+using Antd.Wpf.Tokens;
+
+namespace Antd.Wpf.Controls
+{
+    public enum FormLayout
+    {
+        Vertical = 0,
+        Horizontal = 1
+    }
+
+    /// <summary>
+    /// antd Form. A lightweight container: it lays out <see cref="FormItem"/> children in a
+    /// label/content grid and aggregates validation. It is not a full antd Form
+    /// (no field dependency graph, no async rules) - see M2 notes for what is deferred.
+    /// </summary>
+    public class Form : Panel
+    {
+        private readonly List<FormItem> _items = new List<FormItem>();
+
+        public Form()
+        {
+            ThemeLink.Attach(this, InvalidateMeasure);
+        }
+
+        public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(
+            "Layout", typeof(FormLayout), typeof(Form),
+            new FrameworkPropertyMetadata(FormLayout.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        public FormLayout Layout
+        {
+            get { return (FormLayout)GetValue(LayoutProperty); }
+            set { SetValue(LayoutProperty, value); }
+        }
+
+        public static readonly DependencyProperty LabelWidthProperty = DependencyProperty.Register(
+            "LabelWidth", typeof(double), typeof(Form),
+            new FrameworkPropertyMetadata(96.0, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        /// <summary>Label column width used when <see cref="Layout"/> is Horizontal.</summary>
+        public double LabelWidth
+        {
+            get { return (double)GetValue(LabelWidthProperty); }
+            set { SetValue(LabelWidthProperty, value); }
+        }
+
+        public static readonly DependencyProperty ItemSpacingProperty = DependencyProperty.Register(
+            "ItemSpacing", typeof(double), typeof(Form),
+            new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        public double ItemSpacing
+        {
+            get { return (double)GetValue(ItemSpacingProperty); }
+            set { SetValue(ItemSpacingProperty, value); }
+        }
+
+        /// <summary>Validates every item and returns false when at least one is invalid.</summary>
+        public bool Validate()
+        {
+            bool valid = true;
+            foreach (UIElement child in InternalChildren)
+            {
+                var item = child as FormItem;
+                if (item == null) continue;
+                if (!item.Validate()) valid = false;
+            }
+            return valid;
+        }
+
+        public void ResetErrors()
+        {
+            foreach (UIElement child in InternalChildren)
+            {
+                var item = child as FormItem;
+                if (item != null) item.ClearError();
+            }
+        }
+
+        private double Spacing
+        {
+            get
+            {
+                return double.IsNaN(ItemSpacing)
+                    ? ThemeManager.Current.Snapshot.Tokens.SizeLG
+                    : ItemSpacing;
+            }
+        }
+
+        private void CollectItems()
+        {
+            _items.Clear();
+            foreach (UIElement child in InternalChildren)
+            {
+                var item = child as FormItem;
+                if (item != null) _items.Add(item);
+            }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            CollectItems();
+            double spacing = Spacing;
+            double total = 0;
+            double width = 0;
+
+            for (int i = 0; i < _items.Count; i++)
+            {
+                FormItem item = _items[i];
+                if (item.Visibility == Visibility.Collapsed) continue;
+
+                item.Measure(new Size(availableSize.Width, double.PositiveInfinity));
+                total += item.DesiredSize.Height;
+                if (item.DesiredSize.Width > width) width = item.DesiredSize.Width;
+                if (i < _items.Count - 1) total += spacing;
+            }
+
+            if (double.IsInfinity(availableSize.Width) && width < 320) width = 320;
+            return new Size(double.IsInfinity(availableSize.Width) ? width : availableSize.Width, total);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            double spacing = Spacing;
+            double y = 0;
+
+            foreach (FormItem item in _items)
+            {
+                if (item.Visibility == Visibility.Collapsed) continue;
+                item.Arrange(new Rect(0, y, finalSize.Width, item.DesiredSize.Height));
+                y += item.DesiredSize.Height + spacing;
+            }
+
+            return finalSize;
+        }
+    }
+
+    /// <summary>antd Form.Item: label row, content and error/help line.</summary>
+    public class FormItem : ContentControl
+    {
+        static FormItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(FormItem), new FrameworkPropertyMetadata(typeof(FormItem)));
+        }
+
+        public FormItem()
+        {
+            ThemeLink.Attach(this, UpdateVisualState);
+            UpdateVisualState();
+        }
+
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
+            "Label", typeof(string), typeof(FormItem), new FrameworkPropertyMetadata(null));
+
+        public string Label
+        {
+            get { return (string)GetValue(LabelProperty); }
+            set { SetValue(LabelProperty, value); }
+        }
+
+        public static readonly DependencyProperty RequiredProperty = DependencyProperty.Register(
+            "Required", typeof(bool), typeof(FormItem),
+            new FrameworkPropertyMetadata(false, OnAppearanceChanged));
+
+        public bool Required
+        {
+            get { return (bool)GetValue(RequiredProperty); }
+            set { SetValue(RequiredProperty, value); }
+        }
+
+        public static readonly DependencyProperty HelpProperty = DependencyProperty.Register(
+            "Help", typeof(string), typeof(FormItem),
+            new FrameworkPropertyMetadata(null, OnAppearanceChanged));
+
+        public string Help
+        {
+            get { return (string)GetValue(HelpProperty); }
+            set { SetValue(HelpProperty, value); }
+        }
+
+        public static readonly DependencyProperty ErrorProperty = DependencyProperty.Register(
+            "Error", typeof(string), typeof(FormItem),
+            new FrameworkPropertyMetadata(null, OnAppearanceChanged));
+
+        public string Error
+        {
+            get { return (string)GetValue(ErrorProperty); }
+            set { SetValue(ErrorProperty, value); }
+        }
+
+        /// <summary>Optional custom rule. Return null when valid, or the message to show.</summary>
+        public Func<object, string> Validator { get; set; }
+
+        private static readonly DependencyPropertyKey LabelBrushKey = DependencyProperty.RegisterReadOnly(
+            "LabelBrush", typeof(Brush), typeof(FormItem), new FrameworkPropertyMetadata(Brushes.Gray));
+
+        public static readonly DependencyProperty LabelBrushProperty = LabelBrushKey.DependencyProperty;
+
+        public Brush LabelBrush
+        {
+            get { return (Brush)GetValue(LabelBrushProperty); }
+            private set { SetValue(LabelBrushKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey HelpBrushKey = DependencyProperty.RegisterReadOnly(
+            "HelpBrush", typeof(Brush), typeof(FormItem), new FrameworkPropertyMetadata(Brushes.Gray));
+
+        public static readonly DependencyProperty HelpBrushProperty = HelpBrushKey.DependencyProperty;
+
+        public Brush HelpBrush
+        {
+            get { return (Brush)GetValue(HelpBrushProperty); }
+            private set { SetValue(HelpBrushKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey RequiredBrushKey = DependencyProperty.RegisterReadOnly(
+            "RequiredBrush", typeof(Brush), typeof(FormItem), new FrameworkPropertyMetadata(Brushes.Red));
+
+        public static readonly DependencyProperty RequiredBrushProperty = RequiredBrushKey.DependencyProperty;
+
+        public Brush RequiredBrush
+        {
+            get { return (Brush)GetValue(RequiredBrushProperty); }
+            private set { SetValue(RequiredBrushKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey MessageBrushKey = DependencyProperty.RegisterReadOnly(
+            "MessageBrush", typeof(Brush), typeof(FormItem), new FrameworkPropertyMetadata(Brushes.Red));
+
+        public static readonly DependencyProperty MessageBrushProperty = MessageBrushKey.DependencyProperty;
+
+        public Brush MessageBrush
+        {
+            get { return (Brush)GetValue(MessageBrushProperty); }
+            private set { SetValue(MessageBrushKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey ActiveMessageKey = DependencyProperty.RegisterReadOnly(
+            "ActiveMessage", typeof(string), typeof(FormItem), new FrameworkPropertyMetadata(null));
+
+        public static readonly DependencyProperty ActiveMessageProperty = ActiveMessageKey.DependencyProperty;
+
+        /// <summary>Error when present, otherwise the help text.</summary>
+        public string ActiveMessage
+        {
+            get { return (string)GetValue(ActiveMessageProperty); }
+            private set { SetValue(ActiveMessageKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey HasMessageKey = DependencyProperty.RegisterReadOnly(
+            "HasMessage", typeof(bool), typeof(FormItem), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty HasMessageProperty = HasMessageKey.DependencyProperty;
+
+        public bool HasMessage
+        {
+            get { return (bool)GetValue(HasMessageProperty); }
+            private set { SetValue(HasMessageKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey HasLabelKey = DependencyProperty.RegisterReadOnly(
+            "HasLabel", typeof(bool), typeof(FormItem), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty HasLabelProperty = HasLabelKey.DependencyProperty;
+
+        public bool HasLabel
+        {
+            get { return (bool)GetValue(HasLabelProperty); }
+            private set { SetValue(HasLabelKey, value); }
+        }
+
+        private static void OnAppearanceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FormItem)d).UpdateVisualState();
+        }
+
+        public void ClearError()
+        {
+            SetCurrentValue(ErrorProperty, null);
+        }
+
+        /// <summary>Runs the built-in required check plus the optional custom validator.</summary>
+        public bool Validate()
+        {
+            string message = null;
+
+            if (Required && IsEmpty(Content))
+            {
+                message = "Please fill in this field";
+            }
+            else if (Validator != null)
+            {
+                message = Validator(Content);
+            }
+
+            SetCurrentValue(ErrorProperty, message);
+            return message == null;
+        }
+
+        private static bool IsEmpty(object content)
+        {
+            if (content == null) return true;
+
+            var input = content as System.Windows.Controls.TextBox;
+            if (input != null) return string.IsNullOrWhiteSpace(input.Text);
+
+            var number = content as InputNumber;
+            if (number != null) return !number.Value.HasValue;
+
+            var select = content as Select;
+            if (select != null) return select.SelectedIndex < 0;
+
+            var toggle = content as System.Windows.Controls.Primitives.ToggleButton;
+            if (toggle != null) return false;
+
+            return false;
+        }
+
+        public void UpdateVisualState()
+        {
+            ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
+            AliasToken t = snapshot.Tokens;
+
+            SetValue(LabelBrushKey, snapshot.Brush("colorText"));
+            SetValue(RequiredBrushKey, snapshot.Brush("colorError"));
+            SetValue(HelpBrushKey, snapshot.Brush("colorTextTertiary"));
+            SetValue(MessageBrushKey, snapshot.Brush(Error != null ? "colorError" : "colorTextTertiary"));
+
+            string message = Error ?? Help;
+            SetValue(ActiveMessageKey, message);
+            SetValue(HasMessageKey, !string.IsNullOrEmpty(message));
+            SetValue(HasLabelKey, !string.IsNullOrEmpty(Label));
+            SetCurrentValue(FontSizeProperty, t.FontSize);
+        }
+
+        protected override void OnContentChanged(object oldContent, object newContent)
+        {
+            base.OnContentChanged(oldContent, newContent);
+            UpdateVisualState();
+        }
+    }
+}

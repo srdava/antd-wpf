@@ -356,6 +356,162 @@
                 </StackPanel>
             </Border>
 
+            <!-- typography -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Typography" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,12" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Five heading levels, semantic text colours and a link." />
+
+                    <antd:Title Level="1" Text="Heading 1" />
+                    <antd:Title Level="2" Text="Heading 2" />
+                    <antd:Title Level="3" Text="Heading 3" />
+                    <antd:Title Level="4" Text="Heading 4" />
+                    <antd:Title Level="5" Text="Heading 5" />
+
+                    <antd:Paragraph Text="A paragraph of body copy rendered with the antd line height of 22/14. Use Paragraph for blocks of text that need consistent rhythm." />
+                    <antd:Paragraph Type="Secondary" Text="Secondary paragraph used for supporting copy." />
+
+                    <WrapPanel Margin="0,0,0,8">
+                        <antd:Text Text="Default text  " Margin="0,0,16,0" />
+                        <antd:Text Text="Secondary" Type="Secondary" Margin="0,0,16,0" />
+                        <antd:Text Text="Success" Type="Success" Margin="0,0,16,0" />
+                        <antd:Text Text="Warning" Type="Warning" Margin="0,0,16,0" />
+                        <antd:Text Text="Danger" Type="Danger" Margin="0,0,16,0" />
+                        <antd:Text Text="Strong" Strong="True" Margin="0,0,16,0" />
+                        <antd:Text Text="Disabled" Disabled="True" Margin="0,0,16,0" />
+                        <antd:Text Text="Underline" Underline="True" Margin="0,0,16,0" />
+                    </WrapPanel>
+                    <antd:Link Text="A hyperlink styled with colorLink" />
+                </StackPanel>
+            </Border>
+
+            <!-- layout -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Layout, Grid and Flex" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Header/Sider/Content/Footer, a 24-column grid and flex alignment." />
+
+                    <Border Height="160" CornerRadius="6" ClipToBounds="True"
+                            BorderBrush="{DynamicResource Antd.colorBorderSecondary}" BorderThickness="1">
+                        <antd:Layout>
+                            <antd:Header>
+                                <antd:Text Text="Header" Type="Secondary" />
+                            </antd:Header>
+                            <antd:Layout>
+                                <antd:Sider SiderWidth="140">
+                                    <antd:Text Text="Sider" Type="Secondary" Margin="16" />
+                                </antd:Sider>
+                                <antd:Content>
+                                    <antd:Text Text="Content" Type="Secondary" />
+                                </antd:Content>
+                            </antd:Layout>
+                            <antd:Footer>
+                                <antd:Text Text="Footer" Type="Secondary" />
+                            </antd:Footer>
+                        </antd:Layout>
+                    </Border>
+
+                    <antd:Row Gutter="16" Margin="0,16,0,0">
+                        <antd:Col Span="8">
+                            <Border Background="{DynamicResource Antd.colorFillTertiary}" CornerRadius="4" Padding="8">
+                                <antd:Text Text="span 8" Type="Secondary" />
+                            </Border>
+                        </antd:Col>
+                        <antd:Col Span="8">
+                            <Border Background="{DynamicResource Antd.colorFillTertiary}" CornerRadius="4" Padding="8">
+                                <antd:Text Text="span 8" Type="Secondary" />
+                            </Border>
+                        </antd:Col>
+                        <antd:Col Span="8">
+                            <Border Background="{DynamicResource Antd.colorFillTertiary}" CornerRadius="4" Padding="8">
+                                <antd:Text Text="span 8" Type="Secondary" />
+                            </Border>
+                        </antd:Col>
+                    </antd:Row>
+
+                    <antd:Flex Justify="SpaceBetween" Margin="0,12,0,0">
+                        <antd:Button Content="Flex start" Size="Small" />
+                        <antd:Button Content="SpaceBetween" Size="Small" Variant="Primary" />
+                        <antd:Button Content="Flex end" Size="Small" />
+                    </antd:Flex>
+                </StackPanel>
+            </Border>
+
+            <!-- form -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Form controls" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="InputNumber, Checkbox, Radio, Switch, Rate, Slider, Select and a validating Form." />
+
+                    <antd:Form x:Name="DemoForm" MaxWidth="520" HorizontalAlignment="Left">
+                        <antd:FormItem x:Name="NameItem" Label="Name" Required="True" Help="Required field, validated on submit.">
+                            <antd:Input x:Name="NameInput" Placeholder="Your name" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Framework">
+                            <antd:Select x:Name="FrameworkSelect" AllowClear="True" Placeholder="Pick one" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Quantity">
+                            <antd:InputNumber x:Name="QuantityInput" Value="3" Minimum="1" Maximum="20" Width="140" HorizontalAlignment="Left" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Notifications">
+                            <antd:Switch x:Name="NotifySwitch" HorizontalAlignment="Left" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Rating">
+                            <antd:Rate x:Name="RateInput" Value="3" HorizontalAlignment="Left" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Threshold">
+                            <antd:Slider x:Name="ThresholdSlider" Minimum="0" Maximum="100" Value="40" />
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Plan">
+                            <antd:Space>
+                                <antd:Radio Content="Free" GroupName="plan" IsChecked="True" />
+                                <antd:Radio Content="Pro" GroupName="plan" />
+                                <antd:Radio Content="Team" GroupName="plan" />
+                            </antd:Space>
+                        </antd:FormItem>
+
+                        <antd:FormItem Label="Extras">
+                            <antd:Space Orientation="Vertical" Size="Small">
+                                <antd:Checkbox Content="Email digest" IsChecked="True" />
+                                <antd:Checkbox Content="Weekly report" />
+                                <antd:Checkbox Content="Indeterminate" IsThreeState="True" IsChecked="{x:Null}" />
+                            </antd:Space>
+                        </antd:FormItem>
+
+                        <antd:FormItem>
+                            <antd:Space>
+                                <antd:Button Content="Submit" Variant="Primary" Click="OnSubmitForm" />
+                                <antd:Button Content="Reset" Click="OnResetForm" />
+                            </antd:Space>
+                        </antd:FormItem>
+                    </antd:Form>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"
