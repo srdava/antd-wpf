@@ -265,6 +265,17 @@ namespace Antd.Wpf.Controls
                     break;
             }
 
+            // antd colours the outline and the label of a danger button with colorError, while a
+            // primary danger button fills with it (handled by the switch above).
+            if (Danger && Variant != ButtonVariant.Primary)
+            {
+                foregroundKey = pressed ? mainActive : (hover ? mainHover : main);
+                if (Variant != ButtonVariant.Text && Variant != ButtonVariant.Link)
+                {
+                    borderKey = pressed ? mainActive : (hover ? mainHover : main);
+                }
+            }
+
             if (!IsEnabled)
             {
                 foregroundKey = "colorTextDisabled";

@@ -39,6 +39,7 @@ namespace Antd.Wpf.Controls
         public Progress()
         {
             ThemeLink.Attach(this, OnThemeChanged);
+            OnThemeChanged();
         }
 
         public static readonly DependencyProperty PercentProperty = DependencyProperty.Register(
@@ -103,6 +104,9 @@ namespace Antd.Wpf.Controls
 
         private void OnThemeChanged()
         {
+            // FontSize is layout state: changing it from OnRender would invalidate layout while
+            // painting and could re-arrange this control wider than its parent.
+            SetCurrentValue(FontSizeProperty, ThemeManager.Current.Snapshot.Tokens.FontSize);
             InvalidateMeasure();
             InvalidateVisual();
         }

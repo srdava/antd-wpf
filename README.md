@@ -28,6 +28,17 @@ dotnet run --project tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --shot artif
 dotnet run --project tests/Antd.Wpf.SmokeTests -f net48
 ```
 
+视觉对齐（token 相等不代表长得像，这套验证尺寸与配色）：
+
+```bash
+cd tools/visual-ref
+node fetch-vendor.js          # 取 antd 6.6.8 UMD + React 18 UMD
+node serve.js &               # 本机 Chrome 不能用 file:// 加载外部脚本
+# 用 Chrome 无头渲染并把官方尺寸 dump 成 out/metrics.json（见 docs/visual-parity.md）
+dotnet run --project ../../tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --metrics out/ours.json
+python compare.py out/metrics.json out/ours.json
+```
+
 重新生成 golden token 数据（需要 Node）：
 
 ```bash
@@ -45,6 +56,7 @@ demo/Antd.Wpf.Gallery   net48;net8        演示程序
 tests/                  两个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token
 tools/icon-gen          Node 脚本，从 @ant-design/icons-svg 生成 Geometry
+tools/visual-ref        真实 antd 参照页 + 尺寸对比脚本（视觉对齐用）
 ```
 
 ## 用法

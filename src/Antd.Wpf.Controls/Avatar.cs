@@ -121,10 +121,13 @@ namespace Antd.Wpf.Controls
             ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
             double size = Size <= 0 ? 32 : Size;
 
-            SetValue(AvatarBackgroundKey, snapshot.Brush("colorFillTertiary"));
+            SetValue(AvatarBackgroundKey, snapshot.Brush("colorTextQuaternary"));
             SetValue(AvatarForegroundKey, snapshot.Brush("colorText"));
             SetValue(AvatarCornerRadiusKey, new CornerRadius(Shape == AntdAvatarShape.Circle ? size / 2 : snapshot.Tokens.BorderRadiusLG));
-            SetValue(AvatarFontSizeKey, size <= 24 ? snapshot.Tokens.FontSizeSM : snapshot.Tokens.FontSize);
+            double avatarFont = size >= 40 ? snapshot.Tokens.FontSizeLG
+                : (size <= 24 ? snapshot.Tokens.FontSizeSM : snapshot.Tokens.FontSize);
+            SetValue(AvatarFontSizeKey, avatarFont);
+            SetCurrentValue(FontSizeProperty, avatarFont);
             SetValue(HasImageKey, Source != null);
 
             SetCurrentValue(WidthProperty, size);

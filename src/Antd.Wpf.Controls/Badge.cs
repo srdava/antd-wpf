@@ -145,6 +145,7 @@ namespace Antd.Wpf.Controls
 
             SetValue(BadgeBackgroundKey, CountColor ?? snapshot.Brush("colorError"));
             SetValue(BadgeFontSizeKey, snapshot.Tokens.FontSizeSM);
+            SetCurrentValue(FontSizeProperty, snapshot.Tokens.FontSize);
         }
     }
 }

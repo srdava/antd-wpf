@@ -32,15 +32,24 @@ namespace Antd.Wpf.SmokeTests
         private static int Main(string[] args)
         {
             string shotDir = null;
+            string metricsPath = null;
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--shot" && i + 1 < args.Length) shotDir = args[i + 1];
+                if (args[i] == "--metrics" && i + 1 < args.Length) metricsPath = args[i + 1];
             }
 
             var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
             ThemeManager.Current.Attach(app.Resources);
             ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
             DoEvents();
+
+            if (metricsPath != null)
+            {
+                MetricsProbe.Run(metricsPath);
+                app.Shutdown();
+                return 0;
+            }
 
             Console.WriteLine("Antd.Wpf M0 smoke tests");
             Console.WriteLine("------------------------------");
@@ -51,6 +60,7 @@ namespace Antd.Wpf.SmokeTests
             CheckThemeSwitch();
             CheckM1Components();
             CheckM2Components();
+            CheckVisualParity();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -378,6 +388,60 @@ namespace Antd.Wpf.SmokeTests
             Check("watermark builds a tile brush", watermark.TileBrush != null, "null");
         }
 
+        // ---------------------------------------------------------------- visual parity
+
+        /// <summary>
+        /// Guards the numbers that tools/visual-ref measures from real antd. If one of these
+        /// drifts the port stops looking like the reference, even when every token still matches.
+        /// </summary>
+        private static void CheckVisualParity()
+        {
+            AliasToken t = ThemeManager.Current.Snapshot.Tokens;
+
+            var button = new AntdButton { Content = "Primary", Variant = ButtonVariant.Primary };
+            Check("button height is controlHeight", Math.Abs(button.MinHeight - t.ControlHeight) < 0.01,
+                button.MinHeight.ToString());
+            Check("button paddingInline is 15", Math.Abs(button.Padding.Left - 15) < 0.01,
+                button.Padding.Left.ToString());
+
+            var small = new AntdButton { Content = "Small", Size = AntdSize.Small };
+            Check("small button is 24 tall with radius 4",
+                Math.Abs(small.MinHeight - t.ControlHeightSM) < 0.01
+                && Math.Abs(small.CornerRadius.TopLeft - t.BorderRadiusSM) < 0.01,
+                small.MinHeight + "/" + small.CornerRadius.TopLeft);
+
+            var large = new AntdButton { Content = "Large", Size = AntdSize.Large };
+            Check("large button is 40 tall with radius 8",
+                Math.Abs(large.MinHeight - t.ControlHeightLG) < 0.01
+                && Math.Abs(large.CornerRadius.TopLeft - t.BorderRadiusLG) < 0.01,
+                large.MinHeight + "/" + large.CornerRadius.TopLeft);
+
+            var tag = new Tag { Content = "Tag" };
+            Check("tag is 22 tall with 7px inline padding",
+                Math.Abs(tag.MinHeight - 22) < 0.01 && Math.Abs(tag.Padding.Left - 7) < 0.01,
+                tag.MinHeight + "/" + tag.Padding.Left);
+
+            var divider = new Divider { Text = "Section" };
+            Check("divider text is 16px at weight 500",
+                Math.Abs(divider.FontSize - t.FontSizeLG) < 0.01 && divider.TextFontWeight == FontWeights.Medium,
+                divider.FontSize + "/" + divider.TextFontWeight);
+            Check("divider line uses colorSplit",
+                SameBrush(divider.LineBrush, ThemeManager.Current.Snapshot.Brush("colorSplit")),
+                Describe(divider.LineBrush));
+
+            // A stretched Progress must never paint its percentage outside its own bounds; this
+            // regressed once when FontSize was mutated from OnRender.
+            var host = new Border { Width = 400 };
+            var progress = new Progress { Percent = 30 };
+            host.Child = progress;
+            host.Measure(new Size(400, 100));
+            host.Arrange(new Rect(0, 0, 400, 100));
+            Check("progress fits its container", progress.ActualWidth <= 400.01,
+                progress.ActualWidth.ToString("0.#"));
+            Check("progress reserves room for the label",
+                Math.Abs(progress.FontSize - t.FontSize) < 0.01, progress.FontSize.ToString());
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -460,6 +524,10 @@ namespace Antd.Wpf.SmokeTests
         private static void RenderElement(FrameworkElement element, string path, double scale)
         {
             element.UpdateLayout();
+            double dpiScale = VisualTreeHelper.GetDpi(element).DpiScaleX;
+            if (dpiScale <= 0) dpiScale = 1.0;
+            scale = scale * dpiScale;
+
             int width = (int)Math.Ceiling(element.ActualWidth * scale);
             int height = (int)Math.Ceiling(element.ActualHeight * scale);
             if (width <= 0 || height <= 0) return;
@@ -539,8 +607,15 @@ namespace Antd.Wpf.SmokeTests
             }
 
             root.UpdateLayout();
-            int width = (int)Math.Ceiling(root.ActualWidth);
-            int height = (int)Math.Ceiling(root.ActualHeight);
+
+            // Layout happens in device independent units at the monitor's DPI. Rendering a
+            // 120 DPI layout into a 96 DPI bitmap squeezes every hairline (a 1px divider lands
+            // on 0.8px and washes out), so capture at the real scale.
+            double dpiScale = VisualTreeHelper.GetDpi(root).DpiScaleX;
+            if (dpiScale <= 0) dpiScale = 1.0;
+
+            int width = (int)Math.Ceiling(root.ActualWidth * dpiScale);
+            int height = (int)Math.Ceiling(root.ActualHeight * dpiScale);
             if (width <= 0 || height <= 0) return;
 
             // The window itself is not part of Content, so composite its background first;
@@ -548,7 +623,9 @@ namespace Antd.Wpf.SmokeTests
             var visual = new DrawingVisual();
             using (DrawingContext context = visual.RenderOpen())
             {
-                context.DrawRectangle(window.Background ?? Brushes.White, null, new Rect(0, 0, width, height));
+                context.PushTransform(new ScaleTransform(dpiScale, dpiScale));
+                context.DrawRectangle(window.Background ?? Brushes.White, null,
+                    new Rect(0, 0, root.ActualWidth, root.ActualHeight));
                 // Viewbox must be absolute, otherwise VisualBrush crops to the content
                 // bounds and the capture loses the page margins.
                 var brush = new VisualBrush(root)
@@ -560,6 +637,7 @@ namespace Antd.Wpf.SmokeTests
                     AlignmentY = AlignmentY.Top
                 };
                 context.DrawRectangle(brush, null, new Rect(0, 0, root.ActualWidth, root.ActualHeight));
+                context.Pop();
             }
 
             var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);

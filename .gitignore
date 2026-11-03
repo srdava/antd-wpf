@@ -19,3 +19,7 @@ artifacts/
 
 # Agent workspace notes (project docs live in docs/)
 .workbuddy/
+
+# Reference page bundles (run tools/visual-ref/fetch-vendor.js)
+tools/visual-ref/vendor/
+tools/visual-ref/out/

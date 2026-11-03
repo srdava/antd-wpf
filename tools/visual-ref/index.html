@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>antd reference</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #f5f5f5; }
+  body { width: 960px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  #root { padding: 32px 48px 48px; box-sizing: border-box; width: 960px; }
+  .page-title { font-size: 32px; font-weight: 700; margin: 0 0 4px; color: rgba(0,0,0,0.88); }
+  .page-sub { font-size: 14px; color: rgba(0,0,0,0.45); margin: 0 0 24px; }
+  .card { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+  .card-title { font-size: 16px; font-weight: 600; color: rgba(0,0,0,0.88); margin: 0 0 4px; }
+  .card-desc { font-size: 13px; color: rgba(0,0,0,0.45); margin: 0 0 16px; }
+  .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .row.tight { gap: 8px; }
+  .label { font-size: 12px; color: rgba(0,0,0,0.45); margin-bottom: 4px; }
+  #metrics { display: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<pre id="metrics"></pre>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/dayjs.min.js"></script>
+<script src="vendor/antd.min.js"></script>
+<script>
+window.onerror = function (msg, src, line, col, err) {
+  var pre = document.getElementById('metrics');
+  pre.textContent = 'ERROR: ' + msg + ' @' + src + ':' + line + ':' + col + '\n' + (err && err.stack || '');
+};
+const h = React.createElement;
+const {
+  Button, Input, InputNumber, Select, Switch, Checkbox, Radio, Rate, Slider,
+  Tag, Badge, Avatar, Statistic, Progress, Spin, Skeleton, Empty, Segmented,
+  Divider, Space, Typography, Form, ConfigProvider
+} = antd;
+const { Title, Paragraph, Text, Link } = Typography;
+
+function Card({ title, desc, children, id }) {
+  return h('div', { className: 'card', 'data-card': id },
+    h('div', { className: 'card-title' }, title),
+    h('div', { className: 'card-desc' }, desc),
+    children);
+}
+
+function App() {
+  return h('div', null,
+    h('h1', { className: 'page-title' }, 'Ant Design reference'),
+    h('p', { className: 'page-sub' }, 'Real antd 6.6.8 rendered at the same width for visual parity'),
+
+    h(Card, { id: 'button', title: 'Button', desc: 'Five variants, danger mode, three sizes, shapes and loading state.' },
+      h('div', { className: 'row' },
+        h(Button, { type: 'primary', 'data-m': 'btn-primary' }, 'Primary'),
+        h(Button, { 'data-m': 'btn-default' }, 'Default'),
+        h(Button, { 'data-m': 'btn-dashed', type: 'dashed' }, 'Dashed'),
+        h(Button, { 'data-m': 'btn-text', type: 'text' }, 'Text'),
+        h(Button, { 'data-m': 'btn-link', type: 'link' }, 'Link'),
+        h(Button, { 'data-m': 'btn-primary-danger', type: 'primary', danger: true }, 'Primary Danger'),
+        h(Button, { 'data-m': 'btn-danger', danger: true }, 'Danger'),
+        h(Button, { 'data-m': 'btn-disabled', disabled: true }, 'Disabled')),
+      h('div', { className: 'row' },
+        h(Button, { size: 'large', 'data-m': 'btn-large' }, 'Large'),
+        h(Button, { 'data-m': 'btn-middle' }, 'Middle'),
+        h(Button, { size: 'small', 'data-m': 'btn-small' }, 'Small'),
+        h(Button, { shape: 'round' }, 'Round'),
+        h(Button, { shape: 'circle', icon: h(antd.icons && antd.icons.PlusOutlined || 'span') }, '+'),
+        h(Button, { loading: true }, 'Loading'),
+        h(Button, { type: 'primary', loading: true }, 'Primary Loading')),
+      h(Button, { block: true, 'data-m': 'btn-block' }, 'Block button')),
+
+    h(Card, { id: 'input', title: 'Input', desc: 'Placeholder, clear button, affixes, sizes and validation status.' },
+      h('div', { className: 'row' },
+        h(Input, { placeholder: 'Basic input', style: { width: 220 }, 'data-m': 'input-basic' }),
+        h(Input, { defaultValue: 'Clearable value', allowClear: true, style: { width: 220 }, 'data-m': 'input-clear' }),
+        h(Input, { placeholder: 'Disabled', disabled: true, style: { width: 220 } })),
+      h('div', { className: 'row' },
+        h(Input, { placeholder: 'With prefix', prefix: h('span', null, '\u2315'), style: { width: 220 } }),
+        h(Input, { defaultValue: 'antd', addonAfter: '.wpf', style: { width: 220 } })),
+      h('div', { className: 'row' },
+        h(Input, { size: 'large', placeholder: 'Large', style: { width: 160 } }),
+        h(Input, { size: 'small', placeholder: 'Small', style: { width: 160 } }),
+        h(Input, { status: 'error', defaultValue: 'Error state', style: { width: 220 }, 'data-m': 'input-error' }),
+        h(Input, { status: 'warning', defaultValue: 'Warning state', style: { width: 220 } }))),
+
+    h(Card, { id: 'space', title: 'Space & Divider', desc: 'Uniform gaps without edge margins, plus three divider forms.' },
+      h(Divider, { orientation: 'left', 'data-m': 'divider-text' }, 'Space sizes'),
+      h(Space, { size: 'small', style: { marginBottom: 8 } },
+        h(Button, { size: 'small' }, 'Small gap'),
+        h(Button, { size: 'small' }, 'Small gap'),
+        h(Button, { size: 'small' }, 'Small gap')),
+      h('div', null,
+        h(Space, null,
+          h(Button, null, 'Middle gap'),
+          h(Button, null, 'Middle gap'),
+          h(Button, null, 'Middle gap'))),
+      h(Divider, { dashed: true, 'data-m': 'divider-dashed' }),
+      h(Text, { type: 'secondary' }, 'Dashed divider above, plain text divider below'),
+      h(Divider, { plain: true, 'data-m': 'divider-plain' }, 'Plain text')),
+
+    h(Card, { id: 'display', title: 'Tag, Badge, Avatar, Statistic', desc: 'Status labels, counters, identities and metrics.' },
+      h('div', { className: 'row' },
+        h(Tag, { 'data-m': 'tag-default' }, 'Default'),
+        h(Tag, { color: 'processing', 'data-m': 'tag-processing' }, 'Processing'),
+        h(Tag, { color: 'success', 'data-m': 'tag-success' }, 'Success'),
+        h(Tag, { color: 'warning', 'data-m': 'tag-warning' }, 'Warning'),
+        h(Tag, { color: 'error', 'data-m': 'tag-error' }, 'Error'),
+        h(Tag, { closable: true }, 'Closable')),
+      h('div', { className: 'row', style: { gap: 32, marginBottom: 20 } },
+        h(Badge, { count: 5, 'data-m': 'badge-5' }, h('span', { style: { fontSize: 14, color: 'rgba(0,0,0,0.88)' } }, 'Inbox')),
+        h(Badge, { count: 128, 'data-m': 'badge-128' }, h('span', { style: { fontSize: 14, color: 'rgba(0,0,0,0.88)' } }, 'Overflow')),
+        h(Badge, { dot: true }, h('span', { style: { fontSize: 14, color: 'rgba(0,0,0,0.88)' } }, 'Dot')),
+        h(Badge, { status: 'success', text: 'Status' })),
+      h('div', { className: 'row', style: { gap: 16, marginBottom: 20 } },
+        h(Avatar, { 'data-m': 'avatar-default' }, 'A'),
+        h(Avatar, { shape: 'square' }, 'B'),
+        h(Avatar, { size: 40 }, 'C'),
+        h(Avatar, { icon: 'U' })),
+      h('div', { className: 'row', style: { gap: 32 } },
+        h(Statistic, { title: 'Active users', value: 112893 }),
+        h(Statistic, { title: 'Balance', value: 1284.32, precision: 2 }))),
+
+    h(Card, { id: 'feedback', title: 'Progress, Spin, Skeleton, Empty, Segmented', desc: 'Loading, placeholder and progress states.' },
+      h(Progress, { percent: 30, 'data-m': 'progress-30' }),
+      h(Progress, { percent: 70 }),
+      h(Progress, { percent: 100, status: 'success' }),
+      h(Segmented, { options: ['Daily', 'Weekly', 'Monthly'], defaultValue: 'Daily', 'data-m': 'segmented', style: { margin: '8px 0 20px' } }),
+      h('div', { style: { display: 'flex', gap: 32, alignItems: 'center' } },
+        h(Progress, { type: 'circle', percent: 68, size: 88 }),
+        h(Spin, { 'data-m': 'spin' }),
+        h(Skeleton, { active: false, avatar: true, paragraph: { rows: 3 }, style: { width: 220 } }),
+        h(Empty, { image: Empty.PRESENTED_IMAGE_SIMPLE }))),
+
+    h(Card, { id: 'typography', title: 'Typography', desc: 'Five heading levels, semantic text colours and a link.' },
+      h(Title, { level: 1, 'data-m': 'title-1' }, 'Heading 1'),
+      h(Title, { level: 2 }, 'Heading 2'),
+      h(Title, { level: 3 }, 'Heading 3'),
+      h(Title, { level: 4 }, 'Heading 4'),
+      h(Title, { level: 5 }, 'Heading 5'),
+      h(Paragraph, null, 'A paragraph of body copy rendered with the antd line height. Use Paragraph for blocks of text that need consistent rhythm.'),
+      h(Paragraph, { type: 'secondary' }, 'Secondary paragraph used for supporting copy.'),
+      h(Space, { wrap: true, size: 16 },
+        h(Text, null, 'Default text'),
+        h(Text, { type: 'secondary' }, 'Secondary'),
+        h(Text, { type: 'success' }, 'Success'),
+        h(Text, { type: 'warning' }, 'Warning'),
+        h(Text, { type: 'danger' }, 'Danger'),
+        h(Text, { strong: true }, 'Strong'),
+        h(Text, { disabled: true }, 'Disabled'),
+        h(Text, { underline: true }, 'Underline')),
+      h('div', null, h(Link, null, 'A hyperlink styled with colorLink'))),
+
+    h(Card, { id: 'form', title: 'Form controls', desc: 'InputNumber, Checkbox, Radio, Switch, Rate, Slider, Select and a validating Form.' },
+      h(Form, { layout: 'vertical', style: { maxWidth: 520 } },
+        h(Form.Item, { label: 'Name', required: true, help: 'Required field, validated on submit.' },
+          h(Input, { placeholder: 'Your name' })),
+        h(Form.Item, { label: 'Framework' }, h(Select, { placeholder: 'Pick one', allowClear: true, options: [{ value: 'wpf', label: 'WPF' }, { value: 'av', label: 'Avalonia' }], defaultValue: 'wpf' })),
+        h(Form.Item, { label: 'Quantity' }, h(InputNumber, { defaultValue: 3, min: 1, max: 20, style: { width: 140 } })),
+        h(Form.Item, { label: 'Notifications' }, h(Switch, { defaultChecked: true })),
+        h(Form.Item, { label: 'Rating' }, h(Rate, { defaultValue: 3 })),
+        h(Form.Item, { label: 'Threshold' }, h(Slider, { defaultValue: 40 })),
+        h(Form.Item, { label: 'Plan' },
+          h(Radio.Group, { defaultValue: 'free' },
+            h(Radio, { value: 'free' }, 'Free'),
+            h(Radio, { value: 'pro' }, 'Pro'),
+            h(Radio, { value: 'team' }, 'Team'))),
+        h(Form.Item, { label: 'Extras' },
+          h(Space, { direction: 'vertical', size: 8 },
+            h(Checkbox, { defaultChecked: true }, 'Email digest'),
+            h(Checkbox, null, 'Weekly report'),
+            h(Checkbox, { indeterminate: true }, 'Indeterminate'))),
+        h(Form.Item, null,
+          h(Space, null,
+            h(Button, { type: 'primary' }, 'Submit'),
+            h(Button, null, 'Reset')))))
+  );
+}
+
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(h(ConfigProvider, null, h(App)));
+} catch (e) {
+  document.getElementById('metrics').textContent = 'RENDER ERROR: ' + e.message + '\n' + e.stack;
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const props = ['width', 'height', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+      'borderTopWidth', 'borderRadius', 'fontSize', 'fontWeight', 'lineHeight', 'color',
+      'backgroundColor', 'borderTopColor', 'marginTop', 'marginBottom', 'boxSizing'];
+    const out = [];
+    document.querySelectorAll('[data-m]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const rec = { name: el.getAttribute('data-m'), x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
+      props.forEach(p => { rec[p] = cs[p]; });
+      out.push(rec);
+    });
+    // Also measure a few structural constants of the reference page.
+    const cards = [...document.querySelectorAll('.card')].map(c => {
+      const r = c.getBoundingClientRect();
+      return { card: c.getAttribute('data-card'), y: Math.round(r.y), h: Math.round(r.height), w: Math.round(r.width) };
+    });
+    document.getElementById('metrics').textContent = JSON.stringify({ metrics: out, cards }, null, 1);
+  }, 500);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "visual-ref",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Render real antd in Chrome as a visual/metric reference for the WPF port",
+  "scripts": {
+    "build": "esbuild app.jsx --bundle --outfile=bundle.js --loader:.js=jsx --jsx=automatic --log-level=warning"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

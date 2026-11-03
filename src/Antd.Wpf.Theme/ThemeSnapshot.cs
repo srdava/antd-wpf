@@ -64,11 +64,12 @@ namespace Antd.Wpf.Theme
         };
 
         /// <summary>
-        /// antd declares a browser font stack (-apple-system, BlinkMacSystemFont, ...) that WPF
-        /// cannot resolve. We drop the non-Windows entries and prepend the Chinese UI font so
-        /// the result matches the intended look on Windows.
+        /// antd declares a browser font stack (-apple-system, BlinkMacSystemFont, 'Segoe UI', ...).
+        /// On Windows the browser resolves that to Segoe UI, so WPF has to start from the same
+        /// face or every glyph comes out wider and heavier than the reference. Chinese UI fonts
+        /// are kept as the tail of the list so CJK text still falls back to YaHei.
         /// </summary>
-        internal static FontFamily BuildFontFamily(string cssFontFamily, string firstChoice = "Microsoft YaHei UI")
+        internal static FontFamily BuildFontFamily(string cssFontFamily, string firstChoice = "Segoe UI")
         {
             var families = new List<string>();
             if (!string.IsNullOrEmpty(firstChoice)) families.Add(firstChoice);
@@ -93,6 +94,7 @@ namespace Antd.Wpf.Theme
                 }
             }
 
+            if (!families.Contains("Microsoft YaHei UI")) families.Add("Microsoft YaHei UI");
             if (families.Count == 0) families.Add("Segoe UI");
             return new FontFamily(string.Join(", ", families.ToArray()));
         }

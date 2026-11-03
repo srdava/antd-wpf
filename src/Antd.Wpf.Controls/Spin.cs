@@ -113,6 +113,12 @@ namespace Antd.Wpf.Controls
             else if (Size == AntdSize.Large) size = 32;
 
             SetValue(IndicatorBrushKey, snapshot.Brush("colorPrimary"));
+            // antd Spinner is inline-block: it never fills the available width.
+            if (Content == null)
+            {
+                SetCurrentValue(HorizontalAlignmentProperty, HorizontalAlignment.Left);
+                SetCurrentValue(VerticalAlignmentProperty, VerticalAlignment.Center);
+            }
             SetValue(TipBrushKey, snapshot.Brush("colorPrimary"));
             SetValue(IndicatorSizeKey, size);
             SetValue(ShowsTipKey, Content != null && !string.IsNullOrEmpty(Tip));

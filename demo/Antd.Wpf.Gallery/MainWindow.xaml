@@ -9,15 +9,16 @@
     Height="660"
     Background="{DynamicResource Antd.colorBgLayout}"
     FontFamily="{DynamicResource Antd.FontFamily}"
-    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextFormattingMode="Ideal"
     UseLayoutRounding="True"
     WindowStartupLocation="CenterScreen">
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel
-            MaxWidth="960"
-            Margin="48,40,48,48"
-            HorizontalAlignment="Left">
+        <!-- A centred Border owns the page width. Using MaxWidth + HorizontalAlignment=Left on
+             the panel itself lets a child that reports the full available width inflate the
+             whole column, which is how the progress bars ended up outside the cards. -->
+        <Border MaxWidth="1056" HorizontalAlignment="Center" Padding="48,40,48,48">
+        <StackPanel>
 
             <!--  ============================================================ header  -->
             <DockPanel LastChildFill="False">
@@ -536,5 +537,7 @@
             </Border>
 
         </StackPanel>
+        </Border>
+
     </ScrollViewer>
 </Window>

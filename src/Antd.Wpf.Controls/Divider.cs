@@ -94,6 +94,18 @@ namespace Antd.Wpf.Controls
             private set { SetValue(TextBrushKey, value); }
         }
 
+        private static readonly DependencyPropertyKey TextLineHeightKey = DependencyProperty.RegisterReadOnly(
+            "TextLineHeight", typeof(double), typeof(Divider), new FrameworkPropertyMetadata(22.0));
+
+        public static readonly DependencyProperty TextLineHeightProperty = TextLineHeightKey.DependencyProperty;
+
+        /// <summary>antd renders divider text at lineHeight (22/14) scaled to the heading size.</summary>
+        public double TextLineHeight
+        {
+            get { return (double)GetValue(TextLineHeightProperty); }
+            private set { SetValue(TextLineHeightKey, value); }
+        }
+
         private static readonly DependencyPropertyKey TextFontWeightKey = DependencyProperty.RegisterReadOnly(
             "TextFontWeight", typeof(FontWeight), typeof(Divider), new FrameworkPropertyMetadata(FontWeights.Normal));
 
@@ -115,7 +127,15 @@ namespace Antd.Wpf.Controls
             ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
             SetValue(LineBrushKey, snapshot.Brush("colorSplit"));
             SetValue(TextBrushKey, snapshot.Brush(PlainText ? "colorText" : "colorTextHeading"));
-            SetValue(TextFontWeightKey, PlainText ? FontWeights.Normal : FontWeights.SemiBold);
+            // antd: .ant-divider-inner-text uses fontSizeLG (16) and weight 500; plain text
+            // drops the heading colour but keeps the larger size.
+            FontWeight weight = PlainText ? FontWeights.Normal : FontWeights.Medium;
+            double fontSize = PlainText ? snapshot.Tokens.FontSize : snapshot.Tokens.FontSizeLG;
+
+            SetValue(TextFontWeightKey, weight);
+            SetCurrentValue(FontWeightProperty, weight);
+            SetCurrentValue(FontSizeProperty, fontSize);
+            SetValue(TextLineHeightKey, snapshot.Tokens.FontHeight * (fontSize / snapshot.Tokens.FontSize));
         }
     }
 }
