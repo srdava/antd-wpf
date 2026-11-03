@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <LangVersion>7.3</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>Antd.Wpf.TokenParity</RootNamespace>
+    <AssemblyName>Antd.Wpf.TokenParity</AssemblyName>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Antd.Wpf.Tokens\Antd.Wpf.Tokens.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\tools\token-sync\out\GoldenTokens.g.cs" Link="Generated\GoldenTokens.g.cs" />
+  </ItemGroup>
+
+</Project>

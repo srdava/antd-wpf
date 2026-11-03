@@ -1,0 +1,10 @@
+{
+  "name": "token-sync",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Dump Ant Design design tokens as golden JSON for C# parity tests",
+  "main": "dump-tokens.js",
+  "dependencies": {
+    "antd": "^6.6.8"
+  }
+}
