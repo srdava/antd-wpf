@@ -130,6 +130,16 @@ namespace Antd.Wpf.Tokens
         public double FontSizeLG { get { return Number("fontSizeLG"); } }
         public double FontSizeXL { get { return Number("fontSizeXL"); } }
         public double FontSizeIcon { get { return Number("fontSizeIcon"); } }
+        public double FontSizeHeading1 { get { return Number("fontSizeHeading1"); } }
+        public double FontSizeHeading2 { get { return Number("fontSizeHeading2"); } }
+        public double FontSizeHeading3 { get { return Number("fontSizeHeading3"); } }
+        public double FontSizeHeading4 { get { return Number("fontSizeHeading4"); } }
+        public double FontSizeHeading5 { get { return Number("fontSizeHeading5"); } }
+
+        public double LineHeightHeading1 { get { return Number("lineHeightHeading1"); } }
+        public double LineHeightHeading2 { get { return Number("lineHeightHeading2"); } }
+        public double LineHeightHeading3 { get { return Number("lineHeightHeading3"); } }
+
         public double LineHeight { get { return Number("lineHeight"); } }
         public double LineHeightSM { get { return Number("lineHeightSM"); } }
         public double LineHeightLG { get { return Number("lineHeightLG"); } }

@@ -21,7 +21,7 @@ namespace Antd.Wpf.Theme
 
         public bool IsDark
         {
-            get { return Algorithm == ThemeAlgorithm.Dark; }
+            get { return (Algorithm & ThemeAlgorithm.Dark) == ThemeAlgorithm.Dark; }
         }
 
         public ThemeConfig Clone()

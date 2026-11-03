@@ -2,7 +2,8 @@
 
 Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 与 **.NET 8+**。
 
-当前状态：**M0 可行性验证已完成**（主题引擎 + Button + Input + 对拍与截图验证）。
+当前状态：**M1 进行中**。已完成 M0（主题引擎 + Button + Input）与 M1 第一批
+（compact 算法、图标管线、Icon/Divider/Space/Tag/Badge/Avatar/Empty/Spin/Progress/Statistic/Skeleton/Segmented）。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
 M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-notes.md)。
 
@@ -17,7 +18,7 @@ dotnet run --project demo/Antd.Wpf.Gallery -f net48
 ## 验证
 
 ```bash
-# 与 antd 官方 theme.getDesignToken() 逐 token 对拍（536 × 8 组配置）
+# 与 antd 官方 theme.getDesignToken() 逐 token 对拍（536 × 10 组配置）
 dotnet run --project tests/Antd.Wpf.TokenParity -f net8.0-windows
 dotnet run --project tests/Antd.Wpf.TokenParity -f net48
 
@@ -37,10 +38,12 @@ cd tools/token-sync && npm install && node dump-tokens.js
 ```
 src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，无 WPF 依赖
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
-src/Antd.Wpf.Controls   net48;net8        Button、Input、Generic.xaml
+src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
+src/Antd.Wpf.Controls   net48;net8        14 个控件 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        演示程序
 tests/                  两个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token
+tools/icon-gen          Node 脚本，从 @ant-design/icons-svg 生成 Geometry
 ```
 
 ## 用法

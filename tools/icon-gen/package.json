@@ -1,0 +1,7 @@
+{
+  "name": "icon-gen",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Convert @ant-design/icons SVG paths into WPF Geometry resources",
+  "main": "gen-icons.js"
+}

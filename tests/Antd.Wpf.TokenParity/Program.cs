@@ -28,6 +28,8 @@ namespace Antd.Wpf.TokenParity
                 new Case("customFontSize16", BuildCustom(s => s.FontSize = 16, ThemeAlgorithm.Default)),
                 new Case("customBgBase", BuildCustom(s => s.ColorBgBase = AntdColor.Parse("#123456"), ThemeAlgorithm.Default)),
                 new Case("customTextBase", BuildCustom(s => s.ColorTextBase = AntdColor.Parse("#333333"), ThemeAlgorithm.Default)),
+                new Case("compact", () => TokenBuilder.Build(new SeedToken(), ThemeAlgorithm.Compact)),
+                new Case("darkCompact", () => TokenBuilder.Build(new SeedToken(), ThemeAlgorithm.Dark | ThemeAlgorithm.Compact)),
                 new Case("darkPurple", BuildCustom(s => s.ColorPrimary = AntdColor.Parse("#9254de"), ThemeAlgorithm.Dark)),
             };
 

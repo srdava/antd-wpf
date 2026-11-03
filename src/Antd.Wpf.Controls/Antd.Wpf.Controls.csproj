@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Antd.Wpf.Tokens\Antd.Wpf.Tokens.csproj" />
     <ProjectReference Include="..\Antd.Wpf.Theme\Antd.Wpf.Theme.csproj" />
+    <ProjectReference Include="..\Antd.Wpf.Icons\Antd.Wpf.Icons.csproj" />
   </ItemGroup>
 
 </Project>

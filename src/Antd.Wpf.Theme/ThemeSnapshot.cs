@@ -28,7 +28,7 @@ namespace Antd.Wpf.Theme
 
         public bool IsDark
         {
-            get { return Algorithm == ThemeAlgorithm.Dark; }
+            get { return (Algorithm & ThemeAlgorithm.Dark) == ThemeAlgorithm.Dark; }
         }
 
         /// <summary>WPF-ready font stack derived from the antd CSS font-family.</summary>

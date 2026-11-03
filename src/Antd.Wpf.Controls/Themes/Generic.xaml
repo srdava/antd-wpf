@@ -42,7 +42,8 @@
                             <ContentPresenter x:Name="IconHost"
                                               Content="{TemplateBinding Icon}"
                                               Margin="{TemplateBinding IconMargin}"
-                                              VerticalAlignment="Center" />
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
                             <Ellipse x:Name="Spinner"
                                      Width="14" Height="14"
                                      Margin="0,0,8,0"
@@ -239,6 +240,417 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- ============================================================ Icon -->
+
+    <Style TargetType="{x:Type antd:Icon}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Icon}">
+                    <Grid RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform>
+                            <RotateTransform Angle="0" />
+                        </Grid.RenderTransform>
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="896" Height="896">
+                                <Path Data="{TemplateBinding Data}" Fill="{TemplateBinding Foreground}" />
+                            </Canvas>
+                        </Viewbox>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Spin" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="IconSpinStoryboard">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                            From="0" To="360" Duration="0:0:1" RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="IconSpinStoryboard" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Divider -->
+
+    <!-- Solid and dashed rules are separate elements because a Setter.Value cannot hold a
+         TemplateBinding, and a local Visibility would beat the trigger. -->
+    <Style TargetType="{x:Type antd:Divider}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Divider}">
+                    <Grid>
+                        <Grid x:Name="HorizontalLayout">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Rectangle x:Name="LineLeftSolid" Grid.Column="0" Height="1" VerticalAlignment="Center"
+                                       Fill="{TemplateBinding LineBrush}" />
+                            <Rectangle x:Name="LineLeftDashed" Grid.Column="0" Height="1" VerticalAlignment="Center"
+                                       Stroke="{TemplateBinding LineBrush}" StrokeThickness="1"
+                                       StrokeDashArray="3 3" />
+
+                            <ContentPresenter x:Name="TextHost" Grid.Column="1" Margin="16,0"
+                                              VerticalAlignment="Center" RecognizesAccessKey="True"
+                                              TextElement.Foreground="{TemplateBinding TextBrush}"
+                                              TextElement.FontWeight="{TemplateBinding TextFontWeight}"
+                                              TextElement.FontSize="{DynamicResource Antd.fontSize}" />
+
+                            <Rectangle x:Name="LineRightSolid" Grid.Column="2" Height="1" VerticalAlignment="Center"
+                                       Fill="{TemplateBinding LineBrush}" />
+                            <Rectangle x:Name="LineRightDashed" Grid.Column="2" Height="1" VerticalAlignment="Center"
+                                       Stroke="{TemplateBinding LineBrush}" StrokeThickness="1"
+                                       StrokeDashArray="3 3" />
+                        </Grid>
+
+                        <Rectangle x:Name="VerticalLine" Width="1" HorizontalAlignment="Center"
+                                   Fill="{TemplateBinding LineBrush}" Visibility="Collapsed" />
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter TargetName="HorizontalLayout" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VerticalLine" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <Trigger Property="HasContent" Value="False">
+                            <Setter TargetName="TextHost" Property="Margin" Value="0" />
+                        </Trigger>
+
+                        <Trigger Property="Dashed" Value="True">
+                            <Setter TargetName="LineLeftSolid" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="LineRightSolid" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="LineLeftDashed" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="LineRightDashed" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="Dashed" Value="False">
+                            <Setter TargetName="LineLeftSolid" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="LineRightSolid" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="LineLeftDashed" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="LineRightDashed" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Tag -->
+
+    <Style TargetType="{x:Type antd:Tag}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Tag}">
+                    <Border Background="{TemplateBinding TagBackground}"
+                            BorderBrush="{TemplateBinding TagBorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding TagCornerRadius}">
+                        <StackPanel Orientation="Horizontal" Margin="7,0" VerticalAlignment="Center">
+                            <ContentPresenter VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding TagForeground}"
+                                              TextElement.FontSize="{TemplateBinding TagFontSize}" />
+                            <Button x:Name="PART_CloseButton"
+                                    Style="{StaticResource Antd.Input.ClearButton}"
+                                    Width="10" Height="10" Margin="4,0,0,0" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Closable" Value="False">
+                            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Badge -->
+
+    <Style TargetType="{x:Type antd:Badge}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Badge}">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"
+                                          Margin="0,6,12,0" />
+                        <Border x:Name="CountBadge"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Margin="0,-8,-12,0" MinWidth="16" Height="16"
+                                Padding="4,0" CornerRadius="8"
+                                Background="{TemplateBinding BadgeBackground}"
+                                Visibility="Collapsed">
+                            <TextBlock Text="{TemplateBinding DisplayText}"
+                                       Foreground="{DynamicResource Antd.colorTextLightSolid}"
+                                       FontSize="{TemplateBinding BadgeFontSize}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <Ellipse x:Name="DotBadge" Width="6" Height="6"
+                                 HorizontalAlignment="Right" VerticalAlignment="Top"
+                                 Margin="0,0,-2,0"
+                                 Fill="{TemplateBinding BadgeBackground}"
+                                 Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Dot" Value="True">
+                            <Setter TargetName="DotBadge" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="CountBadge" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsBadgeVisible" Value="True">
+                            <Setter TargetName="CountBadge" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Avatar -->
+
+    <Style TargetType="{x:Type antd:Avatar}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Avatar}">
+                    <Border Background="{TemplateBinding AvatarBackground}"
+                            CornerRadius="{TemplateBinding AvatarCornerRadius}"
+                            ClipToBounds="True">
+                        <Grid>
+                            <Image x:Name="AvatarImage" Source="{TemplateBinding Source}"
+                                   Stretch="UniformToFill" Visibility="Collapsed" />
+                            <ContentPresenter x:Name="AvatarText" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding AvatarForeground}"
+                                              TextElement.FontSize="{TemplateBinding AvatarFontSize}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasImage" Value="True">
+                            <Setter TargetName="AvatarImage" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="AvatarText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Empty -->
+
+    <Style TargetType="{x:Type antd:Empty}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Empty}">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,16">
+                        <Viewbox Width="48" Height="48" HorizontalAlignment="Center">
+                            <Canvas Width="896" Height="896">
+                                <Path Data="{TemplateBinding Image}" Fill="{TemplateBinding ImageBrush}" />
+                            </Canvas>
+                        </Viewbox>
+                        <TextBlock Text="{TemplateBinding Description}"
+                                   Foreground="{TemplateBinding DescriptionBrush}"
+                                   FontSize="{DynamicResource Antd.fontSize}"
+                                   HorizontalAlignment="Center" Margin="0,8,0,0" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Spin -->
+
+    <Style TargetType="{x:Type antd:Spin}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Spin}">
+                    <Grid>
+                        <ContentPresenter x:Name="SpinContent" Content="{TemplateBinding Content}" />
+                        <Border x:Name="SpinMask" Background="{DynamicResource Antd.colorBgContainer}"
+                                Opacity="0.5" Visibility="Collapsed" />
+                        <StackPanel x:Name="SpinIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Visibility="Collapsed">
+                            <Ellipse Width="{TemplateBinding IndicatorSize}" Height="{TemplateBinding IndicatorSize}"
+                                     Stroke="{TemplateBinding IndicatorBrush}" StrokeThickness="2"
+                                     StrokeDashArray="8 5" StrokeStartLineCap="Round"
+                                     RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center">
+                                <Ellipse.RenderTransform>
+                                    <RotateTransform Angle="0" />
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                            <TextBlock Text="{TemplateBinding Tip}" Margin="0,8,0,0"
+                                       Foreground="{TemplateBinding TipBrush}"
+                                       FontSize="{DynamicResource Antd.fontSize}"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Spinning" Value="True">
+                            <Setter TargetName="SpinIndicator" Property="Visibility" Value="Visible" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="SpinStoryboard">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="SpinIndicator"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                            From="0" To="360" Duration="0:0:1" RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="SpinStoryboard" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="Spinning" Value="False">
+                            <Setter TargetName="SpinIndicator" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="HasContent" Value="True">
+                            <Setter TargetName="SpinMask" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SpinContent" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                        <Trigger Property="ShowsTip" Value="False">
+                            <Setter TargetName="SpinIndicator" Property="VerticalAlignment" Value="Center" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Statistic -->
+
+    <Style TargetType="{x:Type antd:Statistic}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Statistic}">
+                    <StackPanel>
+                        <TextBlock x:Name="TitleText" Text="{TemplateBinding Title}"
+                                   Foreground="{TemplateBinding TitleBrush}"
+                                   FontSize="{DynamicResource Antd.fontSize}"
+                                   Margin="0,0,0,4" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ContentPresenter Content="{TemplateBinding Prefix}" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding ValueBrush}"
+                                              TextElement.FontSize="{TemplateBinding ValueFontSize}" />
+                            <TextBlock Text="{TemplateBinding ValueText}"
+                                       Foreground="{TemplateBinding ValueBrush}"
+                                       FontSize="{TemplateBinding ValueFontSize}"
+                                       FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <ContentPresenter Content="{TemplateBinding Suffix}" VerticalAlignment="Center"
+                                              Margin="4,0,0,0"
+                                              TextElement.Foreground="{TemplateBinding ValueBrush}"
+                                              TextElement.FontSize="{DynamicResource Antd.fontSize}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Title" Value="{x:Null}">
+                            <Setter TargetName="TitleText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Segmented -->
+
+    <Style x:Key="Antd.Segmented.Item" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="ItemRoot" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemRoot" Property="Background" Value="{DynamicResource Antd.colorBgElevated}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextSecondary}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Segmented}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Antd.Segmented.Item}" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Segmented}">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding TrackCornerRadius}"
+                            Padding="2">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Progress and Skeleton draw themselves; these styles only fix the rendering mode. -->
+
+    <Style TargetType="{x:Type antd:Progress}">
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
+    <Style TargetType="{x:Type antd:Skeleton}">
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Focusable" Value="False" />
     </Style>
 
 </ResourceDictionary>

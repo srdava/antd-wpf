@@ -25,6 +25,9 @@ namespace Antd.Wpf.Gallery
         {
             InitializeComponent();
 
+            RangeSegmented.ItemsSource = new[] { "Daily", "Weekly", "Monthly" };
+            RangeSegmented.SelectedIndex = 0;
+
             Loaded += delegate { RefreshTokens(); };
             ThemeManager.Current.ThemeChanged += OnThemeChanged;
             Closed += delegate { ThemeManager.Current.ThemeChanged -= OnThemeChanged; };

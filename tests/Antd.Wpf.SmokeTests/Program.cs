@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using Antd.Wpf.Controls;
 using AntdButton = Antd.Wpf.Controls.Button;
 using AntdInput = Antd.Wpf.Controls.Input;
+using Antd.Wpf.Icons;
 using Antd.Wpf.Gallery;
 using Antd.Wpf.Theme;
 using Antd.Wpf.Tokens;
@@ -48,6 +49,7 @@ namespace Antd.Wpf.SmokeTests
             CheckTokens();
             CheckControls();
             CheckThemeSwitch();
+            CheckM1Components();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -218,6 +220,77 @@ namespace Antd.Wpf.SmokeTests
         private static Window _testHost;
         private static AntdButton _testButton;
 
+        // ---------------------------------------------------------------- M1 components
+
+        private static void CheckM1Components()
+        {
+            ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
+            AliasToken t = snapshot.Tokens;
+
+            var icon = new Icon { Data = AntdIcons.Search, FontSize = 14 };
+            Check("icon geometry resolved", AntdIcons.Search != null, "null");
+            Check("icon frozen", AntdIcons.Search != null && AntdIcons.Search.IsFrozen, "not frozen");
+            Check("icon sizes to 1em of the font", Math.Abs(icon.Width - icon.FontSize) < 0.01, icon.Width.ToString());
+
+            var divider = new Divider { Text = "Hello" };
+            Check("divider content from Text", (string)divider.Content == "Hello", "content not set");
+            Check("divider line = colorSplit",
+                SameBrush(divider.LineBrush, snapshot.Brush("colorSplit")), Describe(divider.LineBrush));
+
+            var tag = new Tag { Content = "ok", Color = AntdTagColor.Success };
+            Check("success tag background = colorSuccessBg",
+                SameBrush(tag.TagBackground, snapshot.Brush("colorSuccessBg")), Describe(tag.TagBackground));
+
+            var badge = new Badge { Count = 128 };
+            Check("badge overflow 99 -> 99+", badge.DisplayText == "99+", badge.DisplayText);
+            badge.ShowZero = false;
+            badge.Count = 0;
+            Check("badge hidden at zero", !badge.IsBadgeVisible, "visible");
+
+            var avatar = new Avatar { Size = 40 };
+            Check("avatar circle radius", Math.Abs(avatar.AvatarCornerRadius.TopLeft - 20) < 0.01,
+                avatar.AvatarCornerRadius.TopLeft.ToString());
+            avatar.Shape = AntdAvatarShape.Square;
+            Check("avatar square radius = borderRadiusLG",
+                Math.Abs(avatar.AvatarCornerRadius.TopLeft - t.BorderRadiusLG) < 0.01,
+                avatar.AvatarCornerRadius.TopLeft.ToString());
+
+            var statistic = new Statistic { Value = 1234.5, Precision = 2 };
+            Check("statistic formats value",
+                statistic.ValueText == 1234.5.ToString("N2"), statistic.ValueText);
+
+            var progress = new Progress { Type = AntdProgressType.Circle, CircleSize = 88 };
+            progress.Measure(new Size(400, 400));
+            Check("circle progress uses CircleSize",
+                Math.Abs(progress.DesiredSize.Width - 88) < 0.01 && Math.Abs(progress.DesiredSize.Height - 88) < 0.01,
+                progress.DesiredSize.ToString());
+
+            var lineProgress = new Progress { Percent = 40 };
+            lineProgress.Measure(new Size(200, 100));
+            Check("line progress fills available width",
+                Math.Abs(lineProgress.DesiredSize.Width - 200) < 0.01, lineProgress.DesiredSize.Width.ToString());
+
+            var skeleton = new Skeleton { Rows = 3, Title = true };
+            skeleton.Measure(new Size(200, 500));
+            double expected = 4 * 16 + 3 * 16;
+            Check("skeleton height matches 4 bars",
+                Math.Abs(skeleton.DesiredSize.Height - expected) < 0.01, skeleton.DesiredSize.Height.ToString());
+
+            var space = new Space();
+            space.Children.Add(new Border { Width = 10, Height = 10 });
+            space.Children.Add(new Border { Width = 10, Height = 10 });
+            space.Children.Add(new Border { Width = 10, Height = 10 });
+            space.Measure(new Size(500, 100));
+            Check("space applies gap between items only",
+                Math.Abs(space.DesiredSize.Width - (30 + 2 * 16)) < 0.01, space.DesiredSize.Width.ToString());
+
+            var segmented = new Segmented();
+            segmented.ItemsSource = new[] { "A", "B", "C" };
+            segmented.SelectedIndex = 1;
+            Check("segmented selection", segmented.SelectedItem as string == "B",
+                segmented.SelectedItem as string ?? "null");
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -269,9 +342,11 @@ namespace Antd.Wpf.SmokeTests
             Directory.CreateDirectory(directory);
 
             ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
-            var window = new MainWindow { Width = 1080, Height = 860, WindowStartupLocation = WindowStartupLocation.Manual, Left = -4000, Top = 0 };
+            var window = new MainWindow { Width = 1100, Height = 2200, WindowStartupLocation = WindowStartupLocation.Manual, Left = -6000, Top = 0 };
             window.Show();
             DoEvents();
+            CaptureCard(FindDescendant<Progress>(window), Path.Combine(directory, "zoom-progress.png"));
+            CaptureCard(FindDescendant<Badge>(window), Path.Combine(directory, "zoom-display.png"));
             Render(window, Path.Combine(directory, "gallery-light.png"));
             Console.WriteLine("captured: gallery-light.png");
 
@@ -321,11 +396,57 @@ namespace Antd.Wpf.SmokeTests
             }
         }
 
+        private static void CaptureCard(DependencyObject anchor, string path)
+        {
+            if (anchor == null) return;
+
+            DependencyObject node = System.Windows.Media.VisualTreeHelper.GetParent(anchor);
+            FrameworkElement card = null;
+            while (node != null)
+            {
+                var border = node as Border;
+                if (border != null && border.ActualWidth > 200)
+                {
+                    card = border;
+                    break;
+                }
+                node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+            }
+
+            if (card != null)
+            {
+                RenderElement(card, path, 2.0);
+                Console.WriteLine("captured: " + Path.GetFileName(path));
+            }
+        }
+
+        private static T FindDescendant<T>(DependencyObject root) where T : DependencyObject
+        {
+            int count = System.Windows.Media.VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < count; i++)
+            {
+                DependencyObject child = System.Windows.Media.VisualTreeHelper.GetChild(root, i);
+                var match = child as T;
+                if (match != null) return match;
+                T nested = FindDescendant<T>(child);
+                if (nested != null) return nested;
+            }
+            return null;
+        }
+
         private static void Render(Window window, string path)
         {
             window.UpdateLayout();
             var root = window.Content as FrameworkElement;
             if (root == null) return;
+
+            // A ScrollViewer clips to the viewport; render its content instead so the whole
+            // page is captured rather than the first screenful.
+            var scroller = root as ScrollViewer;
+            if (scroller != null && scroller.Content is FrameworkElement inner)
+            {
+                root = inner;
+            }
 
             root.UpdateLayout();
             int width = (int)Math.Ceiling(root.ActualWidth);

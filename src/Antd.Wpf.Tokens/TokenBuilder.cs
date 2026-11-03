@@ -4,12 +4,15 @@ using System.Globalization;
 
 namespace Antd.Wpf.Tokens
 {
+    /// <summary>
+    /// Theme algorithms. antd allows combining them (for example dark + compact), so this is
+    /// a flags enum: Default carries no flag, Dark and Compact can be OR-ed together.
+    /// </summary>
+    [System.Flags]
     public enum ThemeAlgorithm
     {
         Default = 0,
         Dark = 1,
-
-        /// <summary>Not implemented yet. Reserved so the public surface stays stable.</summary>
         Compact = 2
     }
 
@@ -25,13 +28,8 @@ namespace Antd.Wpf.Tokens
         {
             if (seed == null) throw new ArgumentNullException("seed");
 
-            if (algorithm == ThemeAlgorithm.Compact)
-            {
-                throw new NotSupportedException(
-                    "compactAlgorithm is not ported yet (M0 scope). Track it in the roadmap.");
-            }
-
-            bool dark = algorithm == ThemeAlgorithm.Dark;
+            bool dark = (algorithm & ThemeAlgorithm.Dark) == ThemeAlgorithm.Dark;
+            bool compact = (algorithm & ThemeAlgorithm.Compact) == ThemeAlgorithm.Compact;
 
             AntdColor bgBase = seed.ColorBgBase ?? (dark ? AntdColor.Black : AntdColor.White);
             AntdColor textBase = seed.ColorTextBase ?? (dark ? AntdColor.White : AntdColor.Black);
@@ -187,8 +185,16 @@ namespace Antd.Wpf.Tokens
                 map["colorPrimaryBgHover"] = map["colorPrimaryBorderHover"];
             }
 
+            // ---------------------------------------------------------- compact algorithm
+            // Runs after the light/dark algorithm and before the alias stage, because alias
+            // tokens (fontHeight, padding, control padding) are derived from these values.
+            if (compact)
+            {
+                ApplyCompact(map, seed);
+            }
+
             // ---------------------------------------------------------- alias stage
-            return BuildAlias(map, seed, dark);
+            return BuildAlias(map, seed, dark, compact);
         }
 
         // ================================================================= helpers
@@ -369,6 +375,34 @@ namespace Antd.Wpf.Tokens
             map["controlHeightLG"] = controlHeight * 1.25;
         }
 
+        /// <summary>
+        /// Port of themes/compact/index.ts + genCompactSizeMapToken.ts.
+        /// Font scale is rebuilt from fontSizeSM and control heights shrink by 4.
+        /// </summary>
+        private static void ApplyCompact(Dictionary<string, object> map, SeedToken seed)
+        {
+            double baseFontSize = N(map, "fontSizeSM");
+            double controlHeight = N(map, "controlHeight") - 4;
+
+            double unit = seed.SizeUnit;
+            double step = seed.SizeStep - 2;
+
+            map["sizeXXL"] = unit * (step + 10);
+            map["sizeXL"] = unit * (step + 6);
+            map["sizeLG"] = unit * (step + 2);
+            map["sizeMD"] = unit * (step + 2);
+            map["sizeMS"] = unit * (step + 1);
+            map["size"] = unit * step;
+            map["sizeSM"] = unit * step;
+            map["sizeXS"] = unit * (step - 1);
+            map["sizeXXS"] = unit * (step - 1);
+
+            AddFontTokens(map, baseFontSize);
+
+            map["controlHeight"] = controlHeight;
+            AddControlHeightTokens(map, controlHeight);
+        }
+
         private static void AddCommonTokens(Dictionary<string, object> map, SeedToken seed)
         {
             if (seed.Motion)
@@ -422,7 +456,7 @@ namespace Antd.Wpf.Tokens
 
         // ================================================================= alias stage
 
-        private static AliasToken BuildAlias(Dictionary<string, object> map, SeedToken seed, bool dark)
+        private static AliasToken BuildAlias(Dictionary<string, object> map, SeedToken seed, bool dark, bool compact)
         {
             var alias = new Dictionary<string, object>(map, StringComparer.Ordinal);
 
@@ -600,8 +634,15 @@ namespace Antd.Wpf.Tokens
             alias["screenXXXL"] = screenXXXL;
             alias["screenXXXLMin"] = screenXXXL;
 
-            string name = dark ? "dark" : "default";
-            return new AliasToken(alias, name);
+            return new AliasToken(alias, DescribeAlgorithm(dark, compact));
+        }
+
+        private static string DescribeAlgorithm(bool dark, bool compact)
+        {
+            if (dark && compact) return "dark+compact";
+            if (dark) return "dark";
+            if (compact) return "compact";
+            return "default";
         }
 
         private static string ShadowStack(Func<double, string> shadowColor, string[] geometry, double[] alphas)
