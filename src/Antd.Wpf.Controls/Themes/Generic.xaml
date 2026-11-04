@@ -3247,7 +3247,845 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ Breadcrumb -->
+
+    <Style TargetType="{x:Type antd:BreadcrumbItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:BreadcrumbItem}">
+                    <StackPanel Orientation="Horizontal">
+                        <ContentPresenter VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}" />
+                        <TextBlock x:Name="Separator"
+                                   Text="/"
+                                   Margin="8,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   Foreground="{DynamicResource Antd.colorTextQuaternary}" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsLast" Value="True">
+                            <Setter TargetName="Separator" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Breadcrumb}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Breadcrumb}">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Descriptions -->
+
+    <Style TargetType="{x:Type antd:DescriptionsItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:DescriptionsItem}">
+                    <Grid x:Name="Root">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border x:Name="LabelCell" Grid.Column="0" Padding="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentPresenter ContentSource="Label"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.FontSize="{TemplateBinding FontSize}"
+                                                  TextElement.Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                                <TextBlock x:Name="Colon"
+                                           Text=":"
+                                           Margin="0,0,8,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="ValueCell" Grid.Column="1" Padding="0,0,16,8">
+                            <ContentPresenter VerticalAlignment="Center"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"
+                                              TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                        </Border>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasLabel" Value="False">
+                            <Setter TargetName="Colon" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+
+                        <!-- Bordered mode: only right and bottom edges per cell, the frame draws
+                             the left and top ones, so neighbours never stack two hairlines. -->
+                        <DataTrigger Binding="{Binding Bordered, RelativeSource={RelativeSource AncestorType={x:Type antd:Descriptions}}}" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Antd.colorBgContainer}" />
+                            <Setter TargetName="LabelCell" Property="Background" Value="{DynamicResource Antd.colorFillAlter}" />
+                            <Setter TargetName="LabelCell" Property="Padding" Value="16" />
+                            <Setter TargetName="LabelCell" Property="BorderBrush" Value="{DynamicResource Antd.colorBorderSecondary}" />
+                            <Setter TargetName="LabelCell" Property="BorderThickness" Value="0,0,1,1" />
+                            <Setter TargetName="ValueCell" Property="Padding" Value="16" />
+                            <Setter TargetName="ValueCell" Property="BorderBrush" Value="{DynamicResource Antd.colorBorderSecondary}" />
+                            <Setter TargetName="ValueCell" Property="BorderThickness" Value="0,0,1,1" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Descriptions}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <antd:DescriptionsPanel
+                        Columns="{Binding Column, RelativeSource={RelativeSource AncestorType={x:Type antd:Descriptions}}}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Descriptions}">
+                    <Border x:Name="Frame"
+                            Background="Transparent"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="0">
+                        <ItemsPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Bordered" Value="True">
+                            <Setter TargetName="Frame" Property="BorderThickness" Value="1,1,0,0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Timeline -->
+
+    <Style TargetType="{x:Type antd:TimelineItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:TimelineItem}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Border x:Name="Rail"
+                                    Width="2"
+                                    Margin="0,14,0,-4"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Stretch"
+                                    Background="{DynamicResource Antd.colorSplit}" />
+                            <Ellipse x:Name="Dot"
+                                     Width="{TemplateBinding DotSize}"
+                                     Height="{TemplateBinding DotSize}"
+                                     Margin="0,4,0,0"
+                                     VerticalAlignment="Top"
+                                     HorizontalAlignment="Center"
+                                     Fill="{TemplateBinding DotBrush}" />
+                        </Grid>
+
+                        <ContentPresenter Grid.Column="1"
+                                          Margin="8,0,0,20"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsLast" Value="True">
+                            <Setter TargetName="Rail" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Timeline}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Timeline}">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Steps -->
+
+    <Style TargetType="{x:Type antd:StepsItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:StepsItem}">
+                    <Grid VerticalAlignment="Top" Margin="0,0,16,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Horizontal: icon on top, label under it, connector running right. -->
+                        <StackPanel x:Name="HorizontalHost" Grid.Column="0" Grid.ColumnSpan="2">
+                            <Grid Height="32">
+                                <Grid x:Name="HIcon" Width="32" Height="32" HorizontalAlignment="Left">
+                                    <Ellipse x:Name="HCircle"
+                                             Fill="{DynamicResource Antd.colorBgContainer}"
+                                             Stroke="{DynamicResource Antd.colorBorder}"
+                                             StrokeThickness="1" />
+                                    <TextBlock x:Name="HNumber"
+                                               Text="{TemplateBinding Number}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                                    <Path x:Name="HCheck"
+                                          Data="M4,8 L6.5,10.5 L11,5"
+                                          Stretch="None"
+                                          Stroke="{DynamicResource Antd.colorTextLightSolid}"
+                                          StrokeThickness="1.6"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Visibility="Collapsed" />
+                                </Grid>
+                                <Border x:Name="HConnector"
+                                        Height="1"
+                                        Margin="40,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Background="{DynamicResource Antd.colorSplit}" />
+                            </Grid>
+
+                            <TextBlock Text="{TemplateBinding Title}"
+                                       Margin="0,8,0,0"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorText}" />
+                            <TextBlock x:Name="HDescription"
+                                       Text="{TemplateBinding Description}"
+                                       Margin="0,2,0,0"
+                                       TextWrapping="Wrap"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorTextDescription}"
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+
+                        <!-- Vertical: icon on the left, label beside it, connector running down. -->
+                        <Grid x:Name="VerticalHost" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Width="32" VerticalAlignment="Stretch">
+                                <Grid x:Name="VIcon" Width="32" Height="32" VerticalAlignment="Top">
+                                    <Ellipse x:Name="VCircle"
+                                             Fill="{DynamicResource Antd.colorBgContainer}"
+                                             Stroke="{DynamicResource Antd.colorBorder}"
+                                             StrokeThickness="1" />
+                                    <TextBlock x:Name="VNumber"
+                                               Text="{TemplateBinding Number}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                                    <Path x:Name="VCheck"
+                                          Data="M4,8 L6.5,10.5 L11,5"
+                                          Stretch="None"
+                                          Stroke="{DynamicResource Antd.colorTextLightSolid}"
+                                          StrokeThickness="1.6"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Visibility="Collapsed" />
+                                </Grid>
+                                <Border x:Name="VConnector"
+                                        Width="1"
+                                        Margin="0,36,0,4"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Stretch"
+                                        Background="{DynamicResource Antd.colorSplit}" />
+                            </Grid>
+
+                            <StackPanel Grid.Column="1" Margin="12,4,0,0">
+                                <TextBlock Text="{TemplateBinding Title}"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource Antd.colorText}" />
+                                <TextBlock x:Name="VDescription"
+                                           Text="{TemplateBinding Description}"
+                                           Margin="0,2,0,0"
+                                           TextWrapping="Wrap"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource Antd.colorTextDescription}"
+                                           Visibility="Collapsed" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Description" Value="{x:Null}">
+                            <Setter TargetName="HDescription" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VDescription" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Description" Value="">
+                            <Setter TargetName="HDescription" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VDescription" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+
+                        <Trigger Property="IsVertical" Value="True">
+                            <Setter TargetName="HorizontalHost" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VerticalHost" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <Trigger Property="IsLast" Value="True">
+                            <Setter TargetName="HConnector" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VConnector" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+
+                        <Trigger Property="Status" Value="Process">
+                            <Setter TargetName="HCircle" Property="Stroke" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="VCircle" Property="Stroke" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="HNumber" Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="VNumber" Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="HConnector" Property="Background" Value="{DynamicResource Antd.colorSplit}" />
+                        </Trigger>
+
+                        <Trigger Property="Status" Value="Finish">
+                            <Setter TargetName="HCircle" Property="Fill" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="HCircle" Property="Stroke" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="VCircle" Property="Fill" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="VCircle" Property="Stroke" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="HNumber" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="VNumber" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="HCheck" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="VCheck" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="HConnector" Property="Background" Value="{DynamicResource Antd.colorPrimaryBorder}" />
+                        </Trigger>
+
+                        <Trigger Property="Status" Value="Error">
+                            <Setter TargetName="HCircle" Property="Stroke" Value="{DynamicResource Antd.colorError}" />
+                            <Setter TargetName="VCircle" Property="Stroke" Value="{DynamicResource Antd.colorError}" />
+                            <Setter TargetName="HNumber" Property="Foreground" Value="{DynamicResource Antd.colorError}" />
+                            <Setter TargetName="VNumber" Property="Foreground" Value="{DynamicResource Antd.colorError}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Steps}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Steps}">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Direction" Value="Vertical">
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ============================================================ Masonry -->
+
+    <Style TargetType="{x:Type antd:Masonry}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <antd:MasonryPanel
+                        Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType={x:Type antd:Masonry}}}"
+                        Gutter="{Binding Gutter, RelativeSource={RelativeSource AncestorType={x:Type antd:Masonry}}}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Masonry}">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Pagination -->
+
+    <Style TargetType="{x:Type antd:PaginationPageButton}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:PaginationPageButton}">
+                    <Border x:Name="PageRoot"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PageRoot" Property="BorderBrush" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter TargetName="PageRoot" Property="BorderBrush" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsEllipsis" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextTertiary}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Pagination}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Pagination}">
+                    <StackPanel x:Name="PART_Host" Orientation="Horizontal" Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Carousel -->
+
+    <Style TargetType="{x:Type antd:CarouselDotButton}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:CarouselDotButton}">
+                    <Border x:Name="Dot"
+                            CornerRadius="2"
+                            Background="{DynamicResource Antd.colorTextQuaternary}" />
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter TargetName="Dot" Property="Background" Value="{DynamicResource Antd.colorText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Carousel}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Carousel}">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            ClipToBounds="True">
+                        <Grid>
+                            <ContentPresenter Content="{TemplateBinding SelectedItem}"
+                                              Margin="24"
+                                              TextElement.FontSize="14"
+                                              TextElement.Foreground="{DynamicResource Antd.colorText}" />
+
+                            <StackPanel x:Name="PART_Dots"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,0,12" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Image -->
+
+    <Style TargetType="{x:Type antd:Image}">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Image}">
+                    <Grid Background="Transparent">
+                        <Border CornerRadius="{TemplateBinding CornerRadius}"
+                                ClipToBounds="True"
+                                Background="{DynamicResource Antd.colorFillQuaternary}">
+                            <Image Source="{TemplateBinding Source}"
+                                   Stretch="{TemplateBinding Stretch}"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               StaysOpen="True"
+                               Placement="Center"
+                               Focusable="False">
+                            <Grid x:Name="PART_Mask" Background="#D9000000">
+                                <Image Source="{TemplateBinding Source}"
+                                       Stretch="Uniform"
+                                       Margin="64"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Anchor -->
+
+    <Style TargetType="{x:Type antd:AnchorLink}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:AnchorLink}">
+                    <Grid Background="Transparent">
+                        <Border x:Name="Rail"
+                                Width="2"
+                                HorizontalAlignment="Left"
+                                Background="{DynamicResource Antd.colorSplit}" />
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="Rail" Property="Background" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Anchor}">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Anchor}">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Menu -->
+
+    <Style x:Key="Antd.Menu.Popup" TargetType="{x:Type antd:MenuNode}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:MenuNode}">
+                    <Grid Background="Transparent">
+                        <Border x:Name="Row"
+                                Height="40"
+                                Padding="{TemplateBinding Padding}"
+                                Background="Transparent"
+                                Cursor="Hand">
+                            <Grid>
+                                <ContentPresenter ContentSource="Header"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.FontSize="{TemplateBinding FontSize}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                                <Path Data="M0,0 L4,4 L0,8"
+                                      Stretch="None"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"
+                                      Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                      StrokeThickness="1.2"
+                                      RenderTransformOrigin="0.5,0.5">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="90" />
+                                    </Path.RenderTransform>
+                                </Path>
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsExpanded}"
+                               Placement="Bottom"
+                               VerticalOffset="4"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               StaysOpen="False"
+                               Focusable="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="4"
+                                    MinWidth="160">
+                                <ItemsPresenter />
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="{DynamicResource Antd.colorPrimaryBg}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:MenuNode}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:MenuNode}">
+                    <StackPanel>
+                        <Border x:Name="Row"
+                                Height="40"
+                                Padding="{TemplateBinding Padding}"
+                                Background="Transparent"
+                                Cursor="Hand">
+                            <Grid>
+                                <ContentPresenter ContentSource="Header"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.FontSize="{TemplateBinding FontSize}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                                <Path x:Name="Caret"
+                                      Data="M0,0 L4,4 L0,8"
+                                      Stretch="None"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"
+                                      Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                      StrokeThickness="1.2"
+                                      Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <ItemsPresenter x:Name="Inline" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasChildren" Value="True">
+                            <Setter TargetName="Caret" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsExpanded" Value="False">
+                            <Setter TargetName="Inline" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="Caret" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="90" CenterX="2" CenterY="4" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="{DynamicResource Antd.colorPrimaryBg}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="PopupMode" Value="True">
+                <Setter Property="Template" Value="{StaticResource Antd.Menu.Popup}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Menu}">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Menu}">
+                    <Border Background="{DynamicResource Antd.colorBgContainer}"
+                            BorderBrush="{DynamicResource Antd.colorSplit}"
+                            BorderThickness="0,0,0,1">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Mode" Value="Horizontal">
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ============================================================ Tour -->
+
+    <Style TargetType="{x:Type antd:Tour}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Tour}">
+                    <Popup x:Name="PART_Popup"
+                           AllowsTransparency="True"
+                           StaysOpen="True"
+                           Focusable="False">
+                        <Canvas x:Name="PART_Mask" Background="Transparent">
+                            <Path x:Name="PART_Spotlight"
+                                  Fill="{DynamicResource Antd.colorBgMask}" />
+
+                            <Border x:Name="PART_Card"
+                                    Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Width="280">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CurrentTitle, RelativeSource={RelativeSource TemplatedParent}}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                                    <TextBlock Text="{Binding CurrentDescription, RelativeSource={RelativeSource TemplatedParent}}"
+                                               Margin="0,8,0,0"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource Antd.colorTextSecondary}" />
+
+                                    <Grid Margin="0,16,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding PositionText, RelativeSource={RelativeSource TemplatedParent}}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <antd:Button x:Name="PART_Prev" Content="Prev" Size="Small" Margin="0,0,8,0" />
+                                            <antd:Button x:Name="PART_Next" Content="Next" Size="Small" Variant="Primary" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <antd:Button x:Name="PART_Close"
+                                         Content="Skip"
+                                         Variant="Link"
+                                         Size="Small"
+                                         Canvas.Left="16"
+                                         Canvas.Top="16" />
+                        </Canvas>
+                    </Popup>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ QRCode -->
+
+    <Style TargetType="{x:Type antd:QRCode}">
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="MinHeight" Value="80" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:QRCode}">
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
+
 
 
 

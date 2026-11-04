@@ -30,6 +30,13 @@ dotnet run --project tests/Antd.Wpf.SmokeTests -f net48
 
 进度与能力边界见 `docs/progress.md`。
 
+QR 编码器是手写的（无第三方依赖），用真实解码器校验：
+
+```bash
+dotnet run --project tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --qr-dump artifacts/qr
+python tools/qr-ref/verify.py artifacts/qr     # 需要 pip install zxing-cpp pillow
+```
+
 视觉对齐（token 相等不代表长得像，这套验证尺寸与配色）：
 
 ```bash
@@ -53,7 +60,7 @@ cd tools/token-sync && npm install && node dump-tokens.js
 src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，无 WPF 依赖
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
 src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
-src/Antd.Wpf.Controls   net48;net8        69 个控件类型 + Generic.xaml
+src/Antd.Wpf.Controls   net48;net8        92 个控件类型 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        演示程序
 tests/                  两个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token

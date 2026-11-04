@@ -901,6 +901,183 @@
                 </StackPanel>
             </Border>
 
+            <!-- breadcrumb / descriptions / timeline -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Breadcrumb, Descriptions, Timeline" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Navigation trail, a label/value grid with spanning cells, and an event rail." />
+
+                    <antd:Breadcrumb x:Name="DemoBreadcrumb" Margin="0,0,0,20" />
+
+                    <antd:Descriptions x:Name="DemoDescriptions" Column="3" Bordered="True" Margin="0,0,0,20" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <antd:Timeline x:Name="DemoTimeline" Grid.Column="0" Margin="0,0,24,0" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Steps" FontSize="13" Margin="0,0,0,12"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            <antd:Steps x:Name="DemoSteps" Current="1" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- masonry -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Masonry" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Cards fall into the shortest column, so uneven heights stay balanced." />
+
+                    <antd:Masonry x:Name="DemoMasonry" Columns="3" Gutter="12">
+                        <Border Height="72" CornerRadius="6" Background="{DynamicResource Antd.colorPrimaryBg}" />
+                        <Border Height="110" CornerRadius="6" Background="{DynamicResource Antd.colorFillSecondary}" />
+                        <Border Height="56" CornerRadius="6" Background="{DynamicResource Antd.colorFillTertiary}" />
+                        <Border Height="92" CornerRadius="6" Background="{DynamicResource Antd.colorPrimaryBg}" />
+                        <Border Height="64" CornerRadius="6" Background="{DynamicResource Antd.colorFillSecondary}" />
+                        <Border Height="84" CornerRadius="6" Background="{DynamicResource Antd.colorFillTertiary}" />
+                    </antd:Masonry>
+                </StackPanel>
+            </Border>
+
+            <!-- pagination / carousel / qr / menu -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Pagination, Carousel, QRCode, Menu" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Page numbers that collapse, a dot carousel, an offline QR symbol and a nested menu." />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0">
+                            <antd:Pagination x:Name="DemoPagination" Total="240" PageSize="10"
+                                             HorizontalAlignment="Left" Margin="0,0,0,20" />
+
+                            <antd:Carousel x:Name="DemoCarousel" Height="120" Width="420"
+                                           HorizontalAlignment="Left">
+                                <Border Background="{DynamicResource Antd.colorPrimaryBg}" CornerRadius="6">
+                                    <TextBlock Text="Slide one" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                               FontSize="14" Foreground="{DynamicResource Antd.colorPrimary}" />
+                                </Border>
+                                <Border Background="{DynamicResource Antd.colorFillSecondary}" CornerRadius="6">
+                                    <TextBlock Text="Slide two" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                               FontSize="14" Foreground="{DynamicResource Antd.colorText}" />
+                                </Border>
+                                <Border Background="{DynamicResource Antd.colorFillTertiary}" CornerRadius="6">
+                                    <TextBlock Text="Slide three" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                               FontSize="14" Foreground="{DynamicResource Antd.colorText}" />
+                                </Border>
+                            </antd:Carousel>
+                        </StackPanel>
+
+                        <antd:Menu x:Name="DemoMenu" Grid.Column="1" Width="200" VerticalAlignment="Top"
+                                   Margin="0,0,24,0" />
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                            <antd:QRCode x:Name="DemoQr" Width="120" Height="120"
+                                         Value="https://ant.design" HorizontalAlignment="Left" />
+                            <TextBlock Margin="0,4,0,0" Text="ant.design" FontSize="12"
+                                       Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- anchor / image / tour -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Anchor, Image, Tour" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="A scroll-spy rail, a click-to-zoom picture and a guided tour over the page." />
+
+                    <Grid Height="180">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+
+                        <antd:Anchor x:Name="DemoAnchor" Grid.Column="0" Margin="0,0,16,0"
+                                     VerticalAlignment="Top" />
+
+                        <ScrollViewer x:Name="DemoAnchorScroll" Grid.Column="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Margin="0,0,24,0">
+                            <StackPanel>
+                                <Border x:Name="SectionOne" Padding="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Section one" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Antd.colorTextHeading}" />
+                                        <TextBlock TextWrapping="Wrap" FontSize="13" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource Antd.colorTextSecondary}"
+                                                   Text="Scroll this panel; the rail on the left highlights whichever heading is currently at the top." />
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="SectionTwo" Padding="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Section two" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Antd.colorTextHeading}" />
+                                        <TextBlock TextWrapping="Wrap" FontSize="13" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource Antd.colorTextSecondary}"
+                                                   Text="Clicking a link scrolls this section to the top of the viewport." />
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="SectionThree" Padding="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="Section three" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Antd.colorTextHeading}" />
+                                        <TextBlock TextWrapping="Wrap" FontSize="13" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource Antd.colorTextSecondary}"
+                                                   Text="Filler so the panel actually scrolls." />
+                                    </StackPanel>
+                                </Border>
+                                <Border Height="120" />
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <StackPanel Grid.Column="2">
+                            <antd:Image x:Name="DemoImage" Height="104" CornerRadius="6" />
+                            <TextBlock Margin="0,8,0,0" Text="Click to preview" FontSize="12"
+                                       Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                            <antd:Button x:Name="DemoTourStart" Content="Start tour" Margin="0,12,0,0"
+                                         HorizontalAlignment="Left" Size="Small" />
+                            <antd:Tour x:Name="DemoTour" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

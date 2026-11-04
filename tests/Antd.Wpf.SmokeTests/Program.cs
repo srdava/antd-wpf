@@ -8,12 +8,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Antd.Wpf.Controls;
+using Antd.Wpf.Controls.Internal;
 using AntdButton = Antd.Wpf.Controls.Button;
 using AntdInput = Antd.Wpf.Controls.Input;
 using AntdCalendar = Antd.Wpf.Controls.Calendar;
 using AntdAutoComplete = Antd.Wpf.Controls.AutoComplete;
 using AntdDatePicker = Antd.Wpf.Controls.DatePicker;
 using AntdList = Antd.Wpf.Controls.List;
+using AntdMenu = Antd.Wpf.Controls.Menu;
+using AntdImage = Antd.Wpf.Controls.Image;
 using AntdCard = Antd.Wpf.Controls.Card;
 using Antd.Wpf.Icons;
 using Antd.Wpf.Gallery;
@@ -38,10 +41,12 @@ namespace Antd.Wpf.SmokeTests
         {
             string shotDir = null;
             string metricsPath = null;
+            string qrPath = null;
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--shot" && i + 1 < args.Length) shotDir = args[i + 1];
                 if (args[i] == "--metrics" && i + 1 < args.Length) metricsPath = args[i + 1];
+                if (args[i] == "--qr-dump" && i + 1 < args.Length) qrPath = args[i + 1];
             }
 
             var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
@@ -55,6 +60,12 @@ namespace Antd.Wpf.SmokeTests
             ThemeManager.Current.Attach(app.Resources);
             ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
             DoEvents();
+
+            if (qrPath != null)
+            {
+                DumpQr(qrPath);
+                return 0;
+            }
 
             if (metricsPath != null)
             {
@@ -85,6 +96,9 @@ namespace Antd.Wpf.SmokeTests
             CheckTreeSelectAndCascader();
             CheckDisplayControls();
             CheckOverlays();
+            CheckDisplayControls2();
+            CheckQrEncoder();
+            CheckNavigationAndMedia();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -1349,6 +1363,383 @@ namespace Antd.Wpf.SmokeTests
             menuHost.Close();
         }
 
+        // ---------------------------------------------------------------- display layer, second batch
+
+        private static void CheckDisplayControls2()
+        {
+            var crumb = new Breadcrumb();
+            crumb.Items.Add(new BreadcrumbItem { Content = "Home" });
+            crumb.Items.Add(new BreadcrumbItem { Content = "Components" });
+            crumb.Items.Add(new BreadcrumbItem { Content = "Card" });
+
+            var descriptions = new Descriptions { Column = 3, Width = 600 };
+            descriptions.Items.Add(new DescriptionsItem { Label = "Product", Content = "Antd.Wpf" });
+            descriptions.Items.Add(new DescriptionsItem { Label = "Theme", Content = "Default" });
+            descriptions.Items.Add(new DescriptionsItem { Label = "Version", Content = "0.3" });
+            descriptions.Items.Add(new DescriptionsItem { Label = "Notes", Content = "wide", Span = 3 });
+
+            var timeline = new Timeline();
+            timeline.Items.Add(new TimelineItem { Content = "one" });
+            timeline.Items.Add(new TimelineItem { Content = "two" });
+
+            var steps = new Steps { Current = 1, Width = 480 };
+            steps.Items.Add(new StepsItem { Title = "Design" });
+            steps.Items.Add(new StepsItem { Title = "Build" });
+            steps.Items.Add(new StepsItem { Title = "Ship" });
+
+            var masonry = new Masonry { Columns = 3, Gutter = 12, Width = 360 };
+            for (int i = 0; i < 6; i++)
+            {
+                masonry.Items.Add(new Border { Height = 40 + i * 10 });
+            }
+
+            var host = new Window
+            {
+                Width = 700, Height = 900, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel
+                {
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Children = { crumb, descriptions, timeline, steps, masonry }
+                }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var lastCrumb = crumb.ItemContainerGenerator.ContainerFromIndex(2) as BreadcrumbItem;
+            var firstCrumb = crumb.ItemContainerGenerator.ContainerFromIndex(0) as BreadcrumbItem;
+            Check("breadcrumb marks the current page",
+                lastCrumb != null && firstCrumb != null && lastCrumb.IsLast && !firstCrumb.IsLast,
+                (lastCrumb == null ? "?" : lastCrumb.IsLast.ToString()));
+
+            var d0 = descriptions.ItemContainerGenerator.ContainerFromIndex(0) as DescriptionsItem;
+            var d1 = descriptions.ItemContainerGenerator.ContainerFromIndex(1) as DescriptionsItem;
+            var d3 = descriptions.ItemContainerGenerator.ContainerFromIndex(3) as DescriptionsItem;
+            Point p0 = d0.TranslatePoint(new Point(0, 0), descriptions);
+            Point p1 = d1.TranslatePoint(new Point(0, 0), descriptions);
+            Point p3 = d3.TranslatePoint(new Point(0, 0), descriptions);
+            Check("descriptions puts one pair per column",
+                Math.Abs(p0.Y - p1.Y) < 0.5 && p1.X > p0.X + 100,
+                p0.ToString() + " / " + p1.ToString());
+            Check("descriptions wraps a full row",
+                p3.Y > p0.Y && Math.Abs(p3.X) < 0.5,
+                p3.ToString());
+
+            var lastEvent = timeline.ItemContainerGenerator.ContainerFromIndex(1) as TimelineItem;
+            Check("timeline drops the rail on the last row",
+                lastEvent != null && lastEvent.IsLast, lastEvent == null ? "?" : lastEvent.IsLast.ToString());
+
+            var s0 = steps.ItemContainerGenerator.ContainerFromIndex(0) as StepsItem;
+            var s1 = steps.ItemContainerGenerator.ContainerFromIndex(1) as StepsItem;
+            var s2 = steps.ItemContainerGenerator.ContainerFromIndex(2) as StepsItem;
+            Check("steps derive status from Current",
+                s0.Status == StepsStatus.Finish && s1.Status == StepsStatus.Process && s2.Status == StepsStatus.Wait,
+                s0.Status + "/" + s1.Status + "/" + s2.Status);
+            Check("steps number their icons",
+                s0.Number == "1" && s2.Number == "3", s0.Number + "/" + s2.Number);
+            Check("steps know their direction", !s0.IsVertical, s0.IsVertical.ToString());
+
+            var m0 = masonry.ItemContainerGenerator.ContainerFromIndex(0) as FrameworkElement;
+            var m1 = masonry.ItemContainerGenerator.ContainerFromIndex(1) as FrameworkElement;
+            var m2 = masonry.ItemContainerGenerator.ContainerFromIndex(2) as FrameworkElement;
+            Point mp0 = m0.TranslatePoint(new Point(0, 0), masonry);
+            Point mp1 = m1.TranslatePoint(new Point(0, 0), masonry);
+            Point mp2 = m2.TranslatePoint(new Point(0, 0), masonry);
+            Check("masonry spreads the first items across columns",
+                mp0.X < mp1.X && mp1.X < mp2.X && Math.Abs(mp0.Y - mp1.Y) < 0.5,
+                mp0.X + "/" + mp1.X + "/" + mp2.X);
+
+            double tallestColumn = Math.Max(Math.Abs(mp0.X - mp1.X), Math.Abs(mp1.X - mp2.X));
+            Check("masonry keeps columns the same width",
+                Math.Abs((mp1.X - mp0.X) - (mp2.X - mp1.X)) < 0.5, tallestColumn.ToString("0.#"));
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- navigation & media
+
+        private static void CheckNavigationAndMedia()
+        {
+            var pager = new Pagination { Total = 240, PageSize = 10, Width = 520 };
+            var host = new Window
+            {
+                Width = 620, Height = 90, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { pager } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("pagination counts its pages", pager.PageCount == 24, pager.PageCount.ToString());
+
+            var strip = pager.Template.FindName("PART_Host", pager) as Panel;
+            Check("pagination renders arrows and numbers", strip != null && strip.Children.Count > 3,
+                strip == null ? "missing" : strip.Children.Count.ToString());
+
+            int previous = pager.Current;
+            int raised = 0;
+            pager.PageChanged += delegate(object sender, RoutedPropertyChangedEventArgs<int> e) { raised = e.NewValue; };
+
+            var target = strip.Children[strip.Children.Count - 2] as Antd.Wpf.Controls.PaginationPageButton;
+            Check("pagination exposes page buttons", target != null, strip.Children.Count.ToString());
+            if (target != null) target.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+            DoEvents();
+            Check("pagination advances on click",
+                pager.Current != previous && raised == pager.Current,
+                pager.Current + "/" + raised);
+
+            pager.Current = 99;
+            DoEvents();
+            Check("pagination clamps the page", pager.Current == pager.PageCount, pager.Current.ToString());
+            host.Close();
+
+            var carousel = new Carousel { Width = 320, Height = 120 };
+            carousel.Items.Add("one");
+            carousel.Items.Add("two");
+            carousel.Items.Add("three");
+
+            var carouselHost = new Window
+            {
+                Width = 400, Height = 220, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { carousel } }
+            };
+            carouselHost.Show();
+            DoEvents();
+            carouselHost.UpdateLayout();
+
+            Check("carousel selects the first slide", (carousel.SelectedItem as string) == "one",
+                carousel.SelectedItem == null ? "null" : carousel.SelectedItem.ToString());
+
+            var dots = carousel.Template.FindName("PART_Dots", carousel) as Panel;
+            Check("carousel builds a dot per slide", dots != null && dots.Children.Count == 3,
+                dots == null ? "missing" : dots.Children.Count.ToString());
+
+            carousel.SelectedIndex = 2;
+            DoEvents();
+            Check("carousel follows the index", (carousel.SelectedItem as string) == "three",
+                carousel.SelectedItem == null ? "null" : carousel.SelectedItem.ToString());
+            carouselHost.Close();
+
+            var menu = new AntdMenu { Width = 200 };
+            var design = new MenuNode { Header = "Design", IsExpanded = true };
+            var colour = new MenuNode { Header = "Colour" };
+            design.Items.Add(colour);
+            design.Items.Add(new MenuNode { Header = "Type" });
+            menu.Items.Add(design);
+            menu.Items.Add(new MenuNode { Header = "About" });
+
+            var menuHost = new Window
+            {
+                Width = 320, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { menu } }
+            };
+            menuHost.Show();
+            DoEvents();
+            menuHost.UpdateLayout();
+
+            Check("menu exposes child nodes", design.HasChildren && design.Items.Count == 2,
+                design.Items.Count.ToString());
+
+            menu.Select(colour);
+            DoEvents();
+            Check("menu tracks the selected leaf",
+                ReferenceEquals(menu.SelectedItem, colour) && colour.IsActive,
+                menu.SelectedItem == null ? "null" : ((MenuNode)menu.SelectedItem).Header.ToString());
+            menuHost.Close();
+
+            var scroller = new ScrollViewer { Height = 100, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            var top = new Border { Height = 60 };
+            var bottom = new Border { Height = 400 };
+            scroller.Content = new StackPanel { Children = { top, bottom } };
+
+            var anchor = new Anchor { ScrollTarget = scroller };
+            anchor.Items.Add(new AnchorLink { Content = "Top", Target = top });
+            anchor.Items.Add(new AnchorLink { Content = "Bottom", Target = bottom });
+
+            var anchorHost = new Window
+            {
+                Width = 360, Height = 220, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { anchor, scroller } }
+            };
+            anchorHost.Show();
+            DoEvents();
+            anchorHost.UpdateLayout();
+
+            scroller.ScrollToVerticalOffset(80);
+            DoEvents();
+            Check("anchor highlights the section at the top", anchor.ActiveIndex == 1, anchor.ActiveIndex.ToString());
+            anchorHost.Close();
+
+            var image = new AntdImage { Width = 120, Height = 80, Preview = true };
+            var imageHost = new Window
+            {
+                Width = 260, Height = 200, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { image } }
+            };
+            imageHost.Show();
+            DoEvents();
+            imageHost.UpdateLayout();
+
+            image.IsPreviewVisible = true;
+            DoEvents();
+            var popup = image.Template.FindName("PART_Popup", image) as System.Windows.Controls.Primitives.Popup;
+            Check("image opens its preview", popup != null && popup.IsOpen,
+                popup == null ? "missing" : popup.IsOpen.ToString());
+            image.IsPreviewVisible = false;
+            DoEvents();
+            Check("image closes its preview", popup == null || !popup.IsOpen,
+                popup == null ? "missing" : popup.IsOpen.ToString());
+            imageHost.Close();
+
+            var tour = new Tour();
+            var stepHost = new Border { Height = 40 };
+            tour.Steps.Add(new TourStep { Target = stepHost, Title = "First", Description = "one" });
+            tour.Steps.Add(new TourStep { Target = stepHost, Title = "Second", Description = "two" });
+
+            var tourHost = new Window
+            {
+                Width = 400, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { stepHost, tour } }
+            };
+            tourHost.Show();
+            DoEvents();
+            tourHost.UpdateLayout();
+
+            tour.Open();
+            DoEvents();
+            Check("tour opens on the first step",
+                tour.IsOpen && tour.Current == 0 && tour.CurrentTitle == "First", tour.CurrentTitle);
+
+            tour.Next();
+            DoEvents();
+            Check("tour advances", tour.Current == 1 && tour.CurrentTitle == "Second", tour.CurrentTitle);
+
+            bool finished = false;
+            tour.Finished += delegate { finished = true; };
+            tour.Next();
+            DoEvents();
+            Check("tour finishes on the last step", !tour.IsOpen && finished, tour.IsOpen.ToString());
+            tourHost.Close();
+        }
+
+        // ---------------------------------------------------------------- qr encoder
+
+        /// <summary>
+        /// Structural checks on the encoder. Full matrix equality against a reference encoder is
+        /// not meaningful: the same text can be laid out with a different mask or mode and still
+        /// be a valid symbol, so the round trip is verified with a real decoder instead
+        /// (tools/qr-ref/verify.py, driven by --qr-dump).
+        /// </summary>
+        /// <summary>Writes our matrices to disk so tools/qr-ref/verify.py can scan them.</summary>
+        private static void DumpQr(string directory)
+        {
+            Directory.CreateDirectory(directory);
+
+            string[] payloads =
+            {
+                "https://ant.design",
+                "HELLO",
+                "Antd.Wpf 二维码",
+                "The quick brown fox jumps over the lazy dog. 0123456789"
+            };
+
+            for (int i = 0; i < payloads.Length; i++)
+            {
+                bool[,] matrix = QrEncoder.Encode(payloads[i], (QrEcc)(i % 4));
+                var lines = new List<string> { payloads[i] };
+                lines.AddRange(ToRows(matrix));
+                File.WriteAllLines(Path.Combine(directory, "case" + i + ".txt"), lines);
+            }
+
+            Console.WriteLine("qr matrices written to " + directory);
+        }
+
+        private static string[] ToRows(bool[,] matrix)
+        {
+            int size = matrix.GetLength(0);
+            var rows = new string[size];
+            for (int row = 0; row < size; row++)
+            {
+                var builder = new System.Text.StringBuilder(size);
+                for (int col = 0; col < size; col++) builder.Append(matrix[row, col] ? '#' : '.');
+                rows[row] = builder.ToString();
+            }
+            return rows;
+        }
+
+        private static void CheckQrEncoder()
+        {
+            bool[,] small = QrEncoder.Encode("HELLO", QrEcc.Medium);
+            Check("qr uses version 1 for a short payload", small.GetLength(0) == 21, small.GetLength(0).ToString());
+
+            int reserved = CountFunctionModules(small.GetLength(0));
+            Check("qr v1 has 208 data modules", small.GetLength(0) * small.GetLength(0) - reserved == 208,
+                (small.GetLength(0) * small.GetLength(0) - reserved).ToString());
+
+            Check("qr draws all three finder patterns",
+                IsFinder(small, 0, 0) && IsFinder(small, 0, 14) && IsFinder(small, 14, 0), "finder");
+            Check("qr keeps the dark module", small[13, 8], small[13, 8].ToString());
+
+            int level;
+            int mask;
+            Check("qr format bits decode",
+                QrFormatOf(small, out level, out mask) && level == 0 && mask >= 0 && mask <= 7,
+                "level " + level + " mask " + mask);
+
+            bool[,] medium = QrEncoder.Encode(new string('x', 120), QrEcc.Medium);
+            Check("qr grows with the payload", medium.GetLength(0) > 21, medium.GetLength(0).ToString());
+
+            bool[,] high = QrEncoder.Encode("Antd.Wpf 二维码", QrEcc.High);
+            Check("qr handles non-ascii payloads", high.GetLength(0) >= 21, high.GetLength(0).ToString());
+        }
+
+        private static int CountFunctionModules(int size)
+        {
+            // Three 8x8 finder+separator blocks, two timing runs of (size - 16), both format
+            // copies (15 each) and the dark module.
+            return 3 * 64 + 2 * (size - 16) + 30 + 1;
+        }
+
+        private static bool IsFinder(bool[,] matrix, int row, int col)
+        {
+            for (int r = 0; r < 7; r++)
+            {
+                for (int c = 0; c < 7; c++)
+                {
+                    bool edge = r == 0 || r == 6 || c == 0 || c == 6;
+                    bool core = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+                    if (matrix[row + r, col + c] != (edge || core)) return false;
+                }
+            }
+            return true;
+        }
+
+        private static bool QrFormatOf(bool[,] matrix, out int level, out int mask)
+        {
+            int size = matrix.GetLength(0);
+            int word = 0;
+
+            for (int i = 0; i < 15; i++)
+            {
+                int row;
+                int col;
+
+                if (i < 6) { row = i; col = 8; }
+                else if (i == 6) { row = 7; col = 8; }
+                else if (i == 7) { row = 8; col = 8; }
+                else if (i == 8) { row = 8; col = 7; }
+                else { row = 8; col = 14 - i; }
+
+                if (matrix[row, col]) word |= 1 << i;
+            }
+
+            // Undo the 0x5412 mask, then split the five data bits.
+            int data = (word ^ 0x5412) >> 10;
+            level = data >> 3;
+            mask = data & 7;
+            return size > 0;
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -1416,6 +1807,11 @@ namespace Antd.Wpf.SmokeTests
             if (switchPreview != null) RenderElement(switchPreview, Path.Combine(directory, "zoom-switch.png"), 6.0);
             var layoutPreview = FindDescendant<Antd.Wpf.Controls.Layout>(window);
             if (layoutPreview != null) RenderElement(layoutPreview, Path.Combine(directory, "zoom-layout.png"), 1.0);
+            var pagerShot = window.FindName("DemoPagination") as Pagination;
+            if (pagerShot != null) RenderElement(pagerShot, Path.Combine(directory, "zoom-pager.png"), 3.0);
+            var qrShot = window.FindName("DemoQr") as QRCode;
+            if (qrShot != null) RenderElement(qrShot, Path.Combine(directory, "zoom-qr.png"), 3.0);
+
             var galleryTabs = window.FindName("DemoTabs") as Tabs;
             if (galleryTabs != null) RenderElement(galleryTabs, Path.Combine(directory, "zoom-tabs.png"), 3.0);
 

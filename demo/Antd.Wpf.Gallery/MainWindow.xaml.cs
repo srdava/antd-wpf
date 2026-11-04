@@ -59,6 +59,9 @@ namespace Antd.Wpf.Gallery
             DemoDropdown.ItemsSource = new[] { "Duplicate", "Export tokens", "Delete" };
             DemoDropdown.ItemInvoked += (s2, e2) => Console.WriteLine("dropdown action: " + e2.NewValue);
 
+            BuildDemoBreadcrumbAndDescriptions();
+            BuildDemoNavigation();
+
             BuildDemoTable();
             BuildDemoSelectors();
 
@@ -98,6 +101,83 @@ namespace Antd.Wpf.Gallery
             public string Role { get; set; }
             public string Status { get; set; }
             public string Updated { get; set; }
+        }
+
+        private void BuildDemoNavigation()
+        {
+            var design = new Antd.Wpf.Controls.MenuNode { Header = "Design" };
+            design.Items.Add(new Antd.Wpf.Controls.MenuNode { Header = "Colour" });
+            design.Items.Add(new Antd.Wpf.Controls.MenuNode { Header = "Typography" });
+            design.IsExpanded = true;
+
+            var components = new Antd.Wpf.Controls.MenuNode { Header = "Components" };
+            components.Items.Add(new Antd.Wpf.Controls.MenuNode { Header = "Button" });
+            components.Items.Add(new Antd.Wpf.Controls.MenuNode { Header = "Table" });
+
+            DemoMenu.Items.Add(design);
+            DemoMenu.Items.Add(components);
+            DemoMenu.Items.Add(new Antd.Wpf.Controls.MenuNode { Header = "Changelog" });
+
+            DemoAnchor.Items.Add(new Antd.Wpf.Controls.AnchorLink { Content = "Section one", Target = SectionOne });
+            DemoAnchor.Items.Add(new Antd.Wpf.Controls.AnchorLink { Content = "Section two", Target = SectionTwo });
+            DemoAnchor.Items.Add(new Antd.Wpf.Controls.AnchorLink { Content = "Section three", Target = SectionThree });
+            DemoAnchor.ScrollTarget = DemoAnchorScroll;
+
+            // A gradient swatch stands in for a real picture so the demo stays offline.
+            var brush = new System.Windows.Media.LinearGradientBrush(
+                System.Windows.Media.Color.FromRgb(0x16, 0x77, 0xFF),
+                System.Windows.Media.Color.FromRgb(0x8A, 0x54, 0xFF), 45);
+            brush.Freeze();
+
+            var drawing = new System.Windows.Media.DrawingGroup();
+            drawing.Children.Add(new System.Windows.Media.GeometryDrawing(
+                brush, null, new System.Windows.Media.RectangleGeometry(new Rect(0, 0, 640, 280))));
+            drawing.Children.Add(new System.Windows.Media.GeometryDrawing(
+                System.Windows.Media.Brushes.White, null,
+                new System.Windows.Media.RectangleGeometry(new Rect(40, 40, 120, 12))));
+
+            var image = new System.Windows.Media.DrawingImage(drawing);
+            image.Freeze();
+            DemoImage.Source = image;
+
+            DemoTour.Steps.Add(new Antd.Wpf.Controls.TourStep
+            {
+                Target = DemoTourStart,
+                Title = "Step one",
+                Description = "The card dims everything except this button while the tour runs."
+            });
+            DemoTour.Steps.Add(new Antd.Wpf.Controls.TourStep
+            {
+                Target = DemoPagination,
+                Title = "Step two",
+                Description = "Next moves the spotlight to another control."
+            });
+            DemoTourStart.Click += delegate { DemoTour.Open(); };
+        }
+
+        private void BuildDemoBreadcrumbAndDescriptions()
+        {
+            DemoBreadcrumb.Items.Add(new Antd.Wpf.Controls.BreadcrumbItem { Content = "Home" });
+            DemoBreadcrumb.Items.Add(new Antd.Wpf.Controls.BreadcrumbItem { Content = "Components" });
+            DemoBreadcrumb.Items.Add(new Antd.Wpf.Controls.BreadcrumbItem { Content = "Breadcrumb" });
+
+            DemoDescriptions.Items.Add(new Antd.Wpf.Controls.DescriptionsItem { Label = "Product", Content = "Antd.Wpf" });
+            DemoDescriptions.Items.Add(new Antd.Wpf.Controls.DescriptionsItem { Label = "Theme", Content = "Default" });
+            DemoDescriptions.Items.Add(new Antd.Wpf.Controls.DescriptionsItem { Label = "Version", Content = "0.3" });
+            DemoDescriptions.Items.Add(new Antd.Wpf.Controls.DescriptionsItem
+            {
+                Label = "Description",
+                Span = 3,
+                Content = "A four-by-four theme engine drives every brush, size and radius in this page."
+            });
+
+            DemoTimeline.Items.Add(new Antd.Wpf.Controls.TimelineItem { Content = "Token engine compiled" });
+            DemoTimeline.Items.Add(new Antd.Wpf.Controls.TimelineItem { Content = "Light and dark verified", DotBrush = ThemeManager.Current.Snapshot.Brush("colorSuccess") });
+            DemoTimeline.Items.Add(new Antd.Wpf.Controls.TimelineItem { Content = "Parity suite still green" });
+
+            DemoSteps.Items.Add(new Antd.Wpf.Controls.StepsItem { Title = "Design", Description = "Tokens + specs" });
+            DemoSteps.Items.Add(new Antd.Wpf.Controls.StepsItem { Title = "Build", Description = "51 components" });
+            DemoSteps.Items.Add(new Antd.Wpf.Controls.StepsItem { Title = "Ship", Description = "Awaiting review" });
         }
 
         private void BuildDemoTable()

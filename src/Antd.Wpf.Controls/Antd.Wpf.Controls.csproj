@@ -25,4 +25,11 @@
     <ProjectReference Include="..\Antd.Wpf.Icons\Antd.Wpf.Icons.csproj" />
   </ItemGroup>
 
+  <!-- The smoke tests compare the QR matrix against reference data. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Antd.Wpf.SmokeTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
