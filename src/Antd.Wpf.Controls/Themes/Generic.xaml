@@ -2086,7 +2086,248 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ Upload -->
+
+    <Style TargetType="{x:Type antd:Upload}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Upload}">
+                    <StackPanel>
+                        <Grid x:Name="PART_DropZone" Background="Transparent" Cursor="Hand">
+                            <Rectangle x:Name="ZoneBorder"
+                                       RadiusX="8" RadiusY="8"
+                                       Stroke="{DynamicResource Antd.colorBorder}"
+                                       StrokeThickness="1"
+                                       StrokeDashArray="4 3"
+                                       Fill="{DynamicResource Antd.colorBgContainer}" />
+                            <StackPanel Margin="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock x:Name="ZoneTitle"
+                                           Text="{TemplateBinding ButtonText}"
+                                           HorizontalAlignment="Center"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           Foreground="{DynamicResource Antd.colorText}" />
+                                <TextBlock x:Name="ZoneHint"
+                                           Text="{TemplateBinding Hint}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,4,0,0"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource Antd.colorTextDescription}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <ItemsControl x:Name="FileList"
+                                      ItemsSource="{Binding Files, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Margin="0,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource Antd.colorFillQuaternary}"
+                                            CornerRadius="6"
+                                            Margin="0,0,0,6"
+                                            Padding="10,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource Antd.colorText}" />
+
+                                            <TextBlock Grid.Column="1" Text="{Binding SizeText}"
+                                                       Margin="12,0,0,0"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="12"
+                                                       Foreground="{DynamicResource Antd.colorTextTertiary}" />
+
+                                            <antd:UploadRemoveButton Grid.Column="2" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasFiles" Value="False">
+                            <Setter TargetName="FileList" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsDraggingOver" Value="True">
+                            <Setter TargetName="ZoneBorder" Property="Stroke" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="ZoneBorder" Property="Fill" Value="{DynamicResource Antd.colorPrimaryBg}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:TransferMoveButton}">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextSecondary}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:TransferMoveButton}">
+                    <Border x:Name="MoveRoot"
+                            Background="{DynamicResource Antd.colorBgContainer}"
+                            BorderBrush="{DynamicResource Antd.colorBorder}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MoveRoot" Property="BorderBrush" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                            <Setter TargetName="MoveRoot" Property="BorderBrush" Value="{DynamicResource Antd.colorBorderDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Transfer -->
+
+    <Style x:Key="Antd.Transfer.List" TargetType="{x:Type ListBox}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="196" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border x:Name="Cell" Background="Transparent" CornerRadius="4" Padding="8,0">
+                                    <ContentPresenter VerticalAlignment="Center"
+                                                      TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Cell" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Cell" Property="Background" Value="{DynamicResource Antd.colorPrimaryBg}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Transfer}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Transfer}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                BorderBrush="{DynamicResource Antd.colorBorder}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Background="{DynamicResource Antd.colorBgContainer}">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top"
+                                        Background="{DynamicResource Antd.colorFillQuaternary}"
+                                        CornerRadius="5,5,0,0"
+                                        Padding="12,8">
+                                    <Grid>
+                                        <TextBlock Text="{TemplateBinding SourceTitle}"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource Antd.colorText}" />
+                                        <TextBlock Text="{TemplateBinding SourceCount}"
+                                                   HorizontalAlignment="Right"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                    </Grid>
+                                </Border>
+                                <ListBox x:Name="PART_SourceList"
+                                         Style="{StaticResource Antd.Transfer.List}"
+                                         SelectionMode="Extended" />
+                            </DockPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
+                            <antd:TransferMoveButton ToTarget="True">
+                                <Path Data="M3.5,2 L8.5,7 L3.5,12"
+                                      Stretch="None"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=antd:TransferMoveButton}}"
+                                      StrokeThickness="1.5"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round" />
+                            </antd:TransferMoveButton>
+                            <antd:TransferMoveButton ToTarget="False" Margin="0,6,0,0">
+                                <Path Data="M8.5,2 L3.5,7 L8.5,12"
+                                      Stretch="None"
+                                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=antd:TransferMoveButton}}"
+                                      StrokeThickness="1.5"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round" />
+                            </antd:TransferMoveButton>
+                        </StackPanel>
+
+                        <Border Grid.Column="2"
+                                BorderBrush="{DynamicResource Antd.colorBorder}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Background="{DynamicResource Antd.colorBgContainer}">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Top"
+                                        Background="{DynamicResource Antd.colorFillQuaternary}"
+                                        CornerRadius="5,5,0,0"
+                                        Padding="12,8">
+                                    <Grid>
+                                        <TextBlock Text="{TemplateBinding TargetTitle}"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource Antd.colorText}" />
+                                        <TextBlock Text="{TemplateBinding TargetCount}"
+                                                   HorizontalAlignment="Right"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                    </Grid>
+                                </Border>
+                                <ListBox x:Name="PART_TargetList"
+                                         Style="{StaticResource Antd.Transfer.List}"
+                                         SelectionMode="Extended" />
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
+
 
 
 

@@ -682,6 +682,36 @@
                 </StackPanel>
             </Border>
 
+            <!-- upload + transfer -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Upload &amp; Transfer" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="A dashed drop zone with a file list, and two lists that shuttle items across." />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="360" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0">
+                            <antd:Upload x:Name="DemoUpload" Hint="Click or drop images here" />
+                        </StackPanel>
+
+                        <antd:Transfer Grid.Column="1"
+                                       x:Name="DemoTransfer"
+                                       SourceTitle="Available"
+                                       TargetTitle="Selected" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

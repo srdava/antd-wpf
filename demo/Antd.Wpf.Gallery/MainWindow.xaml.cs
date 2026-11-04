@@ -35,6 +35,18 @@ namespace Antd.Wpf.Gallery
                 "Alice Chen", "Bob Li", "Carol Wang", "David Zhao", "Eve Sun"
             };
 
+            DemoUpload.Files.Add(new Antd.Wpf.Controls.UploadFile { Name = "token-audit.png", Size = 184320, Status = Antd.Wpf.Controls.AntdUploadStatus.Done });
+            DemoUpload.Files.Add(new Antd.Wpf.Controls.UploadFile { Name = "spec.pdf", Size = 2400000, Status = Antd.Wpf.Controls.AntdUploadStatus.Uploading, Progress = 0.4 });
+
+            DemoTransfer.ItemsSource = new[]
+            {
+                new Antd.Wpf.Controls.TransferItem("1", "Colour"),
+                new Antd.Wpf.Controls.TransferItem("2", "Typography"),
+                new Antd.Wpf.Controls.TransferItem("3", "Spacing"),
+                new Antd.Wpf.Controls.TransferItem("4", "Motion"),
+                new Antd.Wpf.Controls.TransferItem("5", "Iconography")
+            };
+
             BuildDemoTree();
 
             FrameworkAuto.ItemsSource = new[]

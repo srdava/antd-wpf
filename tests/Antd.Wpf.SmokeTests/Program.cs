@@ -77,6 +77,7 @@ namespace Antd.Wpf.SmokeTests
             CheckM1Tail();
             CheckTree();
             CheckTimePickerAndMentions();
+            CheckUploadAndTransfer();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -846,6 +847,59 @@ namespace Antd.Wpf.SmokeTests
             Check("no trigger means no suggestions",
                 !mentions.IsDropDownOpen, mentions.IsDropDownOpen.ToString());
             mHost.Close();
+        }
+
+        // ---------------------------------------------------------------- upload / transfer
+
+        private static void CheckUploadAndTransfer()
+        {
+            var upload = new Upload();
+            Check("upload starts empty", !upload.HasFiles && upload.Files.Count == 0, upload.Files.Count.ToString());
+
+            upload.Files.Add(new Antd.Wpf.Controls.UploadFile { Name = "a.png", Size = 2048 });
+            Check("upload reports files", upload.HasFiles, upload.HasFiles.ToString());
+            Check("upload formats the size", upload.Files[0].SizeText == "2 KB", upload.Files[0].SizeText);
+
+            upload.RemoveFile(upload.Files[0]);
+            Check("upload removes a file", upload.Files.Count == 0 && !upload.HasFiles, upload.Files.Count.ToString());
+
+            var transfer = new Transfer
+            {
+                ItemsSource = new[]
+                {
+                    new TransferItem("1", "Alpha"),
+                    new TransferItem("2", "Beta"),
+                    new TransferItem("3", "Gamma")
+                }
+            };
+            var host = new Window
+            {
+                Width = 620, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { transfer } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("transfer splits the source list", transfer.SourceItems.Count == 3 && transfer.TargetItems.Count == 0,
+                transfer.SourceItems.Count + "/" + transfer.TargetItems.Count);
+
+            bool changed = false;
+            transfer.Changed += delegate { changed = true; };
+            transfer.MoveToTarget(new[] { transfer.SourceItems[0] });
+
+            Check("transfer moves an item to the target",
+                transfer.SourceItems.Count == 2 && transfer.TargetItems.Count == 1 && changed,
+                transfer.SourceItems.Count + "/" + transfer.TargetItems.Count);
+            Check("transfer updates the counters",
+                transfer.SourceCount == "2 items" && transfer.TargetCount == "1 item",
+                transfer.SourceCount + " | " + transfer.TargetCount);
+
+            transfer.MoveToSource(new[] { transfer.TargetItems[0] });
+            Check("transfer moves an item back",
+                transfer.SourceItems.Count == 3 && transfer.TargetItems.Count == 0,
+                transfer.SourceItems.Count.ToString());
+            host.Close();
         }
 
         // ---------------------------------------------------------------- theme switch

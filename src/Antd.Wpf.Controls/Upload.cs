@@ -1,0 +1,295 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Antd.Wpf.Controls.Internal;
+using Antd.Wpf.Theme;
+using Antd.Wpf.Tokens;
+
+namespace Antd.Wpf.Controls
+{
+    public enum AntdUploadStatus
+    {
+        Ready = 0,
+        Uploading = 1,
+        Done = 2,
+        Error = 3
+    }
+
+    /// <summary>One row in an <see cref="Upload"/> list.</summary>
+    public class UploadFile
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public long Size { get; set; }
+        public AntdUploadStatus Status { get; set; }
+        public double Progress { get; set; }
+
+        /// <summary>Human readable size, the way antd prints it in the list.</summary>
+        public string SizeText
+        {
+            get
+            {
+                if (Size < 1024) return Size + " B";
+                if (Size < 1024 * 1024) return (Size / 1024.0).ToString("0.#") + " KB";
+                return (Size / (1024.0 * 1024.0)).ToString("0.#") + " MB";
+            }
+        }
+    }
+
+    /// <summary>
+    /// Remove button used inside the upload list. It resolves the row's file from its DataContext
+    /// and walks up to the owning Upload, so the template needs no code-behind event handler
+    /// (which a generic.xaml dictionary cannot have).
+    /// </summary>
+    public class UploadRemoveButton : Button
+    {
+        public UploadRemoveButton()
+        {
+            Variant = ButtonVariant.Link;
+            Size = AntdSize.Small;
+            Margin = new Thickness(8, 0, 0, 0);
+            Content = "Remove";
+            Click += OnClick;
+        }
+
+        private void OnClick(object sender, RoutedEventArgs e)
+        {
+            var file = DataContext as UploadFile;
+            if (file == null) return;
+
+            DependencyObject node = this;
+            while (node != null)
+            {
+                var upload = node as Upload;
+                if (upload != null) { upload.RemoveFile(file); break; }
+                node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+            }
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>
+    /// antd Upload: a dashed drop zone plus a file list.
+    ///
+    /// The control deliberately does not perform network IO. It collects files, reports status
+    /// and raises <see cref="FileSelected"/>; the host decides how to transfer them and pushes
+    /// progress back into the <see cref="UploadFile"/> objects.
+    /// </summary>
+    public class Upload : Control
+    {
+        private const double HeaderHeight = 40;
+        private FrameworkElement _dropZone;
+
+        static Upload()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Upload), new FrameworkPropertyMetadata(typeof(Upload)));
+        }
+
+        public Upload()
+        {
+            Files = new ObservableCollection<UploadFile>();
+            Files.CollectionChanged += OnFilesChanged;
+            ThemeLink.Attach(this, UpdateVisualState);
+            AllowDrop = true;
+            UpdateVisualState();
+        }
+
+        public ObservableCollection<UploadFile> Files { get; private set; }
+
+        /// <summary>Raised with the files the user just picked or dropped.</summary>
+        public event EventHandler<UploadFile[]> FileSelected;
+
+        public static readonly DependencyProperty MultipleProperty = DependencyProperty.Register(
+            "Multiple", typeof(bool), typeof(Upload), new FrameworkPropertyMetadata(true));
+
+        public bool Multiple
+        {
+            get { return (bool)GetValue(MultipleProperty); }
+            set { SetValue(MultipleProperty, value); }
+        }
+
+        public static readonly DependencyProperty AcceptProperty = DependencyProperty.Register(
+            "Accept", typeof(string), typeof(Upload), new FrameworkPropertyMetadata(null));
+
+        /// <summary>Filter such as ".png;.jpg". Passed to the open dialog and checked on drop.</summary>
+        public string Accept
+        {
+            get { return (string)GetValue(AcceptProperty); }
+            set { SetValue(AcceptProperty, value); }
+        }
+
+        public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
+            "ButtonText", typeof(string), typeof(Upload), new FrameworkPropertyMetadata("Upload"));
+
+        public string ButtonText
+        {
+            get { return (string)GetValue(ButtonTextProperty); }
+            set { SetValue(ButtonTextProperty, value); }
+        }
+
+        public static readonly DependencyProperty HintProperty = DependencyProperty.Register(
+            "Hint", typeof(string), typeof(Upload), new FrameworkPropertyMetadata("Click or drag files here"));
+
+        public string Hint
+        {
+            get { return (string)GetValue(HintProperty); }
+            set { SetValue(HintProperty, value); }
+        }
+
+        private static readonly DependencyPropertyKey IsDraggingOverKey = DependencyProperty.RegisterReadOnly(
+            "IsDraggingOver", typeof(bool), typeof(Upload), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty IsDraggingOverProperty = IsDraggingOverKey.DependencyProperty;
+
+        public bool IsDraggingOver
+        {
+            get { return (bool)GetValue(IsDraggingOverProperty); }
+            private set { SetValue(IsDraggingOverKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey HasFilesKey = DependencyProperty.RegisterReadOnly(
+            "HasFiles", typeof(bool), typeof(Upload), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty HasFilesProperty = HasFilesKey.DependencyProperty;
+
+        public bool HasFiles
+        {
+            get { return (bool)GetValue(HasFilesProperty); }
+            private set { SetValue(HasFilesKey, value); }
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (_dropZone != null)
+            {
+                _dropZone.MouseLeftButtonUp -= OnZoneClick;
+                _dropZone.DragOver -= OnDragOver;
+                _dropZone.Drop -= OnDrop;
+                _dropZone.DragLeave -= OnDragLeave;
+            }
+
+            _dropZone = GetTemplateChild("PART_DropZone") as FrameworkElement;
+            if (_dropZone != null)
+            {
+                _dropZone.MouseLeftButtonUp += OnZoneClick;
+                _dropZone.DragOver += OnDragOver;
+                _dropZone.Drop += OnDrop;
+                _dropZone.DragLeave += OnDragLeave;
+            }
+        }
+
+        private void OnFilesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SetValue(HasFilesKey, Files.Count > 0);
+        }
+
+        private void OnZoneClick(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsEnabled) return;
+
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = Multiple,
+                Filter = string.IsNullOrEmpty(Accept) ? "All files (*.*)|*.*" : BuildFilter(Accept)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                AddFiles(dialog.FileNames);
+            }
+            e.Handled = true;
+        }
+
+        private static string BuildFilter(string accept)
+        {
+            string extensions = accept.Replace(";", ";").Replace(",", ";");
+            return "Supported files (" + extensions.Replace(";", ";") + ")|" + extensions + "|All files (*.*)|*.*";
+        }
+
+        private void OnDragOver(object sender, DragEventArgs e)
+        {
+            bool hasFiles = e.Data.GetDataPresent(DataFormats.FileDrop);
+            e.Effects = hasFiles && IsEnabled ? DragDropEffects.Copy : DragDropEffects.None;
+            SetValue(IsDraggingOverKey, hasFiles && IsEnabled);
+            e.Handled = true;
+        }
+
+        private void OnDragLeave(object sender, DragEventArgs e)
+        {
+            SetValue(IsDraggingOverKey, false);
+        }
+
+        private void OnDrop(object sender, DragEventArgs e)
+        {
+            SetValue(IsDraggingOverKey, false);
+            if (!IsEnabled) return;
+
+            var paths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (paths == null || paths.Length == 0) return;
+
+            AddFiles(Multiple ? paths : new[] { paths[0] });
+            e.Handled = true;
+        }
+
+        private void AddFiles(string[] paths)
+        {
+            var added = new System.Collections.Generic.List<UploadFile>();
+            foreach (string path in paths)
+            {
+                if (!Accepts(path)) continue;
+                var file = new UploadFile
+                {
+                    Name = System.IO.Path.GetFileName(path),
+                    Path = path,
+                    Size = SafeSize(path),
+                    Status = AntdUploadStatus.Ready
+                };
+                Files.Add(file);
+                added.Add(file);
+            }
+
+            if (added.Count == 0) return;
+
+            EventHandler<UploadFile[]> handler = FileSelected;
+            if (handler != null) handler(this, added.ToArray());
+        }
+
+        private bool Accepts(string path)
+        {
+            if (string.IsNullOrEmpty(Accept)) return true;
+
+            string extension = System.IO.Path.GetExtension(path);
+            foreach (string part in Accept.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (string.Equals(part.Trim(), extension, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
+        }
+
+        private static long SafeSize(string path)
+        {
+            try { return new FileInfo(path).Length; }
+            catch (IOException) { return 0; }
+            catch (UnauthorizedAccessException) { return 0; }
+        }
+
+        public void RemoveFile(UploadFile file)
+        {
+            if (file != null) Files.Remove(file);
+        }
+
+        private void UpdateVisualState()
+        {
+            ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
+            AliasToken t = snapshot.Tokens;
+            SetCurrentValue(FontSizeProperty, t.FontSize);
+        }
+    }
+}
