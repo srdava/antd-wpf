@@ -13,6 +13,8 @@ using AntdInput = Antd.Wpf.Controls.Input;
 using AntdCalendar = Antd.Wpf.Controls.Calendar;
 using AntdAutoComplete = Antd.Wpf.Controls.AutoComplete;
 using AntdDatePicker = Antd.Wpf.Controls.DatePicker;
+using AntdList = Antd.Wpf.Controls.List;
+using AntdCard = Antd.Wpf.Controls.Card;
 using Antd.Wpf.Icons;
 using Antd.Wpf.Gallery;
 using Antd.Wpf.Theme;
@@ -81,6 +83,7 @@ namespace Antd.Wpf.SmokeTests
             CheckColorPicker();
             CheckTable();
             CheckTreeSelectAndCascader();
+            CheckDisplayControls();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -1126,6 +1129,124 @@ namespace Antd.Wpf.SmokeTests
             cHost.Close();
         }
 
+        // ---------------------------------------------------------------- display layer
+
+        private static void CheckDisplayControls()
+        {
+            var tabs = new Tabs { Width = 520 };
+            tabs.Items.Add(new TabsItem { Header = "Overview", Content = "one" });
+            tabs.Items.Add(new TabsItem { Header = "Settings", Content = "two" });
+            tabs.Items.Add(new TabsItem { Header = "History", Content = "three" });
+
+            var host = new Window
+            {
+                Width = 600, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { tabs } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("tabs select the first item", tabs.SelectedIndex == 0, tabs.SelectedIndex.ToString());
+
+            var firstTab = tabs.ItemContainerGenerator.ContainerFromIndex(0) as TabsItem;
+            Check("tab label is 46 tall", firstTab != null && Math.Abs(firstTab.ActualHeight - 46) < 0.6,
+                firstTab == null ? "missing" : firstTab.ActualHeight.ToString("0.#"));
+            Check("tabs expose an antd template",
+                firstTab != null && firstTab.Template != null, firstTab == null ? "no item" : "ok");
+
+            var ink = firstTab == null ? null : firstTab.Template.FindName("Ink", firstTab) as FrameworkElement;
+            Check("active tab shows its ink bar",
+                ink != null && ink.Visibility == Visibility.Visible, ink == null ? "missing" : ink.Visibility.ToString());
+
+            tabs.SelectedIndex = 1;
+            DoEvents();
+            Check("selecting a tab swaps the panel",
+                tabs.SelectedIndex == 1 && (ink == null || ink.Visibility != Visibility.Visible),
+                tabs.SelectedIndex.ToString());
+
+            var card = new AntdCard { Title = "Card title", Content = "body", Width = 300 };
+            var cardHost = new Window
+            {
+                Width = 420, Height = 240, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { card } }
+            };
+            cardHost.Show();
+            DoEvents();
+            cardHost.UpdateLayout();
+
+            Check("card grows a head when titled", card.HasHeader, card.HasHeader.ToString());
+            var head = card.Template.FindName("Head", card) as FrameworkElement;
+            Check("card head is 56 tall", head != null && Math.Abs(head.ActualHeight - 56) < 0.6,
+                head == null ? "missing" : head.ActualHeight.ToString("0.#"));
+            Check("card radius is borderRadiusLG", Math.Abs(card.CornerRadius.TopLeft - 8) < 0.01,
+                card.CornerRadius.TopLeft.ToString());
+
+            card.Title = null;
+            DoEvents();
+            Check("card drops the head without a title", !card.HasHeader, card.HasHeader.ToString());
+            cardHost.Close();
+
+            var collapse = new Collapse { Width = 420 };
+            var opened = new CollapseItem { Header = "First", Content = "body one", IsExpanded = true };
+            var closed = new CollapseItem { Header = "Second", Content = "body two" };
+            collapse.Items.Add(opened);
+            collapse.Items.Add(closed);
+
+            var collapseHost = new Window
+            {
+                Width = 520, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { collapse } }
+            };
+            collapseHost.Show();
+            DoEvents();
+            collapseHost.UpdateLayout();
+
+            Check("collapse opens the panel marked expanded", opened.IsExpanded && !closed.IsExpanded,
+                opened.IsExpanded + "/" + closed.IsExpanded);
+            Check("collapse drops the divider on the last row", closed.IsLast && !opened.IsLast,
+                closed.IsLast + "/" + opened.IsLast);
+
+            var header = opened.Template.FindName("PART_Header", opened) as FrameworkElement;
+            Check("collapse header hosts the click target", header != null, header == null ? "missing" : "ok");
+
+            var body = opened.Template.FindName("Body", opened) as FrameworkElement;
+            Check("expanded panel shows its body",
+                body != null && body.Visibility == Visibility.Visible, body == null ? "missing" : body.Visibility.ToString());
+
+            closed.IsExpanded = true;
+            DoEvents();
+            Check("panels expand independently by default", opened.IsExpanded && closed.IsExpanded,
+                opened.IsExpanded + "/" + closed.IsExpanded);
+
+            collapse.Accordion = true;
+            closed.IsExpanded = false;
+            closed.IsExpanded = true;
+            DoEvents();
+            Check("accordion closes the others", !opened.IsExpanded && closed.IsExpanded,
+                opened.IsExpanded + "/" + closed.IsExpanded);
+            collapseHost.Close();
+
+            var list = new AntdList { Width = 420 };
+            list.ItemsSource = new[] { "a", "b", "c" };
+            var listHost = new Window
+            {
+                Width = 520, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { list } }
+            };
+            listHost.Show();
+            DoEvents();
+            listHost.UpdateLayout();
+
+            Check("list renders every row", list.Items.Count == 3, list.Items.Count.ToString());
+            var firstRow = list.ItemContainerGenerator.ContainerFromIndex(0) as ListItem;
+            var lastRow = list.ItemContainerGenerator.ContainerFromIndex(2) as ListItem;
+            Check("list marks the last row",
+                firstRow != null && lastRow != null && !firstRow.IsLast && lastRow.IsLast,
+                (firstRow == null ? "?" : firstRow.IsLast.ToString()) + "/" + (lastRow == null ? "?" : lastRow.IsLast.ToString()));
+            listHost.Close();
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -1192,6 +1313,9 @@ namespace Antd.Wpf.SmokeTests
             if (switchPreview != null) RenderElement(switchPreview, Path.Combine(directory, "zoom-switch.png"), 6.0);
             var layoutPreview = FindDescendant<Antd.Wpf.Controls.Layout>(window);
             if (layoutPreview != null) RenderElement(layoutPreview, Path.Combine(directory, "zoom-layout.png"), 1.0);
+            var galleryTabs = window.FindName("DemoTabs") as Tabs;
+            if (galleryTabs != null) RenderElement(galleryTabs, Path.Combine(directory, "zoom-tabs.png"), 3.0);
+
             Render(window, Path.Combine(directory, "gallery-light.png"));
             Console.WriteLine("captured: gallery-light.png");
 

@@ -2812,7 +2812,304 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ Tabs -->
+
+    <Style TargetType="{x:Type antd:TabsItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <!-- antd pins the label row at 46 (12 + 22 + 12). WPF's default line box for 14px
+             text is 17.6, so the height has to be stated instead of derived from padding. -->
+        <Setter Property="Height" Value="46" />
+        <Setter Property="Padding" Value="0,12" />
+        <Setter Property="Margin" Value="0,0,32,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:TabsItem}">
+                    <!-- The strip hairline sits 16 below the nav, so the ink bar has to be drawn
+                         against the item's own box, not inside its padding. -->
+                    <Grid Background="Transparent">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <!-- Header, not Content: the content belongs to the panel host. -->
+                            <ContentPresenter x:Name="Label"
+                                              ContentSource="Header"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}" />
+                        </Border>
+                        <Border x:Name="Ink"
+                                Height="2"
+                                VerticalAlignment="Bottom"
+                                Background="{DynamicResource Antd.colorPrimary}"
+                                Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter TargetName="Ink" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="False" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimaryHover}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Tabs}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Tabs}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Nav: 46 tall labels sitting on a hairline. The line is a sibling at the
+                             bottom of the row so the 2px ink bar can paint over it; nesting it in a
+                             Border and pulling the items up by 1px buried the line instead. -->
+                        <Grid Grid.Row="0" Margin="0,0,0,16">
+                            <Border VerticalAlignment="Bottom"
+                                    Height="1"
+                                    Background="{DynamicResource Antd.colorSplit}" />
+                            <WrapPanel IsItemsHost="True"
+                                       Orientation="Horizontal"
+                                       Background="Transparent"
+                                       HorizontalAlignment="Left" />
+                        </Grid>
+
+                        <ContentPresenter Grid.Row="1"
+                                          x:Name="PART_SelectedContentHost"
+                                          ContentSource="SelectedContent" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Card -->
+
+    <Style TargetType="{x:Type antd:Card}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Card}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="Head"
+                                    Grid.Row="0"
+                                    Height="56"
+                                    Padding="24,0"
+                                    Background="Transparent"
+                                    BorderBrush="{DynamicResource Antd.colorSplit}"
+                                    BorderThickness="0,0,0,1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Grid.Column="0"
+                                                      ContentSource="Title"
+                                                      VerticalAlignment="Center"
+                                                      TextElement.FontSize="{DynamicResource Antd.fontSizeLG}"
+                                                      TextElement.FontWeight="SemiBold"
+                                                      TextElement.Foreground="{DynamicResource Antd.colorTextHeading}" />
+
+                                    <ContentPresenter Grid.Column="1"
+                                                      ContentSource="Extra"
+                                                      VerticalAlignment="Center"
+                                                      Margin="16,0,0,0"
+                                                      TextElement.FontSize="{DynamicResource Antd.fontSize}" />
+                                </Grid>
+                            </Border>
+
+                            <ContentPresenter Grid.Row="1" Margin="24" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasHeader" Value="False">
+                            <Setter TargetName="Head" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Collapse -->
+
+    <Style TargetType="{x:Type antd:CollapseItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:CollapseItem}">
+                    <Border x:Name="ItemRoot"
+                            Background="Transparent"
+                            BorderBrush="{DynamicResource Antd.colorBorder}"
+                            BorderThickness="0,0,0,1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="PART_Header"
+                                    Grid.Row="0"
+                                    Height="46"
+                                    Padding="16,0"
+                                    Background="{DynamicResource Antd.colorFillAlter}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path x:Name="Arrow"
+                                          Grid.Column="0"
+                                          Data="M2,0 L6,4 L2,8"
+                                          Stretch="None"
+                                          Stroke="{DynamicResource Antd.colorTextDescription}"
+                                          StrokeThickness="1.2"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RenderTransformOrigin="0.5,0.5" />
+
+                                    <ContentPresenter Grid.Column="1"
+                                                      ContentSource="Header"
+                                                      VerticalAlignment="Center"
+                                                      Margin="8,0,0,0"
+                                                      TextElement.FontSize="{DynamicResource Antd.fontSize}"
+                                                      TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="Body"
+                                    Grid.Row="1"
+                                    Padding="16"
+                                    Visibility="Collapsed"
+                                    Background="Transparent">
+                                <ContentPresenter TextElement.FontSize="{DynamicResource Antd.fontSize}"
+                                                  TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="Body" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Arrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="90" CenterX="4" CenterY="4" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsLast" Value="True">
+                            <Setter TargetName="ItemRoot" Property="BorderThickness" Value="0" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsFirst" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_Header" Property="CornerRadius" Value="7,7,0,0" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Collapse}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Collapse}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            ClipToBounds="True">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ List -->
+
+    <Style TargetType="{x:Type antd:ListItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:ListItem}">
+                    <Border x:Name="RowRoot"
+                            Background="Transparent"
+                            BorderBrush="{DynamicResource Antd.colorSplit}"
+                            BorderThickness="0,0,0,1"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.FontSize="{TemplateBinding FontSize}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsLast" Value="True">
+                            <Setter TargetName="RowRoot" Property="BorderThickness" Value="0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:List}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Padding" Value="0,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:List}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
 
 
 

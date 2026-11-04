@@ -49,6 +49,13 @@ namespace Antd.Wpf.Gallery
             };
 
             BuildDemoTree();
+            DemoList.ItemsSource = new[]
+            {
+                new ListRow { Name = "Button", Role = "Atomic component", Status = "Stable" },
+                new ListRow { Name = "Select", Role = "Data entry", Status = "Stable" },
+                new ListRow { Name = "Table", Role = "Data display", Status = "Beta" }
+            };
+
             BuildDemoTable();
             BuildDemoSelectors();
 
@@ -73,6 +80,13 @@ namespace Antd.Wpf.Gallery
         {
             RefreshTokens();
             UpdateThemeButton();
+        }
+
+        public sealed class ListRow
+        {
+            public string Name { get; set; }
+            public string Role { get; set; }
+            public string Status { get; set; }
         }
 
         public sealed class TableRow

@@ -772,6 +772,97 @@
                 </StackPanel>
             </Border>
 
+            <!-- tabs / card / collapse / list -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Tabs, Card, Collapse, List" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Navigation strip, a container with a head, disclosure rows and a divided list." />
+
+                    <antd:Tabs x:Name="DemoTabs" SelectedIndex="0">
+                        <antd:TabsItem Header="Overview">
+                            <TextBlock Margin="0,0,0,4" TextWrapping="Wrap" FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorText}"
+                                       Text="The first panel. Labels are 46 tall with a 2px ink bar under the active one." />
+                        </antd:TabsItem>
+                        <antd:TabsItem Header="Settings">
+                            <TextBlock TextWrapping="Wrap" FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorText}"
+                                       Text="The second panel, hosted by the same content presenter." />
+                        </antd:TabsItem>
+                        <antd:TabsItem Header="History">
+                            <TextBlock TextWrapping="Wrap" FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorText}"
+                                       Text="The third panel." />
+                        </antd:TabsItem>
+                    </antd:Tabs>
+
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="320" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <antd:Card Grid.Column="0" Title="Card title" HorizontalAlignment="Left"
+                                   Width="300" Margin="0,0,24,0">
+                            <antd:Card.Extra>
+                                <antd:Button Content="More" Variant="Link" Size="Small" />
+                            </antd:Card.Extra>
+                            <TextBlock TextWrapping="Wrap" FontSize="14"
+                                       Foreground="{DynamicResource Antd.colorText}"
+                                       Text="Head is 56 tall with a hairline, body keeps 24 padding." />
+                        </antd:Card>
+
+                        <StackPanel Grid.Column="1">
+                            <antd:Collapse x:Name="DemoCollapse">
+                                <antd:CollapseItem Header="First panel" IsExpanded="True">
+                                    <TextBlock FontSize="14" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource Antd.colorText}"
+                                               Text="Rows are separated by hairlines; the container clips its rounded corners." />
+                                </antd:CollapseItem>
+                                <antd:CollapseItem Header="Second panel">
+                                    <TextBlock FontSize="14"
+                                               Foreground="{DynamicResource Antd.colorText}"
+                                               Text="Second body." />
+                                </antd:CollapseItem>
+                                <antd:CollapseItem Header="Third panel">
+                                    <TextBlock FontSize="14"
+                                               Foreground="{DynamicResource Antd.colorText}"
+                                               Text="Third body." />
+                                </antd:CollapseItem>
+                            </antd:Collapse>
+                        </StackPanel>
+                    </Grid>
+
+                    <antd:List x:Name="DemoList" Margin="0,20,0,0" HorizontalAlignment="Stretch">
+                        <antd:List.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Antd.colorText}" />
+                                        <TextBlock Text="{Binding Role}" FontSize="14"
+                                                   Foreground="{DynamicResource Antd.colorTextDescription}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding Status}" FontSize="14"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                                </Grid>
+                            </DataTemplate>
+                        </antd:List.ItemTemplate>
+                    </antd:List>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

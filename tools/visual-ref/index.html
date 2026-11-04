@@ -34,7 +34,8 @@ const h = React.createElement;
 const {
   Button, Input, InputNumber, Select, Switch, Checkbox, Radio, Rate, Slider,
   Tag, Badge, Avatar, Statistic, Progress, Spin, Skeleton, Empty, Segmented,
-  Divider, Space, Typography, Form, ConfigProvider
+  Divider, Space, Typography, Form, ConfigProvider,
+  Tabs, Collapse, List, Card: AntCard
 } = antd;
 const { Title, Paragraph, Text, Link } = Typography;
 
@@ -177,7 +178,41 @@ function App() {
           h(Space, null,
             h(Button, { type: 'primary' }, 'Submit'),
             h(Button, null, 'Reset')))))
+    ,
+    h(Card, { id: 'display2', title: 'Tabs, Card, Collapse, List', desc: 'Navigation, containers, disclosure and data lists.' },
+      h('div', { 'data-m': 'tabs' },
+        h(Tabs, {
+          defaultActiveKey: '1',
+          items: [
+            { key: '1', label: 'Overview', children: h('div', { style: { paddingTop: 16, fontSize: 14 } }, 'First panel content.') },
+            { key: '2', label: 'Settings', children: h('div', { style: { paddingTop: 16, fontSize: 14 } }, 'Second panel.') },
+            { key: '3', label: 'History', children: h('div', { style: { paddingTop: 16, fontSize: 14 } }, 'Third panel.') }
+          ]
+        })),
+      h('div', { style: { height: 16 } }),
+      h(AntCard, { 'data-m': 'card', title: 'Card title', extra: h('a', null, 'More'), style: { width: 320 } },
+        h('div', { 'data-m': 'card-body' }, 'Card body copy.')),
+      h('div', { style: { height: 16 } }),
+      h(Collapse, {
+        'data-m': 'collapse',
+        defaultActiveKey: ['1'],
+        items: [
+          { key: '1', label: h('span', { 'data-m': 'collapse-header' }, 'First panel'), children: h('div', { 'data-m': 'collapse-body' }, 'Panel content.') },
+          { key: '2', label: 'Second panel', children: 'Panel content.' }
+        ]
+      }),
+      h('div', { style: { height: 16 } }),
+      h(List, {
+        'data-m': 'list',
+        size: 'small',
+        bordered: false,
+        dataSource: [{ t: 'Button', d: 'Atomic' }, { t: 'Select', d: 'Data entry' }],
+        renderItem: item => h(List.Item, null,
+          h(List.Item.Meta, { title: item.t, description: item.d }))
+      })
+    )
   );
+
 }
 
 try {
@@ -214,6 +249,23 @@ window.addEventListener('load', () => {
       }
       out.push(rec);
     });
+    // Named antd internals: class names carry the real padding/height of a component's parts.
+    const parts = {
+      'tabs-nav': '.ant-tabs-nav', 'tab': '.ant-tabs-tab', 'ink': '.ant-tabs-ink-bar',
+      'card-head': '.ant-card-head', 'card-head-title': '.ant-card-head-title',
+      'collapse-header': '.ant-collapse-header', 'collapse-content': '.ant-collapse-content-box',
+      'list-item': '.ant-list-item', 'list-meta-title': '.ant-list-item-meta-title'
+    };
+    Object.keys(parts).forEach(key => {
+      const el = document.querySelector(parts[key]);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const rec = { name: key, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
+      props.forEach(p => { rec[p] = cs[p]; });
+      out.push(rec);
+    });
+
     // Also measure a few structural constants of the reference page.
     const cards = [...document.querySelectorAll('.card')].map(c => {
       const r = c.getBoundingClientRect();
