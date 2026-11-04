@@ -67,6 +67,7 @@ namespace Antd.Wpf.SmokeTests
             CheckVisualParity();
             CheckAutoCompleteAndCalendar();
             CheckDatePicker();
+            CheckM1Tail();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -638,6 +639,63 @@ namespace Antd.Wpf.SmokeTests
                 picker.DisplayText == new DateTime(2026, 3, 14).ToString("MMM d, yyyy", System.Globalization.CultureInfo.CurrentCulture),
                 picker.DisplayText);
             host.Close();
+        }
+
+        // ---------------------------------------------------------------- M1 tail
+
+        private static void CheckM1Tail()
+        {
+            AliasToken t = ThemeManager.Current.Snapshot.Tokens;
+
+            var splitter = new Splitter { ResizeDirection = GridResizeDirection.Columns };
+            Check("splitter bar uses colorSplit",
+                SameBrush(splitter.BarBrush, ThemeManager.Current.Snapshot.Brush("colorSplit")),
+                Describe(splitter.BarBrush));
+            Check("splitter bar is 1px", Math.Abs(splitter.BarThickness - 1) < 0.01,
+                splitter.BarThickness.ToString());
+
+            var beam = new BorderBeam { CornerRadius = new CornerRadius(10) };
+            var beamHost = new Window
+            {
+                Width = 260, Height = 140, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new Grid { Children = { beam } }
+            };
+            beamHost.Show();
+            DoEvents();
+            beamHost.UpdateLayout();
+            Check("border beam paints a base border",
+                SameBrush(beam.BaseBrush, ThemeManager.Current.Snapshot.Brush("colorBorderSecondary")),
+                Describe(beam.BaseBrush));
+            beamHost.Close();
+
+            // Affix must pin itself once the scroller passes OffsetTop.
+            var affixTarget = new Border { Height = 40, Background = Brushes.Transparent };
+            var affix = new Affix { Content = affixTarget, OffsetTop = 0 };
+            var scroller = new ScrollViewer
+            {
+                Height = 120,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = new StackPanel { Children = { affix, new Border { Height = 400 } } }
+            };
+            var affixHost = new Window
+            {
+                Width = 320, Height = 200, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { scroller } }
+            };
+            affixHost.Show();
+            DoEvents();
+            affixHost.UpdateLayout();
+
+            Check("affix is not pinned at rest", !affix.IsPinned, affix.IsPinned.ToString());
+
+            scroller.ScrollToVerticalOffset(60);
+            DoEvents();
+            var translate = affix.RenderTransform as TranslateTransform;
+            Check("affix pins after scrolling past the offset",
+                affix.IsPinned && translate != null && translate.Y > 1,
+                translate == null ? "no transform" : translate.Y.ToString("0.#"));
+
+            affixHost.Close();
         }
 
         // ---------------------------------------------------------------- theme switch

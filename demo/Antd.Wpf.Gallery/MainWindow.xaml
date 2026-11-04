@@ -557,6 +557,81 @@
                 </StackPanel>
             </Border>
 
+            <!-- splitter / affix / border beam -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Splitter, Affix, BorderBeam" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="A draggable divider, sticky content inside a scroller, and a beam that runs around a card." />
+
+                    <Grid Height="110">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" MinWidth="120" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="{DynamicResource Antd.colorFillQuaternary}"
+                                CornerRadius="6">
+                            <TextBlock Text="Left pane" Margin="12" FontSize="13"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                        </Border>
+
+                        <antd:Splitter Grid.Column="1" ResizeDirection="Columns"
+                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+                        <Border Grid.Column="2" Background="{DynamicResource Antd.colorFillQuaternary}"
+                                CornerRadius="6">
+                            <TextBlock Text="Right pane" Margin="12" FontSize="13"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                        </Border>
+                    </Grid>
+
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer Grid.Column="0" Height="120" VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <antd:Affix OffsetTop="0">
+                                    <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                            BorderBrush="{DynamicResource Antd.colorSplit}"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="8,6">
+                                        <TextBlock Text="Pinned header (scroll me)"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource Antd.colorText}" />
+                                    </Border>
+                                </antd:Affix>
+                                <TextBlock Margin="8,8,8,0" TextWrapping="Wrap" FontSize="13"
+                                           Foreground="{DynamicResource Antd.colorTextTertiary}"
+                                           Text="Scroll this box and the header above stays pinned to its top edge. The control tracks the nearest ScrollViewer and offsets itself instead of reparenting." />
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <Grid Grid.Column="1" Width="260" Height="120" Margin="24,0,0,0">
+                            <Border Background="{DynamicResource Antd.colorBgContainer}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="10">
+                                <TextBlock Text="Beam" Margin="16" VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            </Border>
+                            <antd:BorderBeam CornerRadius="10" BeamThickness="2" />
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

@@ -1641,5 +1641,68 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ Splitter -->
+
+    <Style TargetType="{x:Type antd:Splitter}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Splitter}">
+                    <!-- The bar is thin but the hit area is 10px, so it is draggable without
+                         looking heavy. -->
+                    <Grid Background="Transparent" MinWidth="10" MinHeight="10">
+                        <Rectangle x:Name="VerticalBar"
+                                   Width="{TemplateBinding BarThickness}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Stretch"
+                                   Fill="{TemplateBinding BarBrush}" />
+                        <Rectangle x:Name="HorizontalBar"
+                                   Height="{TemplateBinding BarThickness}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Center"
+                                   Fill="{TemplateBinding BarBrush}"
+                                   Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ResizeDirection" Value="Rows">
+                            <Setter TargetName="VerticalBar" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="HorizontalBar" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Affix -->
+
+    <Style TargetType="{x:Type antd:Affix}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Affix}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ BorderBeam -->
+
+    <Style TargetType="{x:Type antd:BorderBeam}">
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <!-- Painting happens in OnRender; the template only needs to exist so the
+                     control has a visual to draw into. -->
+                <ControlTemplate TargetType="{x:Type antd:BorderBeam}" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
 
