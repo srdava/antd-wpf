@@ -813,6 +813,60 @@ namespace Antd.Wpf.SmokeTests
             Check("clearing a time restores the placeholder", time.ShowPlaceholder && !time.CanClear, time.DisplayText);
             host.Close();
 
+            // A WPF Popup freezes at the screen position it opened at, so a dropdown inside a
+            // scrolling page drifts away from its field. The panel has to follow it.
+            var scrollPicker = new TimePicker { SelectedTime = new TimeSpan(9, 0, 0) };
+            var scroller = new ScrollViewer
+            {
+                Height = 200,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                Content = new StackPanel { Children = { scrollPicker, new Border { Height = 600 } } }
+            };
+            var scrollHost = new Window
+            {
+                Width = 400, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = scroller
+            };
+            scrollHost.Show();
+            DoEvents();
+            scrollHost.UpdateLayout();
+
+            scrollPicker.IsDropDownOpen = true;
+            DoEvents();
+            DoEvents();
+
+            var anchoredPopup = scrollPicker.Template.FindName("PART_Popup", scrollPicker)
+                as System.Windows.Controls.Primitives.Popup;
+            var panel = anchoredPopup == null ? null : anchoredPopup.Child as FrameworkElement;
+
+            Check("time picker panel is anchored to the field",
+                anchoredPopup != null && anchoredPopup.PlacementTarget == scrollPicker,
+                anchoredPopup == null ? "no popup" : (anchoredPopup.PlacementTarget == null ? "null" : anchoredPopup.PlacementTarget.GetType().Name));
+
+            if (panel != null)
+            {
+                Point fieldStart = scrollPicker.PointToScreen(new Point(0, 0));
+                Point panelStart = panel.PointToScreen(new Point(0, 0));
+
+                scroller.ScrollToVerticalOffset(60);
+                DoEvents();
+                DoEvents();
+
+                Point fieldScrolled = scrollPicker.PointToScreen(new Point(0, 0));
+                Point panelScrolled = panel.PointToScreen(new Point(0, 0));
+
+                double fieldDelta = fieldScrolled.Y - fieldStart.Y;
+                double panelDelta = panelScrolled.Y - panelStart.Y;
+
+                Check("time picker panel moves with the field",
+                    Math.Abs(fieldDelta) > 1 && Math.Abs(panelDelta - fieldDelta) < 1.5,
+                    "field " + fieldDelta.ToString("0.#") + " panel " + panelDelta.ToString("0.#"));
+                Check("time picker panel keeps its gap",
+                    Math.Abs((panelScrolled.Y - fieldScrolled.Y) - (panelStart.Y - fieldStart.Y)) < 1.5,
+                    (panelScrolled.Y - fieldScrolled.Y).ToString("0.#"));
+            }
+            scrollHost.Close();
+
             var mentions = new Mentions
             {
                 ItemsSource = new[] { "Alice Chen", "Bob Li", "Carol Wang" }

@@ -1196,11 +1196,12 @@
 
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
                                Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"
-                               Focusable="False" StaysOpen="False">
+                               Focusable="False" StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1" CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0" Padding="4">
+                                    Padding="4">
                                 <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                               VerticalScrollBarVisibility="Auto">
                                     <ItemsPresenter />
@@ -1346,13 +1347,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="4"
+                                                                        Padding="4"
                                     MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                               VerticalScrollBarVisibility="Auto">
@@ -1585,13 +1586,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="8">
+                                                                        Padding="8">
                                 <StackPanel>
                                     <antd:Calendar x:Name="PART_Calendar"
                                                    Background="Transparent"
@@ -1945,13 +1946,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="8">
+                                                                        Padding="8">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <ListBox x:Name="PART_Hours"
@@ -2400,13 +2401,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="12">
+                                                                        Padding="12">
                                 <StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -2689,13 +2690,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="8"
+                                                                        Padding="8"
                                     MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto"
                                               HorizontalScrollBarVisibility="Disabled">
@@ -2781,13 +2782,13 @@
                                AllowsTransparency="True"
                                PopupAnimation="Fade"
                                Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"
+                               VerticalOffset="4">
                             <Border Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1"
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Margin="0,4,0,0"
-                                    Padding="4">
+                                                                        Padding="4">
                                 <StackPanel x:Name="PART_Columns" Orientation="Horizontal" />
                             </Border>
                         </Popup>

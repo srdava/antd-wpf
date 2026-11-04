@@ -137,6 +137,7 @@ namespace Antd.Wpf.Controls
 
             _editor = GetTemplateChild("PART_EditableTextBox") as TextBox;
             _popup = GetTemplateChild("PART_Popup") as Popup;
+            PopupAnchor.Attach(_popup, this);
             _list = GetTemplateChild("PART_Suggestions") as ListBox;
 
             if (_editor != null)

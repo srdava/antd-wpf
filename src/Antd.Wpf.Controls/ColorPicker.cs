@@ -188,6 +188,7 @@ namespace Antd.Wpf.Controls
             var button = GetTemplateChild("PART_ClearButton") as Button;
             var popup = GetTemplateChild("PART_Popup") as System.Windows.Controls.Primitives.Popup;
             var field = GetTemplateChild("PART_Field") as FrameworkElement;
+            PopupAnchor.Attach(popup, this);
 
             if (_saturation != null)
             {

@@ -135,6 +135,9 @@ namespace Antd.Wpf.Controls
                 if (_popup != null) _popup.PlacementTarget = _editor;
             }
 
+            // The panel is offset to the caret, so it is anchored to the editor itself and only
+            // asked to re-run placement when the page scrolls.
+            PopupAnchor.Attach(_popup, _editor);
             if (_popup != null) _popup.Closed += OnPopupClosed;
 
             UpdateState();

@@ -162,6 +162,7 @@ namespace Antd.Wpf.Controls
 
             _field = GetTemplateChild("PART_Field") as Border;
             _popup = GetTemplateChild("PART_Popup") as Popup;
+            PopupAnchor.Attach(_popup, this);
             _columns = GetTemplateChild("PART_Columns") as StackPanel;
             _clear = GetTemplateChild("PART_ClearButton") as Button;
 

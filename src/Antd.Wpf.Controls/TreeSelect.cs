@@ -136,6 +136,7 @@ namespace Antd.Wpf.Controls
 
             _field = GetTemplateChild("PART_Field") as Border;
             _popup = GetTemplateChild("PART_Popup") as Popup;
+            PopupAnchor.Attach(_popup, this);
             _tree = GetTemplateChild("PART_Tree") as Tree;
             _clear = GetTemplateChild("PART_ClearButton") as Button;
 
