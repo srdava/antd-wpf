@@ -513,6 +513,44 @@
                 </StackPanel>
             </Border>
 
+            <!-- autocomplete + calendar -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="AutoComplete &amp; Calendar" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Free text with filtered suggestions, and a month grid with navigation." />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="360" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0">
+                            <TextBlock Text="Framework" FontSize="13" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            <antd:AutoComplete x:Name="FrameworkAuto"
+                                               Width="320"
+                                               HorizontalAlignment="Left"
+                                               Placeholder="Type to filter" />
+                            <TextBlock Margin="0,12,0,0" FontSize="13"
+                                       Foreground="{DynamicResource Antd.colorTextTertiary}"
+                                       TextWrapping="Wrap"
+                                       Text="Type 'w' or 'ava'. Up/Down to move, Enter to accept, Esc to dismiss." />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Left">
+                            <antd:Calendar x:Name="DemoCalendar" Width="308" MaxWidth="308" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

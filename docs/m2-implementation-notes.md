@@ -125,3 +125,29 @@ static Xxx()
 2. **再攻日期**：`Calendar` → `DatePicker` → `TimePicker`，三者共用日历面板。
 3. **`Tree` 优先级应提前**：`TreeSelect`、`Cascader`、`Menu`、`Table` 的树形行都依赖它。
 4. 每批仍按「先断言、再模板、最后看观感」的节奏，几何问题只信打印值。
+
+## 补充：输入族一致性（AutoComplete / Calendar 同批）
+
+### 问题
+同一张表单里，Input 是圆角、Select 与 InputNumber 是直角。原因不是漏写样式，而是两条不同的
+取数通道：Input 用控件上的 `CornerRadius` 依赖属性，另外两个在模板里用 `{theme:CornerRadius}`
+标记扩展绑定 `Snapshot.Tokens.borderRadius`。后者在模板中静默失败，值落回 0，于是直角。
+
+### 处理
+- 给 Select / InputNumber 补 `CornerRadius` 依赖属性，在 `UpdateVisualState()` 里按尺寸取
+  `Metrics.Radius(t, Size)`，模板改用 `TemplateBinding`。四个有边框的字段（Input / InputNumber /
+  Select / AutoComplete）现在共用同一套高度、圆角、边框来源。
+- 新增断言 `input family shares height and radius`：三者 `MinHeight == controlHeight` 且
+  `CornerRadius == borderRadius`，谁再用别的通道取数就会立刻失败。
+
+### 顺手修掉的清除图标
+清除按钮的图标是一个 14px 的灰色圆 + 白色叉。Select 里把按钮压到了 12×12，14px 的圆被按钮内容
+边界裁掉四边，渲染出来是「圆角方块」。修法是让图标与按钮同尺寸，并让叉与圆共用 14×14 坐标系
+（`Stretch=None` + 左上对齐），不再依赖自身测量的居中。
+
+### 新增组件
+- **AutoComplete**：文本 + 过滤建议。值可以是任意文本，所以不能像 Select 那样派生 ComboBox；
+  建议列表用 ListBox，键盘上下/回车/Esc 交给框架。过滤模式 `Contains` / `StartsWith` / `None`。
+- **Calendar**：42 格月视图（ListBox + UniformGrid），支持上/下月、选中、今日标记、跨月淡出。
+  它是后续 DatePicker 的地基。
+- 命名注意：`Antd.Wpf.Controls.Calendar` 与 `System.Windows.Controls.Calendar` 同名，使用时需要别名。

@@ -75,6 +75,20 @@ namespace Antd.Wpf.Controls
             set { SetValue(PrecisionProperty, value); }
         }
 
+        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(
+            "CornerRadius", typeof(CornerRadius), typeof(InputNumber),
+            new FrameworkPropertyMetadata(new CornerRadius(6)));
+
+        /// <summary>
+        /// Same radius the Input uses. Driving it from a DP (instead of a markup extension in
+        /// the template) keeps every bordered field on one code path, so they cannot drift apart.
+        /// </summary>
+        public CornerRadius CornerRadius
+        {
+            get { return (CornerRadius)GetValue(CornerRadiusProperty); }
+            set { SetValue(CornerRadiusProperty, value); }
+        }
+
         public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
             "Size", typeof(AntdSize), typeof(InputNumber),
             new FrameworkPropertyMetadata(AntdSize.Middle, OnAppearanceChanged));
@@ -215,6 +229,7 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(BorderThicknessProperty, new Thickness(t.LineWidth));
             SetCurrentValue(FontSizeProperty, Metrics.FontSize(t, Size));
             SetCurrentValue(MinHeightProperty, height);
+            SetCurrentValue(CornerRadiusProperty, new CornerRadius(Metrics.Radius(t, Size)));
             SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), 0, 0, 0));
             SetCurrentValue(CaretBrushProperty, snapshot.Brush("colorText"));
 

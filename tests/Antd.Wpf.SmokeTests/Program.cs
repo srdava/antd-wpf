@@ -10,6 +10,8 @@ using System.Windows.Threading;
 using Antd.Wpf.Controls;
 using AntdButton = Antd.Wpf.Controls.Button;
 using AntdInput = Antd.Wpf.Controls.Input;
+using AntdCalendar = Antd.Wpf.Controls.Calendar;
+using AntdAutoComplete = Antd.Wpf.Controls.AutoComplete;
 using Antd.Wpf.Icons;
 using Antd.Wpf.Gallery;
 using Antd.Wpf.Theme;
@@ -46,7 +48,8 @@ namespace Antd.Wpf.SmokeTests
 
             if (metricsPath != null)
             {
-                MetricsProbe.Run(metricsPath);
+                try { MetricsProbe.Run(metricsPath); }
+                catch (Exception ex) { Console.WriteLine("METRICS FAILED: " + ex); return 2; }
                 app.Shutdown();
                 return 0;
             }
@@ -61,6 +64,7 @@ namespace Antd.Wpf.SmokeTests
             CheckM1Components();
             CheckM2Components();
             CheckVisualParity();
+            CheckAutoCompleteAndCalendar();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -438,8 +442,115 @@ namespace Antd.Wpf.SmokeTests
             host.Arrange(new Rect(0, 0, 400, 100));
             Check("progress fits its container", progress.ActualWidth <= 400.01,
                 progress.ActualWidth.ToString("0.#"));
+            // Every bordered field must share one metric source; they drifted once because two
+            // templates read their radius from a markup extension and one from a DP.
+            var fields = new Control[]
+            {
+                new AntdInput(),
+                new InputNumber(),
+                new Select()
+            };
+            bool sameHeight = fields.All(f => Math.Abs(f.MinHeight - t.ControlHeight) < 0.01);
+            bool sameRadius = new[] { (fields[0] as AntdInput).CornerRadius.TopLeft,
+                                      (fields[1] as InputNumber).CornerRadius.TopLeft,
+                                      (fields[2] as Select).CornerRadius.TopLeft }
+                                  .All(r => Math.Abs(r - t.BorderRadius) < 0.01);
+            Check("input family shares height and radius", sameHeight && sameRadius,
+                string.Join("/", fields.Select(f => f.MinHeight.ToString("0.#"))));
+
+            var clearable = new AntdInput { Text = "x", AllowClear = true, Width = 160 };
+            var clearHost = new Window
+            {
+                Width = 240, Height = 120, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new Border { Child = clearable }
+            };
+            clearHost.Show();
+            DoEvents();
+            clearHost.UpdateLayout();
+            var clearPart = clearable.Template.FindName("PART_ClearButton", clearable) as FrameworkElement;
+            Check("clear icon is a square hit box",
+                clearPart != null && Math.Abs(clearPart.ActualWidth - clearPart.ActualHeight) < 0.01,
+                clearPart == null ? "missing" : clearPart.ActualWidth + "x" + clearPart.ActualHeight);
+            clearHost.Close();
+
             Check("progress reserves room for the label",
                 Math.Abs(progress.FontSize - t.FontSize) < 0.01, progress.FontSize.ToString());
+        }
+
+        // ---------------------------------------------------------------- M2 additions
+
+        private static void CheckAutoCompleteAndCalendar()
+        {
+            AliasToken t = ThemeManager.Current.Snapshot.Tokens;
+
+            var complete = new AntdAutoComplete
+            {
+                ItemsSource = new[] { "WPF", "WinUI 3", "Avalonia", "MAUI" },
+                Text = "w"
+            };
+            var host = new Window
+            {
+                Width = 400, Height = 200, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new Border { Child = complete }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var list = complete.Template.FindName("PART_Suggestions", complete) as System.Windows.Controls.ListBox;
+            Check("autocomplete filters on text",
+                list != null && list.Items.Count == 2, list == null ? "no list" : list.Items.Count.ToString());
+            var editor = complete.Template.FindName("PART_EditableTextBox", complete) as System.Windows.Controls.TextBox;
+            if (editor != null) { editor.Focus(); DoEvents(); }
+            Check("autocomplete opens on focus with matches",
+                complete.IsDropDownOpen && complete.HasSuggestions, complete.IsDropDownOpen.ToString());
+
+            complete.Text = "zzz";
+            DoEvents();
+            Check("autocomplete closes when nothing matches",
+                !complete.IsDropDownOpen && !complete.HasSuggestions, complete.IsDropDownOpen.ToString());
+
+            complete.Text = string.Empty;
+            DoEvents();
+            Check("empty text offers every option",
+                list != null && list.Items.Count == 4, list == null ? "no list" : list.Items.Count.ToString());
+            host.Close();
+
+            // December 2026 starts on a Tuesday, so the grid leads with November days.
+            var calendar = new AntdCalendar { DisplayDate = new DateTime(2026, 12, 15) };
+            var calHost = new Window
+            {
+                Width = 400, Height = 400, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new Border { Child = calendar }
+            };
+            calHost.Show();
+            DoEvents();
+            calHost.UpdateLayout();
+
+            Check("calendar renders six weeks", calendar.Days.Count == 42, calendar.Days.Count.ToString());
+            Check("calendar starts on the first week",
+                calendar.Days[0].Date.DayOfWeek == DayOfWeek.Sunday,
+                calendar.Days[0].Date.DayOfWeek.ToString());
+            Check("calendar marks leading days as outside",
+                calendar.Days[0].IsOutsideMonth, calendar.Days[0].Date.ToString("d"));
+
+            calendar.SelectedDate = new DateTime(2026, 12, 15);
+            DoEvents();
+            var grid = calendar.Template.FindName("PART_DayGrid", calendar) as System.Windows.Controls.ListBox;
+            var picked = grid == null ? null : grid.SelectedItem as CalendarDay;
+            Check("calendar selects the requested day",
+                picked != null && picked.Date == new DateTime(2026, 12, 15),
+                picked == null ? "no selection" : picked.Key);
+
+            calendar.DisplayDate = new DateTime(2027, 1, 1);
+            DoEvents();
+            Check("calendar rebuilds on month change",
+                calendar.Days[15].IsOutsideMonth == false && calendar.Days[15].Date.Month == 1,
+                calendar.Days[15].Date.ToString("d"));
+
+            Check("calendar label localised",
+                !string.IsNullOrEmpty(calendar.MonthLabel), calendar.MonthLabel);
+            calHost.Close();
         }
 
         // ---------------------------------------------------------------- theme switch

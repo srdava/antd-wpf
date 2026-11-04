@@ -47,6 +47,11 @@ namespace Antd.Wpf.SmokeTests
 
             add("input-basic", new AntdInput { Width = 220, Placeholder = "Basic input" });
             add("input-error", new AntdInput { Width = 220, Text = "Error state", Status = AntdStatus.Error });
+            add("input-large", new AntdInput { Width = 160, Size = AntdSize.Large, Placeholder = "Large" });
+            add("input-small", new AntdInput { Width = 160, Size = AntdSize.Small, Placeholder = "Small" });
+            add("input-number", new InputNumber { Width = 140, Value = 3, Minimum = 1, Maximum = 20 });
+            add("select", new Select { Width = 200, Placeholder = "Pick one" });
+            add("autocomplete", new AutoComplete { Width = 200, Placeholder = "Type to filter" });
 
             add("tag-default", new Tag { Content = "Default" });
             add("tag-processing", new Tag { Content = "Processing", Color = AntdTagColor.Processing });
@@ -119,6 +124,10 @@ namespace Antd.Wpf.SmokeTests
                 builder.Append("\n");
             }
             builder.Append(" ]\n}\n");
+
+            File.WriteAllText(path, builder.ToString());
+            Console.WriteLine("metrics written: " + path + " (" + items.Count + " entries)");
+            window.Close();
         }
 
         private static string RadiusOf(FrameworkElement element)

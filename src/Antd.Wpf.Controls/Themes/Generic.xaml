@@ -133,16 +133,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border Background="Transparent">
+                        <!-- Both shapes share the same 14x14 coordinate space: Stretch=None plus
+                             Top/Left keeps the cross centred without measuring its own bounds. -->
                         <Grid Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Ellipse Fill="{DynamicResource Antd.colorTextQuaternary}" />
-                            <Path Data="M4.6,4.6 L9.4,9.4 M9.4,4.6 L4.6,9.4"
+                            <Path Data="M4.7,4.7 L9.3,9.3 M9.3,4.7 L4.7,9.3"
                                   Stretch="None"
                                   Stroke="{DynamicResource Antd.colorBgContainer}"
                                   StrokeThickness="1.1"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" />
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Top" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -887,7 +889,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{theme:CornerRadius borderRadius}">
+                            CornerRadius="{TemplateBinding CornerRadius}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -1152,7 +1154,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{theme:CornerRadius borderRadius}">
+                                CornerRadius="{TemplateBinding CornerRadius}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -1175,7 +1177,7 @@
 
                                 <Button x:Name="PART_ClearButton" Grid.Column="1"
                                         Style="{StaticResource Antd.Input.ClearButton}"
-                                        Width="12" Height="12" Margin="0,0,4,0" Visibility="Collapsed" />
+                                        Margin="0,0,4,0" Visibility="Collapsed" />
 
                                 <Path Grid.Column="2" Data="M0,0 L4,4 L8,0" Stretch="None"
                                       Stroke="{TemplateBinding ArrowBrush}" StrokeThickness="1.2"
@@ -1262,6 +1264,248 @@
                             <Setter TargetName="MessageText" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ AutoComplete -->
+
+    <Style x:Key="Antd.AutoComplete.Item" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="ItemRoot" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemRoot" Property="Background" Value="{DynamicResource Antd.controlItemBgHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemRoot" Property="Background" Value="{DynamicResource Antd.controlItemBgActive}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:AutoComplete}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:AutoComplete}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                MinHeight="{TemplateBinding MinHeight}"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Padding="0"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="{TemplateBinding FontSize}"
+                                         FontFamily="{TemplateBinding FontFamily}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         CaretBrush="{TemplateBinding Foreground}"
+                                         FocusVisualStyle="{x:Null}" />
+
+                                <TextBlock x:Name="PlaceholderText"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center"
+                                           IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="4"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ListBox x:Name="PART_Suggestions"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             ItemContainerStyle="{StaticResource Antd.AutoComplete.Item}"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Calendar -->
+
+    <Style x:Key="Antd.Calendar.Nav" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Margin" Value="4,0,0,0" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="NavRoot" Background="Transparent" CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="NavRoot" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Antd.Calendar.Day" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="DayRoot" Background="Transparent" CornerRadius="4" Margin="2">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="DayRoot" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="DayRoot" Property="Background" Value="{DynamicResource Antd.colorPrimary}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextLightSolid}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsOutsideMonth}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsToday}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </DataTrigger>
+            <!-- Last so it beats the today/outside colours: white on the primary fill. -->
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextLightSolid}" />
+                <Setter Property="FontWeight" Value="Normal" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Calendar}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Calendar}">
+                    <Border Background="{DynamicResource Antd.colorBgContainer}"
+                            BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                            BorderThickness="1"
+                            CornerRadius="{theme:CornerRadius borderRadiusLG}">
+                        <StackPanel Margin="{TemplateBinding Padding}">
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="{TemplateBinding MonthLabel}"
+                                           FontSize="{DynamicResource Antd.fontSizeLG}"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource Antd.colorTextHeading}"
+                                           VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button x:Name="PART_PreviousMonth" Style="{StaticResource Antd.Calendar.Nav}">
+                                        <Path Data="M6,0 L1,5 L6,10" Stretch="None" StrokeThickness="1.4"
+                                              Stroke="{DynamicResource Antd.colorTextSecondary}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Button>
+                                    <Button x:Name="PART_NextMonth" Style="{StaticResource Antd.Calendar.Nav}">
+                                        <Path Data="M1,0 L6,5 L1,10" Stretch="None" StrokeThickness="1.4"
+                                              Stroke="{DynamicResource Antd.colorTextSecondary}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{TemplateBinding WeekDays}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="7" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,0,0,6"
+                                                   FontSize="{DynamicResource Antd.fontSizeSM}"
+                                                   Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ListBox x:Name="PART_DayGrid"
+                                     Height="196"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ItemsSource="{TemplateBinding Days}"
+                                     ItemContainerStyle="{StaticResource Antd.Calendar.Day}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="7" Rows="6" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Day}"
+                                                   FontSize="{DynamicResource Antd.fontSize}"
+                                                   FontWeight="{Binding FontWeight, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

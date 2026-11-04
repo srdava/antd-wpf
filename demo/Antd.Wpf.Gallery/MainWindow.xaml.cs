@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,6 +28,14 @@ namespace Antd.Wpf.Gallery
 
             RangeSegmented.ItemsSource = new[] { "Daily", "Weekly", "Monthly" };
             RangeSegmented.SelectedIndex = 0;
+
+            FrameworkAuto.ItemsSource = new[]
+            {
+                "WPF", "WinUI 3", "Avalonia", "MAUI", "Uno Platform", "Avalonia XPF"
+            };
+            FrameworkAuto.Text = string.Empty;
+
+            DemoCalendar.SelectedDate = DateTime.Today;
 
             FrameworkSelect.ItemsSource = new[] { "WPF", "Avalonia", "WinUI", "MAUI" };
             FrameworkSelect.SelectedIndex = 0;

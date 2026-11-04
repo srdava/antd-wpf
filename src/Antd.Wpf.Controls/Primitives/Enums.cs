@@ -34,6 +34,19 @@ namespace Antd.Wpf.Controls
         Round = 2
     }
 
+    /// <summary>How an AutoComplete narrows its options while typing.</summary>
+    public enum AntdFilterMode
+    {
+        /// <summary>Match anywhere in the option, antd's default.</summary>
+        Contains = 0,
+
+        /// <summary>Match only from the start of the option.</summary>
+        StartsWith = 1,
+
+        /// <summary>Ignore the typed text and always offer every option.</summary>
+        None = 2
+    }
+
     /// <summary>Where the icon sits relative to the label.</summary>
     public enum ButtonIconPlacement
     {
