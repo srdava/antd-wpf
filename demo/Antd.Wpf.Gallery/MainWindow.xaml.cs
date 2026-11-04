@@ -56,6 +56,9 @@ namespace Antd.Wpf.Gallery
                 new ListRow { Name = "Table", Role = "Data display", Status = "Beta" }
             };
 
+            DemoDropdown.ItemsSource = new[] { "Duplicate", "Export tokens", "Delete" };
+            DemoDropdown.ItemInvoked += (s2, e2) => Console.WriteLine("dropdown action: " + e2.NewValue);
+
             BuildDemoTable();
             BuildDemoSelectors();
 

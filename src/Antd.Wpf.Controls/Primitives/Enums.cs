@@ -34,6 +34,25 @@ namespace Antd.Wpf.Controls
         Round = 2
     }
 
+    /// <summary>Where a floating panel sits relative to its trigger.</summary>
+    public enum AntdPlacement
+    {
+        Top = 0,
+        Bottom = 1,
+        Left = 2,
+        Right = 3
+    }
+
+    /// <summary>When a floating panel opens.</summary>
+    public enum AntdTrigger
+    {
+        /// <summary>Opens on pointer hover, like antd's Tooltip.</summary>
+        Hover = 0,
+
+        /// <summary>Opens on click, like antd's Dropdown and Popover.</summary>
+        Click = 1
+    }
+
     /// <summary>How an AutoComplete narrows its options while typing.</summary>
     public enum AntdFilterMode
     {

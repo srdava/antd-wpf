@@ -863,6 +863,44 @@
                 </StackPanel>
             </Border>
 
+            <!-- tooltip / popover / dropdown -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Tooltip, Popover, Dropdown" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Three floating panels that stay glued to their trigger while the page scrolls." />
+
+                    <StackPanel Orientation="Horizontal">
+                        <antd:Tooltip Text="Copies the token set to the clipboard">
+                            <antd:Button Content="Hover me" />
+                        </antd:Tooltip>
+
+                        <antd:Popover x:Name="DemoPopover" Title="Panel title" Margin="12,0,0,0">
+                            <antd:Popover.Body>
+                                <TextBlock TextWrapping="Wrap" Width="220" FontSize="14"
+                                           Foreground="{DynamicResource Antd.colorText}"
+                                           Text="A click-triggered card. Click outside to dismiss." />
+                            </antd:Popover.Body>
+                            <antd:Button Content="Click for popover" />
+                        </antd:Popover>
+
+                        <antd:Dropdown x:Name="DemoDropdown" Margin="12,0,0,0">
+                            <antd:Dropdown.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="14" />
+                                </DataTemplate>
+                            </antd:Dropdown.ItemTemplate>
+                            <antd:Button Content="Actions" />
+                        </antd:Dropdown>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

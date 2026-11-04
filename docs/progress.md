@@ -11,11 +11,11 @@
 | M0 可行性 | 骨架 + 主题引擎 + 2 控件 | ✅ | DoD 全过：token 对拍、双 TFM、架构边界测试 |
 | M1 原子层 | 22 | **22** | 清单全部落地 |
 | M2 录入层 | 19 | **19** | 清单全部落地（能力边界见下） |
-| M3 展示层 | 21 | **6**（Tree、Table、Tabs、Card、Collapse、List） | 其余 15 项未开始 |
+| M3 展示层 | 21 | **9**（Tree、Table、Tabs、Card、Collapse、List、Tooltip、Popover、Dropdown） | 其余 12 项未开始 |
 | M4 反馈层 | 7 | 0 | 未开始 |
 | M5 打磨 | — | 0 | 无障碍、i18n、动效降级均未做 |
 
-**组件进度：47 / 71（约 66%）。** 公开控件类型 66 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
+**组件进度：50 / 71（约 70%）。** 公开控件类型 66 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
 Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
 
 ## 能力边界（做了但与 antd 有差距）
@@ -33,6 +33,9 @@ Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
 | Tabs | 线条型、单行换行、2px 指示条 | 卡片型、可编辑、可关闭、溢出折叠菜单 |
 | Collapse | 手风琴/独立展开、首尾圆角 | 幽灵模式、可折叠图标自定义、嵌套动效 |
 | List | 分隔行、ItemTemplate | 分页、加载更多、栅格布局、虚拟滚动 |
+| Tooltip | 悬停气泡、上下左右四个方向 | 12 个方向、箭头、富内容、延迟配置 |
+| Popover | 标题 + 内容、点击触发 | 12 个方向、受控/非受控混合、箭头 |
+| Dropdown | 菜单项 + ItemInvoked | 子菜单、分组、分割线、多选、右键触发 |
 
 ## 参照实测值（tools/visual-ref）
 

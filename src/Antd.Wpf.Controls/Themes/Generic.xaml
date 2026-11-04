@@ -3108,7 +3108,147 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ Tooltip -->
+
+    <Style TargetType="{x:Type antd:Tooltip}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Tooltip}">
+                    <Grid Background="Transparent">
+                        <ContentPresenter />
+
+                        <!-- A hover bubble must not steal the mouse, otherwise moving onto it
+                             fires MouseLeave on the trigger and it would close instantly. -->
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="True">
+                            <Border Background="{DynamicResource Antd.colorBgSpotlight}"
+                                    CornerRadius="6"
+                                    Padding="8,6"
+                                    MaxWidth="250">
+                                <TextBlock Text="{TemplateBinding Text}"
+                                           TextWrapping="Wrap"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource Antd.colorTextLightSolid}" />
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Popover -->
+
+    <Style TargetType="{x:Type antd:Popover}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Popover}">
+                    <Grid Background="Transparent">
+                        <ContentPresenter />
+
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    MaxWidth="300">
+                                <StackPanel>
+                                    <TextBlock x:Name="TitleText"
+                                               Text="{TemplateBinding Title}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               Margin="0,0,0,8"
+                                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                                    <ContentPresenter ContentSource="Body"
+                                                      TextElement.FontSize="14"
+                                                      TextElement.Foreground="{DynamicResource Antd.colorText}" />
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasTitle" Value="False">
+                            <Setter TargetName="TitleText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Dropdown -->
+
+    <Style x:Key="Antd.Dropdown.Item" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="MenuRow"
+                            Background="Transparent"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MenuRow" Property="Background" Value="{DynamicResource Antd.controlItemBgHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="MenuRow" Property="Background" Value="{DynamicResource Antd.controlItemBgActive}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:Dropdown}">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Dropdown}">
+                    <Grid Background="Transparent">
+                        <ContentPresenter />
+
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="4"
+                                    MinWidth="120">
+                                <ListBox x:Name="PART_Menu"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         ItemsSource="{TemplateBinding ItemsSource}"
+                                         ItemTemplate="{TemplateBinding ItemTemplate}"
+                                         ItemContainerStyle="{StaticResource Antd.Dropdown.Item}"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
 
 
 

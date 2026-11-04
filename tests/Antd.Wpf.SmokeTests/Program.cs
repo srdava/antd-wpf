@@ -84,6 +84,7 @@ namespace Antd.Wpf.SmokeTests
             CheckTable();
             CheckTreeSelectAndCascader();
             CheckDisplayControls();
+            CheckOverlays();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -1247,6 +1248,107 @@ namespace Antd.Wpf.SmokeTests
             listHost.Close();
         }
 
+        // ---------------------------------------------------------------- overlays
+
+        private static void CheckOverlays()
+        {
+            var tooltip = new Tooltip { Text = "Copied" };
+            tooltip.Content = new Antd.Wpf.Controls.Button { Content = "Copy" };
+            var host = new Window
+            {
+                Width = 420, Height = 200, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { tooltip } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var tooltipPopup = tooltip.Template.FindName("PART_Popup", tooltip) as System.Windows.Controls.Primitives.Popup;
+            Check("tooltip anchors to its trigger",
+                tooltipPopup != null && tooltipPopup.PlacementTarget == tooltip,
+                tooltipPopup == null ? "no popup" : "ok");
+            Check("tooltip is closed until hovered", !tooltip.IsOpen, tooltip.IsOpen.ToString());
+
+            tooltip.RaiseEvent(new System.Windows.Input.MouseEventArgs(
+                System.Windows.Input.Mouse.PrimaryDevice, System.Environment.TickCount)
+            { RoutedEvent = UIElement.MouseEnterEvent });
+            DoEvents();
+            Check("tooltip opens on hover", tooltip.IsOpen && tooltipPopup != null && tooltipPopup.IsOpen,
+                tooltip.IsOpen.ToString());
+
+            tooltip.RaiseEvent(new System.Windows.Input.MouseEventArgs(
+                System.Windows.Input.Mouse.PrimaryDevice, System.Environment.TickCount)
+            { RoutedEvent = UIElement.MouseLeaveEvent });
+            DoEvents();
+            Check("tooltip closes on leave", !tooltip.IsOpen, tooltip.IsOpen.ToString());
+
+            Check("tooltip defaults to the top",
+                tooltip.Placement == AntdPlacement.Top && tooltipPopup != null
+                && tooltipPopup.Placement == System.Windows.Controls.Primitives.PlacementMode.Top,
+                tooltip.Placement.ToString());
+            host.Close();
+
+            var popover = new Popover { Title = "Panel title", Body = "Body copy" };
+            popover.Content = new Antd.Wpf.Controls.Button { Content = "Open" };
+            var popoverHost = new Window
+            {
+                Width = 420, Height = 220, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { popover } }
+            };
+            popoverHost.Show();
+            DoEvents();
+            popoverHost.UpdateLayout();
+
+            Check("popover shows a head only when titled", popover.HasTitle, popover.HasTitle.ToString());
+            popover.Title = null;
+            Check("popover drops the head without a title", !popover.HasTitle, popover.HasTitle.ToString());
+
+            ((UIElement)popover.Content).RaiseEvent(new System.Windows.Input.MouseButtonEventArgs(
+                System.Windows.Input.Mouse.PrimaryDevice, System.Environment.TickCount,
+                System.Windows.Input.MouseButton.Left)
+            { RoutedEvent = UIElement.PreviewMouseUpEvent });
+            DoEvents();
+            Check("popover opens on click", popover.IsOpen, popover.IsOpen.ToString());
+            popoverHost.Close();
+
+            var dropdown = new Dropdown { ItemsSource = new[] { "Duplicate", "Delete" } };
+            dropdown.Content = new Antd.Wpf.Controls.Button { Content = "Actions" };
+            var menuHost = new Window
+            {
+                Width = 420, Height = 240, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { dropdown } }
+            };
+            menuHost.Show();
+            DoEvents();
+            menuHost.UpdateLayout();
+
+            Check("dropdown defaults to click and bottom",
+                dropdown.Trigger == AntdTrigger.Click && dropdown.Placement == AntdPlacement.Bottom,
+                dropdown.Trigger + "/" + dropdown.Placement);
+
+            dropdown.IsOpen = true;
+            DoEvents();
+            var menu = dropdown.Template.FindName("PART_Menu", dropdown) as System.Windows.Controls.ListBox;
+            Check("dropdown renders its items", menu != null && menu.Items.Count == 2,
+                menu == null ? "missing" : menu.Items.Count.ToString());
+            Check("dropdown menu is open", dropdown.IsOpen, dropdown.IsOpen.ToString());
+
+            object invoked = null;
+            dropdown.ItemInvoked += delegate(object sender, RoutedPropertyChangedEventArgs<object> e)
+            {
+                invoked = e.NewValue;
+            };
+            if (menu != null) menu.SelectedIndex = 1;
+            DoEvents();
+            Check("picking a menu row invokes the item and closes",
+                invoked as string == "Delete" && !dropdown.IsOpen,
+                (invoked == null ? "none" : invoked.ToString()) + "/" + dropdown.IsOpen);
+
+            Check("menu rows do not stay selected",
+                menu != null && menu.SelectedIndex < 0, menu == null ? "?" : menu.SelectedIndex.ToString());
+            menuHost.Close();
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -1309,6 +1411,7 @@ namespace Antd.Wpf.SmokeTests
             var treePreview = FindDescendant<Antd.Wpf.Controls.Tree>(window);
             if (treePreview != null) RenderElement(treePreview, Path.Combine(directory, "zoom-tree.png"), 2.0);
             CaptureDatePicker(window, directory);
+            CaptureOverlays(window, directory);
             var switchPreview = FindDescendant<Antd.Wpf.Controls.Switch>(window);
             if (switchPreview != null) RenderElement(switchPreview, Path.Combine(directory, "zoom-switch.png"), 6.0);
             var layoutPreview = FindDescendant<Antd.Wpf.Controls.Layout>(window);
@@ -1366,6 +1469,47 @@ namespace Antd.Wpf.SmokeTests
             using (FileStream stream = File.Create(path))
             {
                 encoder.Save(stream);
+            }
+        }
+
+        private static void CaptureOverlays(Window window, string directory)
+        {
+            var popover = FindDescendant<Popover>(window);
+            if (popover != null)
+            {
+                popover.IsOpen = true;
+                DoEvents();
+                DoEvents();
+                var popup = popover.Template.FindName("PART_Popup", popover) as System.Windows.Controls.Primitives.Popup;
+                var child = popup == null ? null : popup.Child as FrameworkElement;
+                if (child != null)
+                {
+                    child.UpdateLayout();
+                    DoEvents();
+                    RenderElement(child, Path.Combine(directory, "zoom-popover.png"), 2.0);
+                    Console.WriteLine("captured: zoom-popover.png");
+                }
+                popover.IsOpen = false;
+                DoEvents();
+            }
+
+            var dropdown = FindDescendant<Dropdown>(window);
+            if (dropdown != null)
+            {
+                dropdown.IsOpen = true;
+                DoEvents();
+                DoEvents();
+                var popup = dropdown.Template.FindName("PART_Popup", dropdown) as System.Windows.Controls.Primitives.Popup;
+                var child = popup == null ? null : popup.Child as FrameworkElement;
+                if (child != null)
+                {
+                    child.UpdateLayout();
+                    DoEvents();
+                    RenderElement(child, Path.Combine(directory, "zoom-dropdown.png"), 2.0);
+                    Console.WriteLine("captured: zoom-dropdown.png");
+                }
+                dropdown.IsOpen = false;
+                DoEvents();
             }
         }
 
