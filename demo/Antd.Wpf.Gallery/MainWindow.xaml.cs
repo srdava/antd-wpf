@@ -29,6 +29,12 @@ namespace Antd.Wpf.Gallery
             RangeSegmented.ItemsSource = new[] { "Daily", "Weekly", "Monthly" };
             RangeSegmented.SelectedIndex = 0;
 
+            DemoTimePicker.SelectedTime = new TimeSpan(9, 30, 0);
+            DemoMentions.ItemsSource = new[]
+            {
+                "Alice Chen", "Bob Li", "Carol Wang", "David Zhao", "Eve Sun"
+            };
+
             BuildDemoTree();
 
             FrameworkAuto.ItemsSource = new[]

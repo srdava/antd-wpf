@@ -1848,7 +1848,247 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ TimePicker -->
+
+    <Style x:Key="Antd.TimePicker.Column" TargetType="{x:Type ListBox}">
+        <Setter Property="Width" Value="56" />
+        <Setter Property="Height" Value="196" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Height" Value="28" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border x:Name="Cell" Background="Transparent" CornerRadius="4" Margin="2,1">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Cell" Property="Background" Value="{DynamicResource Antd.colorFillTertiary}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Cell" Property="Background" Value="{DynamicResource Antd.colorPrimaryBg}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:TimePicker}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:TimePicker}">
+                    <Grid>
+                        <Border x:Name="PART_Field"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="ValueText" Grid.Column="0"
+                                           Text="{TemplateBinding DisplayText}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <TextBlock x:Name="PlaceholderText" Grid.Column="0"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="PART_ClearButton"
+                                            Style="{StaticResource Antd.Input.ClearButton}"
+                                            Margin="0,0,6,0"
+                                            Visibility="Collapsed" />
+                                    <Path Data="M7,0 A7,7 0 1 1 6.99,0 M7,3.5 L7,7.5 L9.6,9.2"
+                                          Stretch="None"
+                                          Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                          StrokeThickness="1"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="8">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ListBox x:Name="PART_Hours"
+                                                 Style="{StaticResource Antd.TimePicker.Column}"
+                                                 ItemsSource="{TemplateBinding Hours}" />
+                                        <TextBlock Text=":" VerticalAlignment="Center" Margin="2,0"
+                                                   Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                        <ListBox x:Name="PART_Minutes"
+                                                 Style="{StaticResource Antd.TimePicker.Column}"
+                                                 ItemsSource="{TemplateBinding Sixty}" />
+                                        <TextBlock x:Name="SecondsSeparator" Text=":" VerticalAlignment="Center" Margin="2,0"
+                                                   Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                        <ListBox x:Name="PART_Seconds"
+                                                 Style="{StaticResource Antd.TimePicker.Column}"
+                                                 ItemsSource="{TemplateBinding Sixty}" />
+                                    </StackPanel>
+
+                                    <Border BorderBrush="{DynamicResource Antd.colorSplit}"
+                                            BorderThickness="0,1,0,0"
+                                            Margin="0,8,0,0"
+                                            Padding="0,4,0,0">
+                                        <antd:Button x:Name="PART_Now"
+                                                     Content="Now"
+                                                     HorizontalAlignment="Right"
+                                                     Variant="Link"
+                                                     Size="Small" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClear" Value="False">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="CanClear" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                        <Trigger Property="ShowSeconds" Value="False">
+                            <Setter TargetName="SecondsSeparator" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_Seconds" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Mentions -->
+
+    <Style TargetType="{x:Type antd:Mentions}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Mentions}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <TextBox x:Name="PART_Editor"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Padding="0"
+                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                         FontSize="{TemplateBinding FontSize}"
+                                         FontFamily="{TemplateBinding FontFamily}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         CaretBrush="{TemplateBinding Foreground}"
+                                         FocusVisualStyle="{x:Null}" />
+
+                                <TextBlock x:Name="PlaceholderText"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                           IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Relative"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Padding="4"
+                                    MinWidth="160">
+                                <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                    <ListBox x:Name="PART_Suggestions"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             ItemContainerStyle="{StaticResource Antd.AutoComplete.Item}" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
+
 
 
 

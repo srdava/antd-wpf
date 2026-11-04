@@ -76,6 +76,7 @@ namespace Antd.Wpf.SmokeTests
             CheckDatePicker();
             CheckM1Tail();
             CheckTree();
+            CheckTimePickerAndMentions();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -767,6 +768,84 @@ namespace Antd.Wpf.SmokeTests
             Check("tree applies the antd item container",
                 container != null && container.Template != null, container == null ? "missing" : "ok");
             host.Close();
+        }
+
+        // ---------------------------------------------------------------- time picker / mentions
+
+        private static void CheckTimePickerAndMentions()
+        {
+            var time = new TimePicker { SelectedTime = new TimeSpan(9, 5, 7) };
+            var host = new Window
+            {
+                Width = 420, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { time } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("time picker formats the value", time.DisplayText == "09:05:07", time.DisplayText);
+
+            time.ShowSeconds = false;
+            DoEvents();
+            Check("time picker hides seconds", time.DisplayText == "09:05", time.DisplayText);
+
+            var hours = time.Template.FindName("PART_Hours", time) as System.Windows.Controls.ListBox;
+            var minutes = time.Template.FindName("PART_Minutes", time) as System.Windows.Controls.ListBox;
+            Check("time picker seeds the hour column",
+                hours != null && hours.Items.Count == 24, hours == null ? "missing" : hours.Items.Count.ToString());
+
+            time.ShowSeconds = true;
+            DoEvents();
+            if (hours != null) hours.SelectedIndex = 14;
+            if (minutes != null) minutes.SelectedIndex = 45;
+            DoEvents();
+            Check("picking a column updates the value",
+                time.SelectedTime.HasValue && time.SelectedTime.Value.Hours == 14 && time.SelectedTime.Value.Minutes == 45,
+                time.SelectedTime.ToString());
+
+            time.SelectedTime = null;
+            DoEvents();
+            Check("clearing a time restores the placeholder", time.ShowPlaceholder && !time.CanClear, time.DisplayText);
+            host.Close();
+
+            var mentions = new Mentions
+            {
+                ItemsSource = new[] { "Alice Chen", "Bob Li", "Carol Wang" }
+            };
+            var mHost = new Window
+            {
+                Width = 420, Height = 200, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { mentions } }
+            };
+            mHost.Show();
+            DoEvents();
+            mHost.UpdateLayout();
+
+            var editor = mentions.Template.FindName("PART_Editor", mentions) as System.Windows.Controls.TextBox;
+            var list = mentions.Template.FindName("PART_Suggestions", mentions) as System.Windows.Controls.ListBox;
+            Check("mentions has an editor", editor != null, editor == null ? "missing" : "ok");
+
+            if (editor != null)
+            {
+                editor.Text = "hi @ali";
+                editor.CaretIndex = editor.Text.Length;
+                editor.Focus();
+                DoEvents();
+            }
+            var items = list == null ? null : list.Items;
+            Check("mentions filters after the trigger",
+                items != null && items.Count == 1, items == null ? "no list" : items.Count.ToString());
+
+            if (editor != null)
+            {
+                editor.Text = "hi alice";
+                editor.CaretIndex = editor.Text.Length;
+                DoEvents();
+            }
+            Check("no trigger means no suggestions",
+                !mentions.IsDropDownOpen, mentions.IsDropDownOpen.ToString());
+            mHost.Close();
         }
 
         // ---------------------------------------------------------------- theme switch
