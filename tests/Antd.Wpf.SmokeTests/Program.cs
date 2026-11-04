@@ -78,6 +78,9 @@ namespace Antd.Wpf.SmokeTests
             CheckTree();
             CheckTimePickerAndMentions();
             CheckUploadAndTransfer();
+            CheckColorPicker();
+            CheckTable();
+            CheckTreeSelectAndCascader();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -900,6 +903,173 @@ namespace Antd.Wpf.SmokeTests
                 transfer.SourceItems.Count == 3 && transfer.TargetItems.Count == 0,
                 transfer.SourceItems.Count.ToString());
             host.Close();
+        }
+
+        // ---------------------------------------------------------------- colour picker
+
+        private static void CheckColorPicker()
+        {
+            var picker = new ColorPicker();
+            var host = new Window
+            {
+                Width = 360, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { picker } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("colour picker starts empty", picker.HexText.Length == 0 && !picker.CanClear, picker.HexText);
+
+            picker.SelectedColor = Color.FromRgb(0xFF, 0x00, 0x00);
+            DoEvents();
+            Check("colour picker prints hex", picker.HexText == "#FF0000", picker.HexText);
+
+            var swatch = picker.SwatchBrush as SolidColorBrush;
+            Check("colour picker shows the swatch",
+                swatch != null && swatch.Color.R == 0xFF && swatch.Color.G == 0, picker.SwatchBrush.ToString());
+            Check("colour picker offers clear", picker.CanClear, picker.CanClear.ToString());
+
+            var hueBrush = picker.HueBrush as SolidColorBrush;
+            Check("hue brush follows the selection",
+                hueBrush != null && hueBrush.Color.R > 200 && hueBrush.Color.G < 60,
+                picker.HueBrush == null ? "null" : hueBrush.Color.ToString());
+
+            var square = picker.Template.FindName("PART_Saturation", picker) as FrameworkElement;
+            var popup = picker.Template.FindName("PART_Popup", picker) as System.Windows.Controls.Primitives.Popup;
+            Check("colour picker exposes its square", square != null && popup != null,
+                square == null ? "missing" : "ok");
+
+            picker.IsDropDownOpen = true;
+            DoEvents();
+            Check("colour picker opens its panel", popup != null && popup.IsOpen,
+                popup == null ? "missing" : popup.IsOpen.ToString());
+
+            picker.SelectedColor = null;
+            DoEvents();
+            Check("clearing a colour empties the field", picker.HexText.Length == 0, picker.HexText);
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- table
+
+        private static void CheckTable()
+        {
+            var table = new Table();
+            table.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new System.Windows.Data.Binding("Name"), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
+            table.Columns.Add(new DataGridTextColumn { Header = "Role", Binding = new System.Windows.Data.Binding("Role"), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
+
+            var host = new Window
+            {
+                Width = 600, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { table } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("table starts empty", !table.HasRows, table.HasRows.ToString());
+
+            table.ItemsSource = new[]
+            {
+                new { Name = "Button", Role = "Atomic" },
+                new { Name = "Select", Role = "Data entry" }
+            };
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("table reports rows", table.HasRows && table.Items.Count == 2, table.Items.Count.ToString());
+            Check("table keeps its columns", table.Columns.Count == 2, table.Columns.Count.ToString());
+
+            table.SelectedIndex = 1;
+            DoEvents();
+            Check("table selects a row", table.SelectedIndex == 1, table.SelectedIndex.ToString());
+
+            var row = table.ItemContainerGenerator.ContainerFromIndex(0) as DataGridRow;
+            Check("table applies the antd row style",
+                row != null && Math.Abs(row.MinHeight - 48) < 0.01,
+                row == null ? "missing" : row.MinHeight.ToString());
+
+            // Sorting through the view keeps working because the control is a DataGrid.
+            var view = System.Windows.Data.CollectionViewSource.GetDefaultView(table.ItemsSource);
+            view.SortDescriptions.Add(new System.ComponentModel.SortDescription("Name",
+                System.ComponentModel.ListSortDirection.Descending));
+            DoEvents();
+            Check("table rows follow the view", table.Items.Count == 2, table.Items.Count.ToString());
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- tree select / cascader
+
+        private static void CheckTreeSelectAndCascader()
+        {
+            var parent = new TreeItem("Components");
+            parent.Children.Add(new TreeItem("Button"));
+            parent.Children.Add(new TreeItem("Input"));
+
+            var treeSelect = new TreeSelect { ItemsSource = new[] { parent } };
+            var host = new Window
+            {
+                Width = 360, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { treeSelect } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("tree select starts with the placeholder",
+                treeSelect.ShowPlaceholder && !treeSelect.CanClear, treeSelect.DisplayText);
+
+            treeSelect.SelectedItem = parent.Children[1];
+            DoEvents();
+            Check("tree select shows the picked node",
+                treeSelect.DisplayText == "Input" && treeSelect.CanClear, treeSelect.DisplayText);
+
+            var innerTree = treeSelect.Template.FindName("PART_Tree", treeSelect) as Tree;
+            Check("tree select hosts a tree", innerTree != null && innerTree.Items.Count == 1,
+                innerTree == null ? "missing" : innerTree.Items.Count.ToString());
+            host.Close();
+
+            var root = new CascaderNode("Zhejiang");
+            var hangzhou = new CascaderNode("Hangzhou");
+            hangzhou.Children.Add(new CascaderNode("Xihu"));
+            hangzhou.Children.Add(new CascaderNode("Binjiang"));
+            root.Children.Add(hangzhou);
+
+            var cascader = new Cascader { ItemsSource = new[] { root } };
+            var cHost = new Window
+            {
+                Width = 420, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { cascader } }
+            };
+            cHost.Show();
+            DoEvents();
+            cHost.UpdateLayout();
+
+            cascader.IsDropDownOpen = true;
+            DoEvents();
+            var columns = cascader.Template.FindName("PART_Columns", cascader) as System.Windows.Controls.StackPanel;
+            Check("cascader opens with one column", columns != null && columns.Children.Count == 1,
+                columns == null ? "missing" : columns.Children.Count.ToString());
+
+            var first = columns.Children[0] as System.Windows.Controls.ListBox;
+            if (first != null) first.SelectedIndex = 0;
+            DoEvents();
+            Check("picking a parent opens the next column",
+                columns.Children.Count == 2 && cascader.DisplayText == "Zhejiang",
+                columns.Children.Count + " | " + cascader.DisplayText);
+
+            var second = columns.Children[1] as System.Windows.Controls.ListBox;
+            if (second != null) second.SelectedIndex = 0;
+            DoEvents();
+            var third = columns.Children.Count > 2 ? columns.Children[2] as System.Windows.Controls.ListBox : null;
+            if (third != null) third.SelectedIndex = 1;
+            DoEvents();
+
+            Check("cascader joins the path",
+                cascader.DisplayText == "Zhejiang / Hangzhou / Binjiang", cascader.DisplayText);
+            Check("picking a leaf closes the panel", !cascader.IsDropDownOpen, cascader.IsDropDownOpen.ToString());
+            cHost.Close();
         }
 
         // ---------------------------------------------------------------- theme switch

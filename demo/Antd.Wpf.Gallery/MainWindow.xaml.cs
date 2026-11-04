@@ -30,6 +30,7 @@ namespace Antd.Wpf.Gallery
             RangeSegmented.SelectedIndex = 0;
 
             DemoTimePicker.SelectedTime = new TimeSpan(9, 30, 0);
+            DemoColorPicker.SelectedColor = System.Windows.Media.Color.FromRgb(0x16, 0x77, 0xFF);
             DemoMentions.ItemsSource = new[]
             {
                 "Alice Chen", "Bob Li", "Carol Wang", "David Zhao", "Eve Sun"
@@ -48,6 +49,8 @@ namespace Antd.Wpf.Gallery
             };
 
             BuildDemoTree();
+            BuildDemoTable();
+            BuildDemoSelectors();
 
             FrameworkAuto.ItemsSource = new[]
             {
@@ -70,6 +73,50 @@ namespace Antd.Wpf.Gallery
         {
             RefreshTokens();
             UpdateThemeButton();
+        }
+
+        public sealed class TableRow
+        {
+            public string Name { get; set; }
+            public string Role { get; set; }
+            public string Status { get; set; }
+            public string Updated { get; set; }
+        }
+
+        private void BuildDemoTable()
+        {
+            DemoTable.ItemsSource = new[]
+            {
+                new TableRow { Name = "Button", Role = "Atomic", Status = "Stable", Updated = "2 days ago" },
+                new TableRow { Name = "Select", Role = "Data entry", Status = "Stable", Updated = "5 days ago" },
+                new TableRow { Name = "DatePicker", Role = "Data entry", Status = "Beta", Updated = "yesterday" },
+                new TableRow { Name = "Tree", Role = "Navigation", Status = "Beta", Updated = "today" },
+                new TableRow { Name = "Table", Role = "Display", Status = "Beta", Updated = "today" },
+                new TableRow { Name = "Upload", Role = "Data entry", Status = "Draft", Updated = "3 days ago" }
+            };
+        }
+
+        private void BuildDemoSelectors()
+        {
+            var components = new Antd.Wpf.Controls.TreeItem("Components") { IsExpanded = true };
+            var entry = new Antd.Wpf.Controls.TreeItem("Data entry") { IsExpanded = true };
+            entry.Children.Add(new Antd.Wpf.Controls.TreeItem("Button"));
+            entry.Children.Add(new Antd.Wpf.Controls.TreeItem("Input"));
+            components.Children.Add(entry);
+            components.Children.Add(new Antd.Wpf.Controls.TreeItem("Table"));
+            DemoTreeSelect.ItemsSource = new[] { components };
+            DemoTreeSelect.SelectedItem = entry.Children[1];
+
+            var zhejiang = new Antd.Wpf.Controls.CascaderNode("Zhejiang");
+            var hangzhou = new Antd.Wpf.Controls.CascaderNode("Hangzhou");
+            hangzhou.Children.Add(new Antd.Wpf.Controls.CascaderNode("Xihu"));
+            hangzhou.Children.Add(new Antd.Wpf.Controls.CascaderNode("Binjiang"));
+            zhejiang.Children.Add(hangzhou);
+            var jiangsu = new Antd.Wpf.Controls.CascaderNode("Jiangsu");
+            var nanjing = new Antd.Wpf.Controls.CascaderNode("Nanjing");
+            nanjing.Children.Add(new Antd.Wpf.Controls.CascaderNode("Xuanwu"));
+            jiangsu.Children.Add(nanjing);
+            DemoCascader.ItemsSource = new[] { zhejiang, jiangsu };
         }
 
         private void BuildDemoTree()

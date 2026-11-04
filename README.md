@@ -2,7 +2,7 @@
 
 Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 与 **.NET 8+**。
 
-当前状态：**M2 进行中（39 个控件）**。M0/M1 已完成；M2 已交付表单控件
+当前状态：**M1 / M2 组件清单已完成，M3 进行中（51 个控件类型）**。M0/M1 已完成；M2 已交付表单控件
 （InputNumber/Checkbox/Radio/Switch/Rate/Slider/Select/Form）。
 日期选择、级联、上传等 8 个复杂组件待做，见 `docs/m2-implementation-notes.md`。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
@@ -28,6 +28,8 @@ dotnet run --project tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --shot artif
 dotnet run --project tests/Antd.Wpf.SmokeTests -f net48
 ```
 
+进度与能力边界见 `docs/progress.md`。
+
 视觉对齐（token 相等不代表长得像，这套验证尺寸与配色）：
 
 ```bash
@@ -51,7 +53,7 @@ cd tools/token-sync && npm install && node dump-tokens.js
 src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，无 WPF 依赖
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
 src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
-src/Antd.Wpf.Controls   net48;net8        39 个控件 + Generic.xaml
+src/Antd.Wpf.Controls   net48;net8        51 个控件类型 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        演示程序
 tests/                  两个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token

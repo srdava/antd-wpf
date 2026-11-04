@@ -670,6 +670,10 @@
                             <TextBlock Text="Starts at" FontSize="13" Margin="0,0,0,8"
                                        Foreground="{DynamicResource Antd.colorTextSecondary}" />
                             <antd:TimePicker x:Name="DemoTimePicker" HorizontalAlignment="Left" Width="200" />
+
+                            <TextBlock Text="Accent" FontSize="13" Margin="0,20,0,8"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            <antd:ColorPicker x:Name="DemoColorPicker" HorizontalAlignment="Left" Width="200" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="1">
@@ -708,6 +712,62 @@
                                        x:Name="DemoTransfer"
                                        SourceTitle="Available"
                                        TargetTitle="Selected" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- table -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Table" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Virtualised rows, sortable headers and row selection, painted with antd colours." />
+
+                    <antd:Table x:Name="DemoTable" Height="260">
+                        <antd:Table.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140" />
+                            <DataGridTextColumn Header="Updated" Binding="{Binding Updated}" Width="160" />
+                        </antd:Table.Columns>
+                    </antd:Table>
+                </StackPanel>
+            </Border>
+
+            <!-- tree select + cascader -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="TreeSelect &amp; Cascader" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="A tree inside a select, and a cascading column picker." />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="320" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0">
+                            <TextBlock Text="Component" FontSize="13" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            <antd:TreeSelect x:Name="DemoTreeSelect" HorizontalAlignment="Left" Width="280" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Region" FontSize="13" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource Antd.colorTextSecondary}" />
+                            <antd:Cascader x:Name="DemoCascader" HorizontalAlignment="Left" Width="280" />
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </Border>

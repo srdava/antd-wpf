@@ -2325,7 +2325,496 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ ColorPicker -->
+
+    <theme:RatioConverter x:Key="Antd.SquareX" Ratio="180" />
+    <theme:RatioConverter x:Key="Antd.SquareY" Ratio="150" />
+    <theme:RatioConverter x:Key="Antd.HueY" Ratio="150" />
+
+    <Style TargetType="{x:Type antd:ColorPresetButton}">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:ColorPresetButton}">
+                    <Border Background="{TemplateBinding Swatch}"
+                            CornerRadius="3"
+                            BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                            BorderThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type antd:ColorPicker}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:ColorPicker}">
+                    <Grid>
+                        <Border x:Name="PART_Field"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Width="16" Height="16"
+                                        CornerRadius="2"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        Background="{TemplateBinding SwatchBrush}"
+                                        BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                        BorderThickness="1" />
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{TemplateBinding HexText}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <Button x:Name="PART_ClearButton"
+                                        Grid.Column="2"
+                                        Style="{StaticResource Antd.Input.ClearButton}"
+                                        Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="12">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Saturation runs left to right, value bottom to top. -->
+                                        <Grid x:Name="PART_Saturation"
+                                              Grid.Column="0"
+                                              Width="180" Height="150"
+                                              ClipToBounds="True">
+                                            <Rectangle Fill="{TemplateBinding HueBrush}" />
+                                            <Rectangle>
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                                        <GradientStop Color="#00FFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+                                            <Rectangle>
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#00000000" Offset="0" />
+                                                        <GradientStop Color="#FF000000" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <Ellipse Width="10" Height="10"
+                                                     Fill="Transparent"
+                                                     Stroke="White"
+                                                     StrokeThickness="2"
+                                                     HorizontalAlignment="Left"
+                                                     VerticalAlignment="Top"
+                                                     Margin="-5,-5,0,0"
+                                                     IsHitTestVisible="False">
+                                                <Ellipse.RenderTransform>
+                                                    <TranslateTransform
+                                                        X="{Binding MarkerX, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Antd.SquareX}}"
+                                                        Y="{Binding MarkerY, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Antd.SquareY}}" />
+                                                </Ellipse.RenderTransform>
+                                            </Ellipse>
+                                        </Grid>
+
+                                        <Grid x:Name="PART_Hue"
+                                              Grid.Column="1"
+                                              Width="12" Height="150"
+                                              Margin="12,0,0,0"
+                                              ClipToBounds="True">
+                                            <Rectangle>
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Color="#FFFF0000" Offset="0" />
+                                                        <GradientStop Color="#FFFFFF00" Offset="0.17" />
+                                                        <GradientStop Color="#FF00FF00" Offset="0.33" />
+                                                        <GradientStop Color="#FF00FFFF" Offset="0.5" />
+                                                        <GradientStop Color="#FF0000FF" Offset="0.67" />
+                                                        <GradientStop Color="#FFFF00FF" Offset="0.83" />
+                                                        <GradientStop Color="#FFFF0000" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <Border Height="3"
+                                                    Background="White"
+                                                    BorderBrush="{DynamicResource Antd.colorBorder}"
+                                                    BorderThickness="1"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Top"
+                                                    Margin="0,-1,0,0"
+                                                    IsHitTestVisible="False">
+                                                <Border.RenderTransform>
+                                                    <TranslateTransform
+                                                        X="0"
+                                                        Y="{Binding HueOffset, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Antd.HueY}}" />
+                                                </Border.RenderTransform>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+
+                                    <ItemsControl ItemsSource="{TemplateBinding Presets}" Margin="0,12,0,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <antd:ColorPresetButton Swatch="{Binding}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="CanClear" Value="False">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="CanClear" Value="True">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Table -->
+
+    <Style x:Key="Antd.Table.ColumnHeader" TargetType="{x:Type DataGridColumnHeader}">
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextHeading}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                    <Border x:Name="Head"
+                            Background="{DynamicResource Antd.colorFillAlter}"
+                            BorderBrush="{DynamicResource Antd.colorSplit}"
+                            BorderThickness="0,0,0,1"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter VerticalAlignment="Center"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}" />
+
+                            <Path x:Name="SortArrow"
+                                  Grid.Column="1"
+                                  Data="M0,5 L4,1 L8,5"
+                                  Stretch="None"
+                                  Stroke="{DynamicResource Antd.colorPrimary}"
+                                  StrokeThickness="1.4"
+                                  Margin="6,0,0,0"
+                                  VerticalAlignment="Center"
+                                  Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Head" Property="Background" Value="{DynamicResource Antd.colorFillSecondary}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SortArrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180" CenterX="4" CenterY="3" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Antd.Table.Cell" TargetType="{x:Type DataGridCell}">
+        <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                    <Border Background="Transparent"
+                            BorderBrush="{DynamicResource Antd.colorSplit}"
+                            BorderThickness="0,0,0,1"
+                            Padding="12,0">
+                        <ContentPresenter VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Antd.Table.Row" TargetType="{x:Type DataGridRow}">
+        <Setter Property="Background" Value="{DynamicResource Antd.colorBgContainer}" />
+        <Setter Property="MinHeight" Value="48" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Antd.colorFillAlter}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Antd.colorPrimaryBg}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Based on the framework DataGrid style: we only repaint it, so sorting, resizing,
+         column virtualisation and keyboard navigation stay intact. -->
+    <Style TargetType="{x:Type antd:Table}" BasedOn="{StaticResource {x:Type DataGrid}}">
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
+        <Setter Property="Background" Value="{DynamicResource Antd.colorBgContainer}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Antd.colorBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Antd.colorSplit}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource Antd.colorSplit}" />
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource Antd.Table.ColumnHeader}" />
+        <Setter Property="CellStyle" Value="{StaticResource Antd.Table.Cell}" />
+        <Setter Property="RowStyle" Value="{StaticResource Antd.Table.Row}" />
+        <Setter Property="ColumnWidth" Value="*" />
+    </Style>
+
+    <!-- ============================================================ TreeSelect -->
+
+    <Style TargetType="{x:Type antd:TreeSelect}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:TreeSelect}">
+                    <Grid>
+                        <Border x:Name="PART_Field"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="ValueText" Grid.Column="0"
+                                           Text="{TemplateBinding DisplayText}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+
+                                <TextBlock x:Name="PlaceholderText" Grid.Column="0"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <Button x:Name="PART_ClearButton" Grid.Column="1"
+                                        Style="{StaticResource Antd.Input.ClearButton}"
+                                        Margin="0,0,6,0"
+                                        Visibility="Collapsed" />
+
+                                <Path Grid.Column="2"
+                                      Data="M0,0 L4,4 L8,0"
+                                      Stretch="None"
+                                      Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                      StrokeThickness="1.2"
+                                      VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="8"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <antd:Tree x:Name="PART_Tree" ItemsSource="{TemplateBinding ItemsSource}" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClear" Value="True">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================ Cascader -->
+
+    <Style TargetType="{x:Type antd:Cascader}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:Cascader}">
+                    <Grid>
+                        <Border x:Name="PART_Field"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="ValueText" Grid.Column="0"
+                                           Text="{TemplateBinding DisplayText}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+
+                                <TextBlock x:Name="PlaceholderText" Grid.Column="0"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <Button x:Name="PART_ClearButton" Grid.Column="1"
+                                        Style="{StaticResource Antd.Input.ClearButton}"
+                                        Margin="0,0,6,0"
+                                        Visibility="Collapsed" />
+
+                                <Path Grid.Column="2"
+                                      Data="M0,0 L4,4 L8,0"
+                                      Stretch="None"
+                                      Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                      StrokeThickness="1.2"
+                                      VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="4">
+                                <StackPanel x:Name="PART_Columns" Orientation="Horizontal" />
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClear" Value="True">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+
+
+
 
 
 
