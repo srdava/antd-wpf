@@ -131,6 +131,21 @@ namespace Antd.Wpf.Controls
             private set { SetValue(ShowPlaceholderKey, value); }
         }
 
+        private static readonly DependencyPropertyKey ContentHeightKey = DependencyProperty.RegisterReadOnly(
+            "ContentHeight", typeof(double), typeof(Input), new FrameworkPropertyMetadata(22.0));
+
+        public static readonly DependencyProperty ContentHeightProperty = ContentHeightKey.DependencyProperty;
+
+        /// <summary>
+        /// Height of the editable area: controlHeight - border - padding. Pinning it keeps the
+        /// field exactly 32 tall even when the font's line spacing wants more room.
+        /// </summary>
+        public double ContentHeight
+        {
+            get { return (double)GetValue(ContentHeightProperty); }
+            private set { SetValue(ContentHeightKey, value); }
+        }
+
         private static readonly DependencyPropertyKey HasPrefixKey = DependencyProperty.RegisterReadOnly(
             "HasPrefix", typeof(bool), typeof(Input), new FrameworkPropertyMetadata(false));
 
@@ -274,7 +289,10 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(CornerRadiusProperty, new CornerRadius(Metrics.Radius(t, Size)));
             SetCurrentValue(FontSizeProperty, fontSize);
             SetCurrentValue(MinHeightProperty, height);
-            SetCurrentValue(PaddingProperty, new Thickness(inline, 0, inline, 0));
+            // antd: 4px vertical for the default size, 6.5 for large, 0 for small.
+            double block = Size == AntdSize.Large ? 6.5 : (Size == AntdSize.Small ? 0 : 4);
+            SetCurrentValue(PaddingProperty, new Thickness(inline, block, inline, block));
+            SetValue(ContentHeightKey, height - 2 * t.LineWidth - 2 * block);
             SetCurrentValue(PlaceholderBrushProperty, snapshot.Brush("colorTextPlaceholder"));
             SetValue(IsFocusedStateKey, focused && IsEnabled);
             SetValue(CanClearKey, AllowClear && !string.IsNullOrEmpty(Text) && IsEnabled);

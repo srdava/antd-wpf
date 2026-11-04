@@ -36,6 +36,7 @@ namespace Antd.Wpf.Gallery
             FrameworkAuto.Text = string.Empty;
 
             DemoCalendar.SelectedDate = DateTime.Today;
+            DemoDatePicker.SelectedDate = DateTime.Today.AddDays(3);
 
             FrameworkSelect.ItemsSource = new[] { "WPF", "Avalonia", "WinUI", "MAUI" };
             FrameworkSelect.SelectedIndex = 0;

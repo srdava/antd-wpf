@@ -12,6 +12,7 @@ using AntdButton = Antd.Wpf.Controls.Button;
 using AntdInput = Antd.Wpf.Controls.Input;
 using AntdCalendar = Antd.Wpf.Controls.Calendar;
 using AntdAutoComplete = Antd.Wpf.Controls.AutoComplete;
+using AntdDatePicker = Antd.Wpf.Controls.DatePicker;
 using Antd.Wpf.Icons;
 using Antd.Wpf.Gallery;
 using Antd.Wpf.Theme;
@@ -65,6 +66,7 @@ namespace Antd.Wpf.SmokeTests
             CheckM2Components();
             CheckVisualParity();
             CheckAutoCompleteAndCalendar();
+            CheckDatePicker();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -455,6 +457,34 @@ namespace Antd.Wpf.SmokeTests
                                       (fields[1] as InputNumber).CornerRadius.TopLeft,
                                       (fields[2] as Select).CornerRadius.TopLeft }
                                   .All(r => Math.Abs(r - t.BorderRadius) < 0.01);
+            var antdInput = new AntdInput { Width = 220, Placeholder = "x" };
+            Check("input padding is 4 by 11",
+                Math.Abs(antdInput.Padding.Left - 11) < 0.01
+                && Math.Abs(antdInput.Padding.Top - 4) < 0.01
+                && Math.Abs(antdInput.Padding.Right - 11) < 0.01
+                && Math.Abs(antdInput.Padding.Bottom - 4) < 0.01,
+                antdInput.Padding.ToString());
+
+            // The text area must be controlHeight - 2*line - 2*padding = 22, like antd.
+            var inputHost = new Window
+            {
+                Width = 300, Height = 120, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { antdInput } }
+            };
+            inputHost.Show();
+            DoEvents();
+            inputHost.UpdateLayout();
+            var contentHost = antdInput.Template.FindName("PART_ContentHost", antdInput) as FrameworkElement;
+            Check("input text area is 22 tall",
+                contentHost != null && Math.Abs(contentHost.ActualHeight - 22) < 0.51,
+                contentHost == null ? "missing" : contentHost.ActualHeight.ToString("0.#"));
+            inputHost.Close();
+
+            var toggleProbe = new Antd.Wpf.Controls.Switch();
+            Check("switch track corner is half the height",
+                Math.Abs(toggleProbe.TrackCornerRadius.TopLeft - toggleProbe.TrackHeight / 2) < 0.01,
+                toggleProbe.TrackCornerRadius.TopLeft + " of " + toggleProbe.TrackHeight);
+
             Check("input family shares height and radius", sameHeight && sameRadius,
                 string.Join("/", fields.Select(f => f.MinHeight.ToString("0.#"))));
 
@@ -553,6 +583,63 @@ namespace Antd.Wpf.SmokeTests
             calHost.Close();
         }
 
+        // ---------------------------------------------------------------- date picker
+
+        private static void CheckDatePicker()
+        {
+            var picker = new AntdDatePicker { Format = "yyyy-MM-dd", SelectedDate = new DateTime(2026, 3, 14) };
+            var host = new Window
+            {
+                Width = 420, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { picker } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Check("date picker formats the selected date", picker.DisplayText == "2026-03-14", picker.DisplayText);
+            Check("date picker hides placeholder when set", !picker.ShowPlaceholder, picker.ShowPlaceholder.ToString());
+            Check("date picker offers clear when set", picker.CanClear, picker.CanClear.ToString());
+
+            var calendar = picker.Template.FindName("PART_Calendar", picker) as AntdCalendar;
+            var popup = picker.Template.FindName("PART_Popup", picker) as System.Windows.Controls.Primitives.Popup;
+            Check("date picker panel is the calendar control", calendar != null, calendar == null ? "missing" : "ok");
+            Check("date picker forwards its value to the panel",
+                calendar != null && calendar.SelectedDate == new DateTime(2026, 3, 14),
+                calendar == null ? "no calendar" : calendar.SelectedDate.HasValue.ToString());
+
+            picker.IsDropDownOpen = true;
+            DoEvents();
+            Check("date picker opens its popup", popup != null && popup.IsOpen, popup == null ? "missing" : popup.IsOpen.ToString());
+
+            // Picking a day in the panel closes the popup and updates the field.
+            if (calendar != null)
+            {
+                var grid = calendar.Template.FindName("PART_DayGrid", calendar) as System.Windows.Controls.ListBox;
+                var day = grid == null ? null : grid.Items[10] as Antd.Wpf.Controls.CalendarDay;
+                if (grid != null) grid.SelectedItem = day;
+                DoEvents();
+            }
+            Check("picking a day closes the popup", !picker.IsDropDownOpen, picker.IsDropDownOpen.ToString());
+            Check("picking a day updates the field",
+                picker.SelectedDate.HasValue && picker.DisplayText == picker.SelectedDate.Value.ToString("yyyy-MM-dd"),
+                picker.DisplayText);
+
+            picker.SelectedDate = null;
+            DoEvents();
+            Check("clearing restores the placeholder",
+                picker.ShowPlaceholder && picker.DisplayText.Length == 0 && !picker.CanClear,
+                picker.DisplayText);
+
+            picker.Format = "MMM d, yyyy";
+            picker.SelectedDate = new DateTime(2026, 3, 14);
+            DoEvents();
+            Check("format applies to the field",
+                picker.DisplayText == new DateTime(2026, 3, 14).ToString("MMM d, yyyy", System.Globalization.CultureInfo.CurrentCulture),
+                picker.DisplayText);
+            host.Close();
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -610,6 +697,11 @@ namespace Antd.Wpf.SmokeTests
             CaptureCard(FindDescendant<Progress>(window), Path.Combine(directory, "zoom-progress.png"));
             CaptureCard(FindDescendant<Badge>(window), Path.Combine(directory, "zoom-display.png"));
             CaptureCard(FindDescendant<FormItem>(window), Path.Combine(directory, "zoom-form.png"));
+            var inputPreview = FindDescendant<AntdInput>(window);
+            if (inputPreview != null) RenderElement(inputPreview, Path.Combine(directory, "zoom-input-single.png"), 3.0);
+            CaptureDatePicker(window, directory);
+            var switchPreview = FindDescendant<Antd.Wpf.Controls.Switch>(window);
+            if (switchPreview != null) RenderElement(switchPreview, Path.Combine(directory, "zoom-switch.png"), 6.0);
             var layoutPreview = FindDescendant<Antd.Wpf.Controls.Layout>(window);
             if (layoutPreview != null) RenderElement(layoutPreview, Path.Combine(directory, "zoom-layout.png"), 1.0);
             Render(window, Path.Combine(directory, "gallery-light.png"));
@@ -663,6 +755,31 @@ namespace Antd.Wpf.SmokeTests
             {
                 encoder.Save(stream);
             }
+        }
+
+        private static void CaptureDatePicker(Window window, string directory)
+        {
+            var picker = FindDescendant<AntdDatePicker>(window);
+            if (picker == null) return;
+
+            RenderElement(picker, Path.Combine(directory, "zoom-datepicker-field.png"), 2.0);
+
+            picker.IsDropDownOpen = true;
+            DoEvents();
+            DoEvents();
+
+            var popup = picker.Template.FindName("PART_Popup", picker) as System.Windows.Controls.Primitives.Popup;
+            var child = popup == null ? null : popup.Child as FrameworkElement;
+            if (child != null)
+            {
+                child.UpdateLayout();
+                DoEvents();
+                RenderElement(child, Path.Combine(directory, "zoom-datepicker-panel.png"), 2.0);
+                Console.WriteLine("captured: zoom-datepicker-panel.png");
+            }
+
+            picker.IsDropDownOpen = false;
+            DoEvents();
         }
 
         private static void CaptureCard(DependencyObject anchor, string path)

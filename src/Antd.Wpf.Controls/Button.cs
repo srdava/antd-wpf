@@ -313,7 +313,17 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(MinWidthProperty, Shape == ButtonShape.Circle ? height : 0.0);
             SetCurrentValue(CornerRadiusProperty, new CornerRadius(radius));
             SetCurrentValue(OutlineThicknessProperty, t.LineWidth);
-            SetCurrentValue(HorizontalAlignmentProperty, Block ? HorizontalAlignment.Stretch : HorizontalAlignment.Left);
+            // Block buttons fill the row; otherwise only default to Left when the caller has not
+            // chosen an alignment, so things like a right aligned "Today" link survive.
+            if (Block)
+            {
+                SetCurrentValue(HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+            }
+            else if (HorizontalAlignment == HorizontalAlignment.Stretch)
+            {
+                // Only replace the default stretch; an explicit Left/Center/Right is respected.
+                SetCurrentValue(HorizontalAlignmentProperty, HorizontalAlignment.Left);
+            }
             SetCurrentValue(CursorProperty, interactive ? Cursors.Hand : Cursors.Arrow);
             SetCurrentValue(OpacityProperty, Loading ? t.OpacityLoading : 1.0);
             SetCurrentValue(IconMarginProperty, new Thickness(0, 0, hasIcon && hasLabel ? 8 : 0, 0));

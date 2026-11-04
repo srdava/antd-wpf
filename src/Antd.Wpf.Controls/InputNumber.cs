@@ -230,7 +230,10 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(FontSizeProperty, Metrics.FontSize(t, Size));
             SetCurrentValue(MinHeightProperty, height);
             SetCurrentValue(CornerRadiusProperty, new CornerRadius(Metrics.Radius(t, Size)));
-            SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), 0, 0, 0));
+            // The spinner lives in its own column, so padding only needs the inline component plus
+        // antd's vertical 4px (0 for small, 6.5 for large).
+        double block = Size == AntdSize.Large ? 6.5 : (Size == AntdSize.Small ? 0 : 4);
+        SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), block, 0, block));
             SetCurrentValue(CaretBrushProperty, snapshot.Brush("colorText"));
 
             double? value = Value;

@@ -331,6 +331,21 @@ namespace Antd.Wpf.Controls
             private set { SetValue(TrackHeightKey, value); }
         }
 
+        private static readonly DependencyPropertyKey TrackCornerRadiusKey = DependencyProperty.RegisterReadOnly(
+            "TrackCornerRadius", typeof(CornerRadius), typeof(Switch), new FrameworkPropertyMetadata(new CornerRadius(11)));
+
+        public static readonly DependencyProperty TrackCornerRadiusProperty = TrackCornerRadiusKey.DependencyProperty;
+
+        /// <summary>
+        /// Half the track height. Passing the height itself makes WPF scale the corner radii
+        /// against the shorter side, which turns the pill into an ellipse.
+        /// </summary>
+        public CornerRadius TrackCornerRadius
+        {
+            get { return (CornerRadius)GetValue(TrackCornerRadiusProperty); }
+            private set { SetValue(TrackCornerRadiusKey, value); }
+        }
+
         private static readonly DependencyPropertyKey ThumbSizeKey = DependencyProperty.RegisterReadOnly(
             "ThumbSize", typeof(double), typeof(Switch), new FrameworkPropertyMetadata(18.0));
 
@@ -403,9 +418,11 @@ namespace Antd.Wpf.Controls
 
             SetValue(TrackBrushKey, snapshot.Brush(trackKey));
             SetValue(ThumbBrushKey, Brushes.White);
+            double trackHeight = small ? 16.0 : 22.0;
             SetValue(TrackWidthKey, small ? 28.0 : 44.0);
-            SetValue(TrackHeightKey, small ? 16.0 : 22.0);
+            SetValue(TrackHeightKey, trackHeight);
             SetValue(ThumbSizeKey, small ? 12.0 : 18.0);
+            SetValue(TrackCornerRadiusKey, new CornerRadius(trackHeight / 2));
             SetValue(ActiveTextKey, on ? CheckedText : UncheckedText);
             SetCurrentValue(FontSizeProperty, snapshot.Tokens.FontSizeSM);
         }

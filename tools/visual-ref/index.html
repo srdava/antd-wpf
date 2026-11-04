@@ -157,7 +157,10 @@ function App() {
           h(Input, { placeholder: 'Your name' })),
         h(Form.Item, { label: 'Framework' }, h(Select, { placeholder: 'Pick one', allowClear: true, options: [{ value: 'wpf', label: 'WPF' }, { value: 'av', label: 'Avalonia' }], defaultValue: 'wpf' })),
         h(Form.Item, { label: 'Quantity' }, h(InputNumber, { defaultValue: 3, min: 1, max: 20, style: { width: 140 } })),
-        h(Form.Item, { label: 'Notifications' }, h(Switch, { defaultChecked: true })),
+        h(Form.Item, { label: 'Notifications' },
+          h(Switch, { 'data-m': 'switch-on', defaultChecked: true }),
+          h(Switch, { 'data-m': 'switch-off', style: { marginLeft: 12 } }),
+          h(Switch, { 'data-m': 'switch-small', size: 'small', style: { marginLeft: 12 } })),
         h(Form.Item, { label: 'Rating' }, h(Rate, { defaultValue: 3 })),
         h(Form.Item, { label: 'Threshold' }, h(Slider, { defaultValue: 40 })),
         h(Form.Item, { label: 'Plan' },
@@ -194,6 +197,21 @@ window.addEventListener('load', () => {
       const cs = getComputedStyle(el);
       const rec = { name: el.getAttribute('data-m'), x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
       props.forEach(p => { rec[p] = cs[p]; });
+
+      // Inner geometry: text offset for inputs, thumb geometry for switches.
+      const inner = el.querySelector('input');
+      if (inner) {
+        const ir = inner.getBoundingClientRect();
+        rec.textDx = Math.round((ir.x - r.x) * 100) / 100;
+        rec.textDy = Math.round((ir.y - r.y) * 100) / 100;
+        rec.textH = Math.round(ir.height * 100) / 100;
+      }
+      const handle = el.querySelector('.ant-switch-handle');
+      if (handle) {
+        const hr = handle.getBoundingClientRect();
+        rec.handle = { w: Math.round(hr.width * 100) / 100, h: Math.round(hr.height * 100) / 100,
+                       dx: Math.round((hr.x - r.x) * 100) / 100, dy: Math.round((hr.y - r.y) * 100) / 100 };
+      }
       out.push(rec);
     });
     // Also measure a few structural constants of the reference page.

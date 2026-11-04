@@ -86,6 +86,16 @@ namespace Antd.Wpf.Controls
         /// <summary>Raised after the user picks a day (not when set from code).</summary>
         public event EventHandler<DateTime> SelectedDateChanged;
 
+        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(
+            "CornerRadius", typeof(CornerRadius), typeof(Calendar),
+            new FrameworkPropertyMetadata(new CornerRadius(8)));
+
+        public CornerRadius CornerRadius
+        {
+            get { return (CornerRadius)GetValue(CornerRadiusProperty); }
+            set { SetValue(CornerRadiusProperty, value); }
+        }
+
         private static readonly DependencyPropertyKey DaysKey = DependencyProperty.RegisterReadOnly(
             "Days", typeof(ObservableCollection<CalendarDay>), typeof(Calendar),
             new FrameworkPropertyMetadata(null));

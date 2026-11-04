@@ -53,6 +53,9 @@ namespace Antd.Wpf.SmokeTests
             add("select", new Select { Width = 200, Placeholder = "Pick one" });
             add("autocomplete", new AutoComplete { Width = 200, Placeholder = "Type to filter" });
 
+            add("switch-on", new Switch { IsChecked = true });
+            add("switch-off", new Switch { IsChecked = false });
+
             add("tag-default", new Tag { Content = "Default" });
             add("tag-processing", new Tag { Content = "Processing", Color = AntdTagColor.Processing });
             add("tag-success", new Tag { Content = "Success", Color = AntdTagColor.Success });
@@ -112,6 +115,21 @@ namespace Antd.Wpf.SmokeTests
                 else
                 {
                     builder.Append("\"paddingLeft\": 0, \"paddingRight\": 0, \"borderLeft\": 0, ");
+                }
+
+                var toggle = element as Switch;
+                if (toggle != null)
+                {
+                    var thumb = toggle.Template == null ? null : toggle.Template.FindName("SwitchThumb", toggle) as FrameworkElement;
+                    if (thumb != null)
+                    {
+                        Point thumbOrigin = thumb.TranslatePoint(new Point(0, 0), toggle);
+                        builder.Append("\"thumb\": \"")
+                            .Append(Round(thumb.ActualWidth)).Append("x").Append(Round(thumb.ActualHeight))
+                            .Append(" at ").Append(Round(thumbOrigin.X)).Append(",").Append(Round(thumbOrigin.Y))
+                            .Append("\", ");
+                        builder.Append("\"track\": \"").Append(Round(toggle.TrackWidth)).Append("x").Append(Round(toggle.TrackHeight)).Append("\", ");
+                    }
                 }
 
                 builder.Append("\"radius\": ").Append(Json(RadiusOf(element))).Append(", ");

@@ -151,3 +151,27 @@ static Xxx()
 - **Calendar**：42 格月视图（ListBox + UniformGrid），支持上/下月、选中、今日标记、跨月淡出。
   它是后续 DatePicker 的地基。
 - 命名注意：`Antd.Wpf.Controls.Calendar` 与 `System.Windows.Controls.Calendar` 同名，使用时需要别名。
+
+## 输入内边距与开关（同日第二次修正）
+
+### 输入框
+- 之前 `Padding = (11, 0, 11, 0)`，官方是 `4px 11px`；而且 Input 的模板把边框画成**兄弟节点**，
+  内容 Grid 只是加了个 Margin，导致边框没有参与空间分配，文本区比官方高 4px（26.4 vs 22）。
+- 改为：Border 承载 `BorderThickness` + `Padding`，内容 Grid 嵌在 Border 里；竖向内边距按尺寸取
+  4 / 6.5 / 0（对应 middle / large / small）。
+- 文本区高度固定为 `controlHeight - 2*lineWidth - 2*padding`，用只读属性 `ContentHeight` 绑定到
+  PART_ContentHost。否则 WPF 的字体行距（26.4）会把 32 高的输入框撑到 36.4。
+- Select / InputNumber / AutoComplete 同样把 padding 移到 Border，四类字段现在同源。
+
+### Switch
+- 轨道用 `CornerRadius = TrackHeight`（22）绑定，WPF 会按短边等比缩放四个圆角，结果画成**椭圆**
+  而不是胶囊。改为 `TrackCornerRadius = TrackHeight / 2`，并在控件里暴露只读属性。
+- 断言：`switch track corner is half the height`、`input text area is 22 tall`、`input padding is 4 by 11`。
+
+### DatePicker
+- 复用 Calendar 作为面板，字段本身走与 Input 相同的边框/圆角/内边距来源。
+- 支持 `SelectedDate` / `Format` / `Placeholder` / `AllowClear` / `IsDropDownOpen`，面板底部有 Today。
+- 清除按钮只在悬停时出现（antd 行为），通过 MultiTrigger 实现。
+- Button 的 `UpdateVisualState` 之前无条件把 `HorizontalAlignment` 设为 Left，导致面板里右对齐的
+  Today 又跑回左边；改为只在当前值是 Stretch 时才设 Left。
+- 命名注意：`DatePicker` 与 `System.Windows.Controls.DatePicker` 同名，需要别名。

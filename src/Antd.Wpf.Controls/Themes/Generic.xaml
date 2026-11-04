@@ -165,20 +165,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type antd:Input}">
                     <Grid>
+                        <!-- The chrome Border owns padding and border thickness so the text box is
+                             exactly controlHeight - 2*lineWidth - 2*padding, like antd. Drawing the
+                             border as a sibling left the content 2px too tall and the padding
+                             reported as 0 vertically. -->
                         <Border x:Name="Root"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{TemplateBinding CornerRadius}" />
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}">
 
-                        <Border x:Name="FocusRing"
-                                Margin="-2"
-                                IsHitTestVisible="False"
-                                BorderThickness="2"
-                                BorderBrush="{DynamicResource Antd.controlOutline}"
-                                CornerRadius="{TemplateBinding CornerRadius}" />
-
-                        <Grid Margin="{TemplateBinding Padding}">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -191,12 +189,16 @@
                                               VerticalAlignment="Center"
                                               Margin="0,0,6,0" />
 
+                            <!-- Fill the padded area instead of centring by desired size: a
+                                 TextBox host that only takes its desired height ends up taller
+                                 than controlHeight - border - padding. -->
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Grid.Column="1"
-                                          VerticalAlignment="Center"
+                                          Height="{TemplateBinding ContentHeight}"
+                                          VerticalContentAlignment="Center"
                                           Focusable="False"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden" />
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Disabled" />
 
                             <TextBlock x:Name="PlaceholderText"
                                        Grid.Column="1"
@@ -213,6 +215,14 @@
                                         Style="{StaticResource Antd.Input.ClearButton}" />
                             </StackPanel>
                         </Grid>
+                        </Border>
+
+                        <Border x:Name="FocusRing"
+                                Margin="-2"
+                                IsHitTestVisible="False"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource Antd.controlOutline}"
+                                CornerRadius="{TemplateBinding CornerRadius}" />
                     </Grid>
 
                     <ControlTemplate.Triggers>
@@ -889,7 +899,8 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}">
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -897,7 +908,6 @@
                             </Grid.ColumnDefinitions>
 
                             <ScrollViewer x:Name="PART_ContentHost" Grid.Column="0"
-                                          Margin="{TemplateBinding Padding}"
                                           VerticalAlignment="Center" Focusable="False"
                                           HorizontalScrollBarVisibility="Hidden"
                                           VerticalScrollBarVisibility="Hidden" />
@@ -1006,7 +1016,7 @@
                 <ControlTemplate TargetType="{x:Type antd:Switch}">
                     <Border Width="{TemplateBinding TrackWidth}" Height="{TemplateBinding TrackHeight}"
                             Background="{TemplateBinding TrackBrush}"
-                            CornerRadius="{Binding TrackHeight, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static theme:DoubleToCornerRadiusConverter.Instance}}">
+                            CornerRadius="{TemplateBinding TrackCornerRadius}">
                         <Grid>
                             <TextBlock x:Name="SwitchText" Text="{TemplateBinding ActiveText}"
                                        Foreground="White" FontSize="{TemplateBinding FontSize}"
@@ -1154,7 +1164,8 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{TemplateBinding CornerRadius}">
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -1166,13 +1177,11 @@
                                                   Content="{TemplateBinding SelectionBoxItem}"
                                                   ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                                   ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
-                                                  Margin="{TemplateBinding Padding}"
                                                   VerticalAlignment="Center" />
 
                                 <TextBlock x:Name="PlaceholderHost" Grid.Column="0"
                                            Text="{TemplateBinding Placeholder}"
                                            Foreground="{TemplateBinding PlaceholderBrush}"
-                                           Margin="{TemplateBinding Padding}"
                                            VerticalAlignment="Center" Visibility="Collapsed" />
 
                                 <Button x:Name="PART_ClearButton" Grid.Column="1"
@@ -1434,16 +1443,19 @@
 
     <Style TargetType="{x:Type antd:Calendar}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource Antd.colorBgContainer}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Antd.colorBorderSecondary}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type antd:Calendar}">
-                    <Border Background="{DynamicResource Antd.colorBgContainer}"
-                            BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
-                            BorderThickness="1"
-                            CornerRadius="{theme:CornerRadius borderRadiusLG}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
                         <StackPanel Margin="{TemplateBinding Padding}">
                             <Grid Margin="0,0,0,8">
                                 <TextBlock Text="{TemplateBinding MonthLabel}"
@@ -1511,4 +1523,123 @@
         </Setter>
     </Style>
 
+    <!-- ============================================================ DatePicker -->
+
+    <Style TargetType="{x:Type antd:DatePicker}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type antd:DatePicker}">
+                    <Grid>
+                        <Border x:Name="PART_Field"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="ValueText"
+                                           Grid.Column="0"
+                                           Text="{TemplateBinding DisplayText}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+
+                                <TextBlock x:Name="PlaceholderText"
+                                           Grid.Column="0"
+                                           Text="{TemplateBinding Placeholder}"
+                                           Foreground="{DynamicResource Antd.colorTextPlaceholder}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           VerticalAlignment="Center" />
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="PART_ClearButton"
+                                            Style="{StaticResource Antd.Input.ClearButton}"
+                                            Margin="0,0,6,0"
+                                            Visibility="Collapsed" />
+                                    <Path Data="M0,1.5 L10,1.5 M3,0 L3,3 M7,0 L7,3 M0.5,1.5 L0.5,9.5 L9.5,9.5 L9.5,1.5 Z"
+                                          Stretch="None"
+                                          Stroke="{DynamicResource Antd.colorTextTertiary}"
+                                          StrokeThickness="1"
+                                          StrokeLineJoin="Round"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Popup x:Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade"
+                               Focusable="False"
+                               StaysOpen="False">
+                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                                    BorderThickness="1"
+                                    CornerRadius="{theme:CornerRadius borderRadiusLG}"
+                                    Margin="0,4,0,0"
+                                    Padding="8">
+                                <StackPanel>
+                                    <antd:Calendar x:Name="PART_Calendar"
+                                                   Background="Transparent"
+                                                   BorderThickness="0"
+                                                   Padding="8"
+                                                   Width="264" />
+                                    <Border BorderBrush="{DynamicResource Antd.colorSplit}"
+                                            BorderThickness="0,1,0,0"
+                                            Margin="0,8,0,0"
+                                            Padding="0,4,0,0">
+                                        <antd:Button x:Name="PART_Today"
+                                                     Content="Today"
+                                                     HorizontalAlignment="Right"
+                                                     Variant="Link"
+                                                     Size="Small" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowPlaceholder" Value="True">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ShowPlaceholder" Value="False">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ValueText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="CanClear" Value="False">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="CanClear" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PART_Field" Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
+

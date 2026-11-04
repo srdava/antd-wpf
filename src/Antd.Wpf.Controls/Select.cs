@@ -182,8 +182,9 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(FontSizeProperty, Metrics.FontSize(t, Size));
             SetCurrentValue(MinHeightProperty, Metrics.ControlHeight(t, Size));
             SetCurrentValue(CornerRadiusProperty, new CornerRadius(Metrics.Radius(t, Size)));
-            SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), 0,
-                Metrics.InputPaddingInline(Size), 0));
+            double block = Size == AntdSize.Large ? 6.5 : (Size == AntdSize.Small ? 0 : 4);
+            SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), block,
+                Metrics.InputPaddingInline(Size), block));
 
             SetValue(HasSelectionKey, hasSelection);
             SetValue(CanClearSelectionKey, AllowClear && hasSelection && IsEnabled);
