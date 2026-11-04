@@ -43,6 +43,13 @@ namespace Antd.Wpf.SmokeTests
             }
 
             var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+
+            // Framework chrome (scroll bars) lives in a separate dictionary the host merges.
+            app.Resources.MergedDictionaries.Add(new ResourceDictionary
+            {
+                Source = new Uri("pack://application:,,,/Antd.Wpf.Controls;component/Themes/Framework.xaml")
+            });
+
             ThemeManager.Current.Attach(app.Resources);
             ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
             DoEvents();
@@ -68,6 +75,7 @@ namespace Antd.Wpf.SmokeTests
             CheckAutoCompleteAndCalendar();
             CheckDatePicker();
             CheckM1Tail();
+            CheckTree();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -698,6 +706,69 @@ namespace Antd.Wpf.SmokeTests
             affixHost.Close();
         }
 
+        // ---------------------------------------------------------------- tree
+
+        private static void CheckTree()
+        {
+            var root = new TreeItem("root");
+            var a = new TreeItem("a");
+            var b = new TreeItem("b");
+            a.Children.Add(new TreeItem("a1"));
+            a.Children.Add(new TreeItem("a2"));
+            root.Children.Add(a);
+            root.Children.Add(b);
+
+            Check("tree sets parent links", a.Parent == root && a.Children[0].Parent == a, "parent missing");
+
+            root.IsChecked = true;
+            Check("checking a parent checks descendants",
+                a.IsChecked == true && a.Children[0].IsChecked == true && b.IsChecked == true,
+                a.IsChecked + "/" + a.Children[0].IsChecked);
+
+            root.IsChecked = false;
+            Check("unchecking a parent clears descendants",
+                a.IsChecked == false && a.Children[1].IsChecked == false, a.IsChecked.ToString());
+
+            a.Children[0].IsChecked = true;
+            Check("a single child makes the parent indeterminate",
+                a.IsChecked == null && root.IsChecked == null, a.IsChecked + "/" + root.IsChecked);
+
+            a.Children[1].IsChecked = true;
+            Check("all children checked makes the parent checked",
+                a.IsChecked == true && root.IsChecked == null, a.IsChecked.ToString());
+
+            b.IsChecked = true;
+            Check("ancestors roll up to fully checked",
+                root.IsChecked == true, root.IsChecked.ToString());
+
+            var tree = new Tree { ItemsSource = new[] { root } };
+            var host = new Window
+            {
+                Width = 360, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { VerticalAlignment = VerticalAlignment.Top, Children = { tree } }
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            int checkedCount = 0;
+            foreach (TreeItem item in tree.GetCheckedItems()) checkedCount++;
+            Check("tree lists checked nodes", checkedCount == 5, checkedCount.ToString());
+
+            tree.ExpandAll(true);
+            DoEvents();
+            Check("expand all opens every parent", a.IsExpanded && root.IsExpanded, a.IsExpanded.ToString());
+
+            tree.ExpandAll(false);
+            DoEvents();
+            Check("collapse all closes every parent", !a.IsExpanded && !root.IsExpanded, a.IsExpanded.ToString());
+
+            var container = tree.ItemContainerGenerator.ContainerFromItem(root) as TreeViewItem;
+            Check("tree applies the antd item container",
+                container != null && container.Template != null, container == null ? "missing" : "ok");
+            host.Close();
+        }
+
         // ---------------------------------------------------------------- theme switch
 
         private static void CheckThemeSwitch()
@@ -757,6 +828,8 @@ namespace Antd.Wpf.SmokeTests
             CaptureCard(FindDescendant<FormItem>(window), Path.Combine(directory, "zoom-form.png"));
             var inputPreview = FindDescendant<AntdInput>(window);
             if (inputPreview != null) RenderElement(inputPreview, Path.Combine(directory, "zoom-input-single.png"), 3.0);
+            var treePreview = FindDescendant<Antd.Wpf.Controls.Tree>(window);
+            if (treePreview != null) RenderElement(treePreview, Path.Combine(directory, "zoom-tree.png"), 2.0);
             CaptureDatePicker(window, directory);
             var switchPreview = FindDescendant<Antd.Wpf.Controls.Switch>(window);
             if (switchPreview != null) RenderElement(switchPreview, Path.Combine(directory, "zoom-switch.png"), 6.0);

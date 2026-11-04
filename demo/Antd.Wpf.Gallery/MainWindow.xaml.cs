@@ -29,6 +29,8 @@ namespace Antd.Wpf.Gallery
             RangeSegmented.ItemsSource = new[] { "Daily", "Weekly", "Monthly" };
             RangeSegmented.SelectedIndex = 0;
 
+            BuildDemoTree();
+
             FrameworkAuto.ItemsSource = new[]
             {
                 "WPF", "WinUI 3", "Avalonia", "MAUI", "Uno Platform", "Avalonia XPF"
@@ -50,6 +52,30 @@ namespace Antd.Wpf.Gallery
         {
             RefreshTokens();
             UpdateThemeButton();
+        }
+
+        private void BuildDemoTree()
+        {
+            var root = new Antd.Wpf.Controls.TreeItem("Design system") { IsExpanded = true };
+            var foundations = new Antd.Wpf.Controls.TreeItem("Foundations") { IsExpanded = true };
+            foundations.Children.Add(new Antd.Wpf.Controls.TreeItem("Colour"));
+            foundations.Children.Add(new Antd.Wpf.Controls.TreeItem("Typography"));
+            foundations.Children.Add(new Antd.Wpf.Controls.TreeItem("Spacing"));
+
+            var components = new Antd.Wpf.Controls.TreeItem("Components") { IsExpanded = true };
+            var inputs = new Antd.Wpf.Controls.TreeItem("Data entry") { IsExpanded = true };
+            inputs.Children.Add(new Antd.Wpf.Controls.TreeItem("Button"));
+            inputs.Children.Add(new Antd.Wpf.Controls.TreeItem("Input"));
+            inputs.Children.Add(new Antd.Wpf.Controls.TreeItem("DatePicker"));
+            components.Children.Add(inputs);
+            components.Children.Add(new Antd.Wpf.Controls.TreeItem("Tree"));
+            components.Children.Add(new Antd.Wpf.Controls.TreeItem("Table"));
+
+            root.Children.Add(foundations);
+            root.Children.Add(components);
+            root.Children.Add(new Antd.Wpf.Controls.TreeItem("Changelog"));
+
+            DemoTree.ItemsSource = new[] { root };
         }
 
         private void OnSubmitForm(object sender, RoutedEventArgs e)

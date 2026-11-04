@@ -632,6 +632,22 @@
                 </StackPanel>
             </Border>
 
+            <!-- tree -->
+            <Border Margin="0,16,0,0" Padding="24"
+                    Background="{DynamicResource Antd.colorBgContainer}"
+                    BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Tree" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,16" FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="Hierarchical list with tri-state check boxes; checking a parent cascades down and half-checked parents report indeterminate." />
+
+                    <antd:Tree x:Name="DemoTree" Checkable="True" Height="240" />
+                </StackPanel>
+            </Border>
+
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"
