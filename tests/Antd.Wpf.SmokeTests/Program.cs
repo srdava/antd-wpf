@@ -99,6 +99,7 @@ namespace Antd.Wpf.SmokeTests
             CheckDisplayControls2();
             CheckQrEncoder();
             CheckNavigationAndMedia();
+            CheckReviewFixes();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2061,6 +2062,118 @@ namespace Antd.Wpf.SmokeTests
             }
         }
 
+        // ---------------------------------------------------------------- review fixes
+
+        private static void CheckReviewFixes()
+        {
+            // InputNumber: the declared range has to win over every write path, not just typing.
+            var number = new Antd.Wpf.Controls.InputNumber { Minimum = 1, Maximum = 20, Value = 100 };
+            Check("input number clamps an out-of-range initial Value",
+                number.Value.HasValue && Math.Abs(number.Value.Value - 20) < 1e-9, number.Value.ToString());
+
+            number.Value = -5;
+            Check("input number clamps a later Value assignment",
+                number.Value.HasValue && Math.Abs(number.Value.Value - 1) < 1e-9, number.Value.ToString());
+
+            number.Value = 10;
+            number.Maximum = 4;
+            Check("input number re-clamps when Maximum shrinks",
+                number.Value.HasValue && Math.Abs(number.Value.Value - 4) < 1e-9, number.Value.ToString());
+
+            number.Maximum = 20;
+            number.Minimum = 12;
+            Check("input number re-clamps when Minimum grows",
+                number.Value.HasValue && Math.Abs(number.Value.Value - 12) < 1e-9, number.Value.ToString());
+            Check("clamped value is mirrored into the text", number.Text == "12", number.Text);
+
+            number.Minimum = 30;
+            number.Value = 5;
+            Check("a swapped range stays bounded instead of throwing",
+                number.Value.HasValue && number.Value.Value >= 20 && number.Value.Value <= 30,
+                number.Value.ToString());
+
+            // Form: Layout / LabelWidth are not decoration, they change the item layout.
+            var form = new Form { Layout = FormLayout.Horizontal, LabelWidth = 120, Width = 460 };
+            var userItem = new FormItem { Label = "User", Content = new AntdInput { Text = "admin" } };
+            form.Children.Add(userItem);
+
+            var formHost = new Window
+            {
+                Width = 560, Height = 220, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = form
+            };
+            formHost.Show();
+            DoEvents();
+            formHost.UpdateLayout();
+
+            Check("layout inherits from the form into items",
+                userItem.Layout == FormLayout.Horizontal, userItem.Layout.ToString());
+            Check("label width inherits from the form",
+                Math.Abs(userItem.LabelWidth - 120) < 0.01, userItem.LabelWidth.ToString());
+
+            var labelColumn = userItem.Template.FindName("PART_LabelColumn", userItem) as ColumnDefinition;
+            var contentPart = userItem.Template.FindName("PART_Content", userItem) as FrameworkElement;
+            Check("horizontal form reserves the label column",
+                labelColumn != null && Math.Abs(labelColumn.Width.Value - 120) < 0.01,
+                labelColumn == null ? "missing" : labelColumn.Width.ToString());
+            Check("horizontal form puts the field in the second column",
+                contentPart != null && Grid.GetColumn(contentPart) == 1 && Grid.GetColumnSpan(contentPart) == 1,
+                contentPart == null ? "missing" : Grid.GetColumn(contentPart) + "/" + Grid.GetColumnSpan(contentPart));
+
+            userItem.Content = new AntdInput { Text = "root" };
+            form.Layout = FormLayout.Vertical;
+            DoEvents();
+            formHost.UpdateLayout();
+
+            Check("switching back to vertical zeroes the label column",
+                labelColumn != null && labelColumn.Width.Value == 0,
+                labelColumn == null ? "missing" : labelColumn.Width.ToString());
+            Check("vertical form lets the field span both columns",
+                contentPart != null && Grid.GetColumn(contentPart) == 0 && Grid.GetColumnSpan(contentPart) == 2,
+                contentPart == null ? "missing" : Grid.GetColumn(contentPart) + "/" + Grid.GetColumnSpan(contentPart));
+            Check("vertical form stacks the label above the field",
+                contentPart != null && Grid.GetRow(contentPart) == 1,
+                contentPart == null ? "missing" : Grid.GetRow(contentPart).ToString());
+            formHost.Close();
+
+            // Upload: the dialog filter and the drop check must agree on the same accept string.
+            string filter = Upload.BuildFilter(".png;.jpg");
+            Check("upload filter uses wildcard patterns",
+                filter == "Supported files (*.png;*.jpg)|*.png;*.jpg|All files (*.*)|*.*", filter);
+            Check("upload accept tolerates bare extensions",
+                Upload.ParseAccept("png, jpg").Length == 2, Upload.ParseAccept("png, jpg").Length.ToString());
+            Check("upload accept normalises *.ext",
+                Upload.ParseAccept("*.png")[0] == ".png", Upload.ParseAccept("*.png")[0]);
+            Check("upload falls back to all files for MIME wildcards",
+                Upload.ParseAccept("image/*").Length == 0, Upload.ParseAccept("image/*").Length.ToString());
+
+            var upload = new Upload { Accept = ".png;.jpg" };
+            Check("upload drops a non-matching extension", !upload.Accepts("notes.txt"), "accepted notes.txt");
+            Check("upload accepts a matching extension case-insensitively", upload.Accepts("photo.PNG"), "rejected photo.PNG");
+
+            // Theme: switching colour mode must not silently drop the compact algorithm.
+            ThemeManager.Current.Apply(ThemeConfig.Create(null, ThemeAlgorithm.Dark | ThemeAlgorithm.Compact));
+            ThemeManager.Current.ApplyLight();
+            Check("ApplyLight keeps compact",
+                !ThemeManager.Current.Config.IsDark
+                && (ThemeManager.Current.Config.Algorithm & ThemeAlgorithm.Compact) == ThemeAlgorithm.Compact,
+                ThemeManager.Current.Config.Algorithm.ToString());
+
+            ThemeManager.Current.ApplyDark();
+            Check("ApplyDark keeps compact",
+                ThemeManager.Current.Config.IsDark
+                && (ThemeManager.Current.Config.Algorithm & ThemeAlgorithm.Compact) == ThemeAlgorithm.Compact,
+                ThemeManager.Current.Config.Algorithm.ToString());
+
+            ThemeManager.Current.ToggleDark();
+            Check("ToggleDark keeps compact",
+                !ThemeManager.Current.Config.IsDark
+                && (ThemeManager.Current.Config.Algorithm & ThemeAlgorithm.Compact) == ThemeAlgorithm.Compact,
+                ThemeManager.Current.Config.Algorithm.ToString());
+
+            ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
+            DoEvents();
+        }
         private static void DoEvents()
         {
             var frame = new DispatcherFrame();

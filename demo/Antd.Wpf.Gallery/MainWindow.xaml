@@ -510,6 +510,21 @@
                             </antd:Space>
                         </antd:FormItem>
                     </antd:Form>
+
+                    <TextBlock Text="Horizontal layout — same items, label column 120" FontSize="13"
+                               Margin="0,24,0,8"
+                               Foreground="{DynamicResource Antd.colorTextDescription}" />
+                    <antd:Form Layout="Horizontal" LabelWidth="120" MaxWidth="520" HorizontalAlignment="Left">
+                        <antd:FormItem Label="Project">
+                            <antd:Input Placeholder="nova" />
+                        </antd:FormItem>
+                        <antd:FormItem Label="Owner">
+                            <antd:Select Placeholder="Pick one" />
+                        </antd:FormItem>
+                        <antd:FormItem Label="Retention" Help="Days before the record is purged.">
+                            <antd:InputNumber Value="30" Minimum="1" Maximum="365" Width="140" HorizontalAlignment="Left" />
+                        </antd:FormItem>
+                    </antd:Form>
                 </StackPanel>
             </Border>
 

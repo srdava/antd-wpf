@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -207,10 +209,49 @@ namespace Antd.Wpf.Controls
             e.Handled = true;
         }
 
-        private static string BuildFilter(string accept)
+        /// <summary>
+        /// Normalises an accept string (".png;.jpg", "png, jpg", "*.png") into ".png" style
+        /// extensions. An empty result means "any file": either accept was empty, or it used MIME
+        /// wildcards such as "image/*", which a Win32 open dialog cannot express.
+        /// </summary>
+        internal static string[] ParseAccept(string accept)
         {
-            string extensions = accept.Replace(";", ";").Replace(",", ";");
-            return "Supported files (" + extensions.Replace(";", ";") + ")|" + extensions + "|All files (*.*)|*.*";
+            if (string.IsNullOrEmpty(accept)) return new string[0];
+
+            var extensions = new List<string>();
+            foreach (string raw in accept.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string part = raw.Trim();
+                if (part.Length == 0) continue;
+                if (part == "*" || part == "*.*" || part.IndexOf('/') >= 0) return new string[0];
+
+                if (part.StartsWith("*.", StringComparison.Ordinal)) part = part.Substring(1);
+                else if (!part.StartsWith(".", StringComparison.Ordinal)) part = "." + part;
+
+                if (!extensions.Contains(part)) extensions.Add(part);
+            }
+            return extensions.ToArray();
+        }
+
+        /// <summary>
+        /// Win32 filter string. The display half lists extensions, the pattern half needs the
+        /// asterisks: "Supported files (*.png;*.jpg)|*.png;*.jpg". The old version reused the
+        /// dotted list on both sides, so the dialog matched nothing.
+        /// </summary>
+        internal static string BuildFilter(string accept)
+        {
+            string[] extensions = ParseAccept(accept);
+            if (extensions.Length == 0) return "All files (*.*)|*.*";
+
+            var patterns = new StringBuilder();
+            foreach (string extension in extensions)
+            {
+                if (patterns.Length > 0) patterns.Append(';');
+                patterns.Append('*').Append(extension);
+            }
+
+            string list = patterns.ToString();
+            return "Supported files (" + list + ")|" + list + "|All files (*.*)|*.*";
         }
 
         private void OnDragOver(object sender, DragEventArgs e)
@@ -261,14 +302,15 @@ namespace Antd.Wpf.Controls
             if (handler != null) handler(this, added.ToArray());
         }
 
-        private bool Accepts(string path)
+        internal bool Accepts(string path)
         {
-            if (string.IsNullOrEmpty(Accept)) return true;
+            string[] extensions = ParseAccept(Accept);
+            if (extensions.Length == 0) return true;
 
             string extension = System.IO.Path.GetExtension(path);
-            foreach (string part in Accept.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (string allowed in extensions)
             {
-                if (string.Equals(part.Trim(), extension, StringComparison.OrdinalIgnoreCase)) return true;
+                if (string.Equals(allowed, extension, StringComparison.OrdinalIgnoreCase)) return true;
             }
             return false;
         }

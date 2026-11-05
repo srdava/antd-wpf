@@ -1247,8 +1247,19 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type antd:FormItem}">
-                    <StackPanel>
-                        <StackPanel x:Name="LabelRow" Orientation="Horizontal" Margin="0,0,0,8"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="PART_LabelColumn" Width="0" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel x:Name="PART_LabelRow" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                    Orientation="Horizontal" Margin="0,0,0,8"
                                     Visibility="Collapsed">
                             <TextBlock x:Name="RequiredMark" Text="*" Margin="0,0,4,0"
                                        Foreground="{TemplateBinding RequiredBrush}" Visibility="Collapsed" />
@@ -1257,22 +1268,24 @@
                                        FontSize="{TemplateBinding FontSize}" />
                         </StackPanel>
 
-                        <ContentPresenter HorizontalAlignment="Stretch" />
+                        <ContentPresenter x:Name="PART_Content" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                          HorizontalAlignment="Stretch" />
 
-                        <TextBlock x:Name="MessageText" Text="{TemplateBinding ActiveMessage}"
+                        <TextBlock x:Name="PART_Message" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Text="{TemplateBinding ActiveMessage}"
                                    Foreground="{TemplateBinding MessageBrush}"
                                    FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
                                    Visibility="Collapsed" />
-                    </StackPanel>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="HasLabel" Value="True">
-                            <Setter TargetName="LabelRow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_LabelRow" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="Required" Value="True">
                             <Setter TargetName="RequiredMark" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="HasMessage" Value="True">
-                            <Setter TargetName="MessageText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_Message" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

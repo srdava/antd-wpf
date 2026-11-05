@@ -131,8 +131,37 @@ namespace Antd.Wpf.Controls
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var input = (InputNumber)d;
-            if (!input._syncing) input.SyncTextFromValue();
+
+            // Re-entrancy: coercing the value below fires this callback again. Sync once, then stop.
+            if (input._syncing) return;
+
+            input.CoerceToLimits();
+            input.SyncTextFromValue();
             input.UpdateVisualState();
+        }
+
+        /// <summary>
+        /// Pulls <see cref="Value"/> back inside [Minimum, Maximum]. Runs for every change of Value,
+        /// Minimum or Maximum, so a bound view model cannot leave the field showing 100 while the
+        /// page declared Maximum=20.
+        /// </summary>
+        private void CoerceToLimits()
+        {
+            double? current = Value;
+            if (!current.HasValue) return;
+
+            double clamped = Clamp(current.Value);
+            if (clamped == current.Value) return;
+
+            _syncing = true;
+            try
+            {
+                SetCurrentValue(ValueProperty, clamped);
+            }
+            finally
+            {
+                _syncing = false;
+            }
         }
 
         protected override void OnTextChanged(TextChangedEventArgs e)
@@ -189,8 +218,19 @@ namespace Antd.Wpf.Controls
 
         private double Clamp(double value)
         {
-            if (value < Minimum) value = Minimum;
-            if (value > Maximum) value = Maximum;
+            double min = Minimum;
+            double max = Maximum;
+
+            // Tolerate a swapped range instead of returning a value outside both bounds.
+            if (max < min)
+            {
+                double swap = min;
+                min = max;
+                max = swap;
+            }
+
+            if (value < min) value = min;
+            if (value > max) value = max;
             return value;
         }
 

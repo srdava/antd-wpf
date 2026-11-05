@@ -29,9 +29,11 @@ namespace Antd.Wpf.Controls
             ThemeLink.Attach(this, InvalidateMeasure);
         }
 
-        public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(
-            "Layout", typeof(FormLayout), typeof(Form),
-            new FrameworkPropertyMetadata(FormLayout.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        // Layout and LabelWidth live on FormItem and are inherited, so an item nested deeper still
+        // picks them up. Form only re-exposes the same dependency properties.
+        public static readonly DependencyProperty LayoutProperty = FormItem.LayoutProperty.AddOwner(
+            typeof(Form), new FrameworkPropertyMetadata(FormLayout.Vertical,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public FormLayout Layout
         {
@@ -39,9 +41,9 @@ namespace Antd.Wpf.Controls
             set { SetValue(LayoutProperty, value); }
         }
 
-        public static readonly DependencyProperty LabelWidthProperty = DependencyProperty.Register(
-            "LabelWidth", typeof(double), typeof(Form),
-            new FrameworkPropertyMetadata(96.0, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public static readonly DependencyProperty LabelWidthProperty = FormItem.LabelWidthProperty.AddOwner(
+            typeof(Form), new FrameworkPropertyMetadata(96.0,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>Label column width used when <see cref="Layout"/> is Horizontal.</summary>
         public double LabelWidth
@@ -152,6 +154,32 @@ namespace Antd.Wpf.Controls
         {
             ThemeLink.Attach(this, UpdateVisualState);
             UpdateVisualState();
+        }
+
+        public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(
+            "Layout", typeof(FormLayout), typeof(FormItem),
+            new FrameworkPropertyMetadata(FormLayout.Vertical,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnLayoutModeChanged));
+
+        /// <summary>Inherited from the parent <see cref="Form"/>; can also be set per item.</summary>
+        public FormLayout Layout
+        {
+            get { return (FormLayout)GetValue(LayoutProperty); }
+            set { SetValue(LayoutProperty, value); }
+        }
+
+        public static readonly DependencyProperty LabelWidthProperty = DependencyProperty.Register(
+            "LabelWidth", typeof(double), typeof(FormItem),
+            new FrameworkPropertyMetadata(96.0,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnLayoutModeChanged));
+
+        /// <summary>Width of the label column when <see cref="Layout"/> is Horizontal.</summary>
+        public double LabelWidth
+        {
+            get { return (double)GetValue(LabelWidthProperty); }
+            set { SetValue(LabelWidthProperty, value); }
         }
 
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
@@ -277,6 +305,56 @@ namespace Antd.Wpf.Controls
         private static void OnAppearanceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((FormItem)d).UpdateVisualState();
+        }
+
+        private static void OnLayoutModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((FormItem)d).UpdateLayoutMode();
+        }
+
+        private ColumnDefinition _labelColumn;
+        private FrameworkElement _labelRow;
+        private FrameworkElement _contentHost;
+        private FrameworkElement _messageText;
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            _labelColumn = GetTemplateChild("PART_LabelColumn") as ColumnDefinition;
+            _labelRow = GetTemplateChild("PART_LabelRow") as FrameworkElement;
+            _contentHost = GetTemplateChild("PART_Content") as FrameworkElement;
+            _messageText = GetTemplateChild("PART_Message") as FrameworkElement;
+
+            UpdateLayoutMode();
+        }
+
+        /// <summary>
+        /// Switches between the stacked (label above field) and the two-column horizontal form.
+        /// Row/column placement is set here rather than in template triggers because Setter.Value
+        /// cannot carry a TemplateBinding for the label width.
+        /// </summary>
+        private void UpdateLayoutMode()
+        {
+            if (_labelColumn == null || _labelRow == null || _contentHost == null || _messageText == null) return;
+
+            bool horizontal = Layout == FormLayout.Horizontal;
+
+            _labelColumn.Width = horizontal ? new GridLength(Math.Max(0, LabelWidth)) : new GridLength(0);
+
+            Grid.SetRow(_labelRow, 0);
+            Grid.SetColumn(_labelRow, 0);
+            Grid.SetColumnSpan(_labelRow, horizontal ? 1 : 2);
+            // 5px pulls the 22px label line onto the centre of a 32px control.
+            _labelRow.Margin = horizontal ? new Thickness(0, 5, 8, 0) : new Thickness(0, 0, 0, 8);
+
+            Grid.SetRow(_contentHost, horizontal ? 0 : 1);
+            Grid.SetColumn(_contentHost, horizontal ? 1 : 0);
+            Grid.SetColumnSpan(_contentHost, horizontal ? 1 : 2);
+
+            Grid.SetRow(_messageText, horizontal ? 1 : 2);
+            Grid.SetColumn(_messageText, horizontal ? 1 : 0);
+            Grid.SetColumnSpan(_messageText, horizontal ? 1 : 2);
         }
 
         public void ClearError()

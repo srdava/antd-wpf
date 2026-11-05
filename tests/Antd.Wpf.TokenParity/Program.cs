@@ -36,6 +36,11 @@ namespace Antd.Wpf.TokenParity
             int totalFailures = 0;
             var allMissing = new SortedDictionary<string, int>(StringComparer.Ordinal);
 
+            // Missing tokens are failures, not warnings. Keep this list empty: a key only belongs
+            // here if antd emits something this port deliberately cannot derive, and that deserves
+            // a comment explaining why.
+            var allowedMissing = new HashSet<string>(StringComparer.Ordinal);
+
             foreach (Case testCase in cases)
             {
                 Dictionary<string, string> golden = Golden.Configs[testCase.Name];
@@ -53,6 +58,12 @@ namespace Antd.Wpf.TokenParity
                         int count;
                         allMissing.TryGetValue(pair.Key, out count);
                         allMissing[pair.Key] = count + 1;
+
+                        if (!allowedMissing.Contains(pair.Key))
+                        {
+                            totalFailures++;
+                            failures.Add("  " + pair.Key.PadRight(26) + " MISSING  antd emits it, this port does not");
+                        }
                         continue;
                     }
 
@@ -68,7 +79,7 @@ namespace Antd.Wpf.TokenParity
                     }
                 }
 
-                Console.WriteLine("[" + testCase.Name + "] matched " + matched + "/" + compared
+                Console.WriteLine("[" + testCase.Name + "] matched " + matched + "/" + golden.Count
                     + "  (golden keys: " + golden.Count + ", produced: " + actual.Values.Count + ")");
 
                 if (failures.Count > 0)

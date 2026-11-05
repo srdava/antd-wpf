@@ -84,15 +84,27 @@ namespace Antd.Wpf.Theme
 
         public void ApplyLight()
         {
-            ThemeConfig next = _config.Clone();
-            next.Algorithm = ThemeAlgorithm.Default;
-            Apply(next);
+            SetDark(false);
         }
 
         public void ApplyDark()
         {
+            SetDark(true);
+        }
+
+        /// <summary>
+        /// Flips only the Dark bit. Assigning a whole new algorithm (as this used to) dropped
+        /// Compact on the floor, so switching colour mode also changed every control's height.
+        /// </summary>
+        private void SetDark(bool dark)
+        {
             ThemeConfig next = _config.Clone();
-            next.Algorithm = ThemeAlgorithm.Dark;
+            ThemeAlgorithm algorithm = next.Algorithm;
+
+            if (dark) algorithm |= ThemeAlgorithm.Dark;
+            else algorithm &= ~ThemeAlgorithm.Dark;
+
+            next.Algorithm = algorithm;
             Apply(next);
         }
 
