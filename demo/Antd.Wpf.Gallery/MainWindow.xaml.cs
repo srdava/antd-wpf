@@ -331,5 +331,32 @@ namespace Antd.Wpf.Gallery
             row.Children.Add(text);
             return row;
         }
+
+        // ---------------------------------------------------------------- feedback demos
+
+        private void OnOpenModal(object sender, RoutedEventArgs e)
+        {
+            DemoModal.IsOpen = true;
+        }
+
+        private void OnOpenDrawer(object sender, RoutedEventArgs e)
+        {
+            DemoDrawer.IsOpen = true;
+        }
+
+        private void OnPopconfirmConfirmed(object sender, EventArgs e)
+        {
+            Antd.Wpf.Controls.Message.Success("Item deleted");
+        }
+
+        private void OnShowMessage(object sender, RoutedEventArgs e)
+        {
+            Antd.Wpf.Controls.Message.Success("Saved successfully");
+        }
+
+        private void OnShowNotification(object sender, RoutedEventArgs e)
+        {
+            Antd.Wpf.Controls.Notification.Info("Notification title", "A short description line.");
+        }
     }
 }

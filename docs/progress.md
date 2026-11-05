@@ -1,6 +1,6 @@
 # 进度状态
 
-最后更新：2026-11-04
+最后更新：2026-11-05
 
 对照 `docs/antd-wpf-implementation-plan.md` 的 71 项组件清单。
 
@@ -12,12 +12,12 @@
 | M1 原子层 | 22 | **22** | 清单全部落地 |
 | M2 录入层 | 19 | **19** | 清单全部落地（能力边界见下） |
 | M3 展示层 | 21 | **21** | 清单全部落地（能力边界见下） |
-| M4 反馈层 | 7 | 0 | 未开始 |
+| M4 反馈层 | 7 | **7** | 清单全部落地（能力边界见下） |
 | M5 打磨 | — | 0 | 无障碍、i18n、动效降级均未做 |
 
-**组件进度：62 / 71（约 87%）。** 公开控件类型 92 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
-Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。 公开控件类型 66 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
-Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
+**组件进度：69 / 71。** 公开控件类型 97 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
+Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
+余下 2 项不在任何里程碑内，属计划里标为「不实现」的部分。
 
 ## 能力边界（做了但与 antd 有差距）
 
@@ -48,6 +48,13 @@ Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
 | Masonry | 最短列填充 | 动画重排、响应式列数 |
 | Popover | 标题 + 内容、点击触发 | 12 个方向、受控/非受控混合、箭头 |
 | Dropdown | 菜单项 + ItemInvoked | 子菜单、分组、分割线、多选、右键触发 |
+| Modal | 遮罩 + 焦点陷阱 + Esc + 入场动效 | 命令式静态方法（`Modal.confirm`）、退出动效、拖拽标题栏、可调 `top` |
+| Drawer | 四方向滑入 + 尺寸 + 页脚 | 嵌套抽屉、推挤父内容、退出动效 |
+| Message | 顶部堆叠、最多 5 条、定时关闭、key 合并未做 | 可更新同 key 的内容、暂停 hover 计时、自定义图标 |
+| Notification | 四角放置 + 标题/描述 + 关闭 | hover 暂停倒计时、进度条、按钮区 |
+| Popconfirm | 标题 + 描述 + 确定/取消 + 22px 图标槽 | 箭头、12 方向自适应、异步确认 loading |
+| Alert | 4 类型 × 单行/带描述/横幅/可关闭/操作槽 | 跑马灯、自定义图标、无边框变体 |
+| Result | 5 状态 + 404/500 数字 + 操作区 | antd 的 SVG 插画（当前用图标/数字代替） |
 
 ## 参照实测值（tools/visual-ref）
 
@@ -58,6 +65,15 @@ Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
 | Card 主体 | 内边距 24、圆角 8、边框 colorBorderSecondary |
 | Collapse 表头 | 高 46、内边距 12 16、底色 colorFillAlter |
 | List 行 | 内边距 8 16（small）、标题 14/600、描述 colorTextDescription |
+| Alert 单行 | 高 40、内边距 8 12、圆角 8、1px 边框、图标 14 + 间距 8 |
+| Alert 带描述 | 高 97、内边距 20 24、标题 16/25 且下边距 8、图标 24 + 间距 12 |
+| Alert 横幅 | 高 38、内边距 8 12、圆角 0、无边框 |
+| Result | 内边距 48 32、图标 72、标题 24/32 常规字重、副标题间距 8、操作区间距 24 |
+| Modal | 宽 520、容器内边距 20 24、圆角 8、标题 16/600、标题下 8、页脚上 12、关闭区 32×32 |
+| Drawer | 宽 378、头部 57（16 24 + 1px 线）、内容内边距 24、页脚 49（8 16 + 1px 线） |
+| Message | 高 40、内边距 9 12、圆角 8、图标 16 + 间距 8 |
+| Notification | 宽 384、内边距 20 24、圆角 8、标题 16/24、描述 14/22 间距 8、图标 24 + 间距 12 |
+| Popconfirm | 内边距 12、圆角 8、标题 14/600、描述间距 4、按钮行间距 8（24 高小按钮）、文案左缩进 22 |
 
 ## DoD 未验证项
 
@@ -68,6 +84,8 @@ Tabs 拆 2、Collapse 拆 2、List 拆 2，以及若干数据模型类）。
 ## 测试
 
 - `tests/Antd.Wpf.TokenParity`：536 token × 10 配置 × 双 TFM 逐值对拍。
-- `tests/Antd.Wpf.SmokeTests`：168 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
+- `tests/Antd.Wpf.SmokeTests`：233 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
   附带渲染截图与 `--metrics` 尺寸导出。
+- `tests/Antd.Wpf.FeedbackTests`：62 项断言（M4 反馈层：配色、尺寸、弹层锚定、焦点陷阱、
+  Esc/遮罩关闭、toast 队列与自动关闭），双 TFM 通过，`--shot` 输出 `m4-*.png`。
 - `tools/visual-ref`：真实 antd 在 Chrome 中的尺寸基线，用于视觉对拍。

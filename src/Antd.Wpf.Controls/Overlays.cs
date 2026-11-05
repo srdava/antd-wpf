@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
@@ -311,6 +312,190 @@ namespace Antd.Wpf.Controls
             {
                 handler(this, new RoutedPropertyChangedEventArgs<object>(null, item));
             }
+        }
+    }
+
+    /// <summary>
+    /// antd Popconfirm. Measured: a 12px padded card (same surface as Popover), title 14/600 with the
+    /// description 4 below, and a 24px-tall button row eight further down. antd reserves a 22px icon
+    /// slot on the left of the copy, so the title is inset even when no icon is shown.
+    /// </summary>
+    public class Popconfirm : OverlayBase
+    {
+        static Popconfirm()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Popconfirm), new FrameworkPropertyMetadata(typeof(Popconfirm)));
+        }
+
+        public Popconfirm()
+        {
+            Placement = AntdPlacement.Bottom;
+            Trigger = AntdTrigger.Click;
+        }
+
+        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
+            "Title", typeof(object), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(null, OnTextChanged));
+
+        public object Title
+        {
+            get { return GetValue(TitleProperty); }
+            set { SetValue(TitleProperty, value); }
+        }
+
+        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(
+            "Description", typeof(object), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(null, OnTextChanged));
+
+        public object Description
+        {
+            get { return GetValue(DescriptionProperty); }
+            set { SetValue(DescriptionProperty, value); }
+        }
+
+        public static readonly DependencyProperty ConfirmTextProperty = DependencyProperty.Register(
+            "ConfirmText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata("OK"));
+
+        public string ConfirmText
+        {
+            get { return (string)GetValue(ConfirmTextProperty); }
+            set { SetValue(ConfirmTextProperty, value); }
+        }
+
+        public static readonly DependencyProperty CancelTextProperty = DependencyProperty.Register(
+            "CancelText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata("Cancel"));
+
+        public string CancelText
+        {
+            get { return (string)GetValue(CancelTextProperty); }
+            set { SetValue(CancelTextProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowCancelProperty = DependencyProperty.Register(
+            "ShowCancel", typeof(bool), typeof(Popconfirm), new FrameworkPropertyMetadata(true));
+
+        public bool ShowCancel
+        {
+            get { return (bool)GetValue(ShowCancelProperty); }
+            set { SetValue(ShowCancelProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowIconProperty = DependencyProperty.Register(
+            "ShowIcon", typeof(bool), typeof(Popconfirm), new FrameworkPropertyMetadata(false));
+
+        public bool ShowIcon
+        {
+            get { return (bool)GetValue(ShowIconProperty); }
+            set { SetValue(ShowIconProperty, value); }
+        }
+
+        public static readonly DependencyProperty IconGeometryProperty = DependencyProperty.Register(
+            "IconGeometry", typeof(System.Windows.Media.Geometry), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(Antd.Wpf.Icons.AntdIcons.ExclamationCircle));
+
+        public System.Windows.Media.Geometry IconGeometry
+        {
+            get { return (System.Windows.Media.Geometry)GetValue(IconGeometryProperty); }
+            set { SetValue(IconGeometryProperty, value); }
+        }
+
+        public static readonly DependencyProperty IconBrushProperty = DependencyProperty.Register(
+            "IconBrush", typeof(System.Windows.Media.Brush), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(null));
+
+        public System.Windows.Media.Brush IconBrush
+        {
+            get { return (System.Windows.Media.Brush)GetValue(IconBrushProperty); }
+            set { SetValue(IconBrushProperty, value); }
+        }
+
+        private static readonly DependencyPropertyKey DescriptionVisibilityKey = DependencyProperty.RegisterReadOnly(
+            "DescriptionVisibility", typeof(Visibility), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty DescriptionVisibilityProperty =
+            DescriptionVisibilityKey.DependencyProperty;
+
+        public Visibility DescriptionVisibility
+        {
+            get { return (Visibility)GetValue(DescriptionVisibilityProperty); }
+            private set { SetValue(DescriptionVisibilityKey, value); }
+        }
+
+        private static readonly DependencyPropertyKey IconVisibilityKey = DependencyProperty.RegisterReadOnly(
+            "IconVisibility", typeof(Visibility), typeof(Popconfirm),
+            new FrameworkPropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty IconVisibilityProperty = IconVisibilityKey.DependencyProperty;
+
+        public Visibility IconVisibility
+        {
+            get { return (Visibility)GetValue(IconVisibilityProperty); }
+            private set { SetValue(IconVisibilityKey, value); }
+        }
+
+        /// <summary>Raised when the confirm button is pressed; the bubble closes first.</summary>
+        public event EventHandler Confirmed;
+
+        public event EventHandler Canceled;
+
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((Popconfirm)d).UpdateVisualState();
+        }
+
+        public override void UpdateVisualState()
+        {
+            base.UpdateVisualState();
+
+            ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
+            SetValue(DescriptionVisibilityKey,
+                Description != null ? Visibility.Visible : Visibility.Collapsed);
+            SetValue(IconVisibilityKey, ShowIcon ? Visibility.Visible : Visibility.Collapsed);
+            SetCurrentValue(IconBrushProperty, snapshot.Brush("colorWarning"));
+        }
+
+        internal void HandleConfirm()
+        {
+            SetCurrentValue(IsOpenProperty, false);
+            EventHandler handler = Confirmed;
+            if (handler != null) handler(this, EventArgs.Empty);
+        }
+
+        internal void HandleCancel()
+        {
+            SetCurrentValue(IsOpenProperty, false);
+            EventHandler handler = Canceled;
+            if (handler != null) handler(this, EventArgs.Empty);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            Button ok = GetTemplateChild("PART_Ok") as Button;
+            if (ok != null)
+            {
+                ok.Click -= OnOkClick;
+                ok.Click += OnOkClick;
+            }
+
+            Button cancel = GetTemplateChild("PART_Cancel") as Button;
+            if (cancel != null)
+            {
+                cancel.Click -= OnCancelClick;
+                cancel.Click += OnCancelClick;
+            }
+        }
+
+        private void OnOkClick(object sender, RoutedEventArgs e)
+        {
+            HandleConfirm();
+        }
+
+        private void OnCancelClick(object sender, RoutedEventArgs e)
+        {
+            HandleCancel();
         }
     }
 }

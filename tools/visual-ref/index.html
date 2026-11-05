@@ -210,13 +210,55 @@ function App() {
         renderItem: item => h(List.Item, null,
           h(List.Item.Meta, { title: item.t, description: item.d }))
       })
+    ),
+    h(Card, { id: 'feedback', title: 'Feedback', desc: 'Alert variants and Result states, the shapes behind Modal, Drawer and the toast layers.' },
+      h('div', { 'data-m': 'alert' }, h(antd.Alert, { type: 'info', message: 'Informational note', showIcon: true })),
+      h('div', { style: { height: 12 } }),
+      h('div', { 'data-m': 'alert-desc-outer' }, h(antd.Alert, {
+        type: 'success', message: 'Upload complete', showIcon: true, closable: true,
+        description: 'Three files were stored in the project library.'
+      })),
+      h('div', { style: { height: 12 } }),
+      h('div', { 'data-m': 'alert-banner' }, h(antd.Alert, { type: 'warning', banner: true, message: 'Banner alert, no radius' })),
+      h('div', { style: { height: 24 } }),
+      h('div', { 'data-m': 'result' }, h(antd.Result, {
+        status: 'success', title: 'Operation successful',
+        subTitle: 'The record was saved and the queue drained.',
+        extra: h(Button, { type: 'primary' }, 'Back to list')
+      }))
     )
   );
 
 }
 
+// Overlays render into portals appended to <body>, so they live outside the flow of the page
+// but are still measured through the class-name lookup below.
+function FeedbackOverlays() {
+  return h(antd.ConfigProvider, { theme: { token: { motion: false } } }, h(React.Fragment, null,
+    h(antd.Modal, {
+      open: true, title: 'Modal title', width: 520, maskClosable: false,
+      footer: [h(Button, { key: 'cancel' }, 'Cancel'), h(Button, { key: 'ok', type: 'primary' }, 'OK')]
+    }, h('p', null, 'Modal body copy that wraps onto a single line.')),
+    h(antd.Popconfirm, {
+      open: true, title: 'Delete this item?', description: 'This action cannot be undone.',
+      getPopupContainer: () => document.body
+    }, h(Button, { style: { position: 'absolute', left: 40, top: 40 } }, 'Delete')),
+    h(antd.Drawer, {
+      open: true, title: 'Drawer title', width: 378, placement: 'right',
+      footer: h(Button, { type: 'primary' }, 'Submit')
+    }, h('p', null, 'Drawer body copy.'))
+  ));
+}
+
 try {
-  ReactDOM.createRoot(document.getElementById('root')).render(h(ConfigProvider, null, h(App)));
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h(ConfigProvider, null, h(React.Fragment, null, h(App), h(FeedbackOverlays))));
+
+  // Toast layers are imperative, so they are raised after the first paint and pinned open.
+  setTimeout(() => {
+    antd.message.success({ content: 'Saved successfully', duration: 0 });
+    antd.notification.success({ message: 'Notification title', description: 'A short description line.', duration: 0, placement: 'topRight' });
+  }, 60);
 } catch (e) {
   document.getElementById('metrics').textContent = 'RENDER ERROR: ' + e.message + '\n' + e.stack;
 }
@@ -254,7 +296,29 @@ window.addEventListener('load', () => {
       'tabs-nav': '.ant-tabs-nav', 'tab': '.ant-tabs-tab', 'ink': '.ant-tabs-ink-bar',
       'card-head': '.ant-card-head', 'card-head-title': '.ant-card-head-title',
       'collapse-header': '.ant-collapse-header', 'collapse-content': '.ant-collapse-content-box',
-      'list-item': '.ant-list-item', 'list-meta-title': '.ant-list-item-meta-title'
+      'list-item': '.ant-list-item', 'list-meta-title': '.ant-list-item-meta-title',
+      'alert': '.ant-alert', 'alert-icon': '.ant-alert-icon', 'alert-content': '.ant-alert-section',
+      'alert-message': '.ant-alert-title', 'alert-desc': '.ant-alert-description',
+      'alert-desc-box': '.ant-alert-with-description', 'alert-close': '.ant-alert-close-icon',
+      'alert-desc-title': '.ant-alert-with-description .ant-alert-title',
+      'alert-desc-icon': '.ant-alert-with-description .ant-alert-icon',
+      'alert-banner-box': '.ant-alert-banner', 'alert-section': '.ant-alert-with-description .ant-alert-section',
+      'result': '.ant-result', 'result-icon': '.ant-result-icon', 'result-title': '.ant-result-title',
+      'result-subtitle': '.ant-result-subtitle', 'result-extra': '.ant-result-extra',
+      'modal': '.ant-modal', 'modal-container': '.ant-modal-container',
+      'modal-header': '.ant-modal-header', 'modal-title': '.ant-modal-title',
+      'modal-body': '.ant-modal-body', 'modal-footer': '.ant-modal-footer', 'modal-close': '.ant-modal-close',
+      'drawer-content': '.ant-drawer-content', 'drawer-header': '.ant-drawer-header',
+      'drawer-title': '.ant-drawer-title', 'drawer-body': '.ant-drawer-body', 'drawer-footer': '.ant-drawer-footer',
+      'message': '.ant-message-notice', 'message-icon': '.ant-message-notice-icon',
+      'notification': '.ant-notification-notice',
+      'notification-title': '.ant-notification-notice-title',
+      'notification-desc': '.ant-notification-notice-description',
+      'notification-close': '.ant-notification-notice-close',
+      'notification-icon': '.ant-notification-notice-icon',
+      'popover-container': '.ant-popover-container', 'popover-content': '.ant-popover-content',
+      'popconfirm': '.ant-popover:has(.ant-popconfirm-title)', 'popconfirm-title': '.ant-popconfirm-title',
+      'popconfirm-desc': '.ant-popconfirm-description', 'popconfirm-buttons': '.ant-popconfirm-buttons'
     };
     Object.keys(parts).forEach(key => {
       const el = document.querySelector(parts[key]);

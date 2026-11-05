@@ -25,10 +25,13 @@
     <ProjectReference Include="..\Antd.Wpf.Icons\Antd.Wpf.Icons.csproj" />
   </ItemGroup>
 
-  <!-- The smoke tests compare the QR matrix against reference data. -->
+  <!-- The harnesses reach into the QR encoder and the toast layers. -->
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Antd.Wpf.SmokeTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Antd.Wpf.FeedbackTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

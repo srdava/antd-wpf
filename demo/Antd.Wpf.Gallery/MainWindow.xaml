@@ -1078,6 +1078,62 @@
                 </StackPanel>
             </Border>
 
+            <!--  ============================================================ feedback  -->
+            <Border
+                Margin="0,16,0,0"
+                Padding="24"
+                Background="{DynamicResource Antd.colorBgContainer}"
+                BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel>
+                    <TextBlock
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource Antd.colorTextHeading}"
+                        Text="Feedback" />
+                    <TextBlock
+                        Margin="0,4,0,16"
+                        FontSize="13"
+                        Foreground="{DynamicResource Antd.colorTextDescription}"
+                        Text="Alert, Result, Modal, Drawer, Popconfirm, Message and Notification — sizes taken from the antd 6.6.8 reference page." />
+                    <antd:Alert Message="Informational note" ShowIcon="True" />
+                    <antd:Alert
+                        Margin="0,12,0,0"
+                        Type="Success"
+                        Message="Upload complete"
+                        Description="Three files were stored in the project library."
+                        Closable="True" />
+                    <antd:Alert Margin="0,12,0,0" Type="Warning" Banner="True" Message="Banner alert" />
+                    <antd:Alert Margin="0,12,0,0" Type="Error" Message="Something went wrong" Closable="True" />
+                    <antd:Result
+                        Margin="0,16,0,0"
+                        Padding="32,32,32,32"
+                        Status="Success"
+                        Title="Operation successful"
+                        SubTitle="The record was saved and the queue drained." />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <antd:Button Content="Open modal" Click="OnOpenModal" />
+                        <antd:Button Content="Open drawer" Margin="8,0,0,0" Click="OnOpenDrawer" />
+                        <antd:Popconfirm
+                            Title="Delete this item?"
+                            Description="This action cannot be undone."
+                            Confirmed="OnPopconfirmConfirmed">
+                            <antd:Button Content="Popconfirm" Danger="True" Margin="8,0,0,0" />
+                        </antd:Popconfirm>
+                        <antd:Button Content="Message" Margin="8,0,0,0" Click="OnShowMessage" />
+                        <antd:Button Content="Notification" Margin="8,0,0,0" Click="OnShowNotification" />
+                    </StackPanel>
+                    <antd:Modal x:Name="DemoModal" Title="Modal title">
+                        <TextBlock
+                            Text="Modal body copy that explains the decision."
+                            TextWrapping="Wrap" />
+                    </antd:Modal>
+                    <antd:Drawer x:Name="DemoDrawer" Title="Drawer title">
+                        <TextBlock Text="Drawer body copy." TextWrapping="Wrap" />
+                    </antd:Drawer>
+                </StackPanel>
+            </Border>
             <!--  ============================================================ tokens  -->
             <Border
                 Margin="0,16,0,0"

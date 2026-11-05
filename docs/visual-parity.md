@@ -81,3 +81,49 @@ python compare.py out/metrics.json out/ours.json
 
 `CheckVisualParity()` 把上表的数字写成断言（按钮 32/15、大号 40/8、Tag 22/7、Divider 16/500、
 Progress 不得超出容器等）。token 全等但视觉漂移时，这里会先失败。
+
+## 6. M4 反馈层的实测基线
+
+参照页新增了 `feedback` 卡片（四条 Alert + 一个 Result）以及三个常开的浮层（Modal、Drawer、
+Popconfirm），消息与通知用命令式 API 拉起后固定不倒计时。测法与前面相同：`data-m` 标记 +
+类名查找 + `chrome --dump-dom`。
+
+antd 6 把弹层改写成了嵌套结构，选择器也随之变化，记在这里免得下次再猜：
+
+| 部件 | antd 6.6.8 实际类名 |
+|---|---|
+| 弹窗容器 | `.ant-modal`（外层，宽度写在 style）/ `.ant-modal-container`（真正带内边距与圆角的盒子） |
+| 抽屉 | `.ant-drawer-header` / `.ant-drawer-body` / `.ant-drawer-footer` |
+| 消息 | `.ant-message-notice`（一条）、`.ant-message-notice-icon` |
+| 通知 | `.ant-notification-notice`、`.ant-notification-notice-title` |
+| 气泡卡片 | `.ant-popover-container`（v5 的 `.ant-popover-inner` 已不在 DOM 里） |
+
+量出来的值（单位 CSS px）：
+
+| 部件 | 关键值 |
+|---|---|
+| Alert 单行 | 40 高，8/12 内边距，8 圆角，1px 边框，图标 14 间距 8，文字 14/22 |
+| Alert 带描述 | 97 高，20/24 内边距，标题 16（行高 25）下边距 8，图标 24 间距 12 |
+| Alert 横幅 | 38 高，8/12 内边距，圆角 0，无边框 |
+| Result | 48/32 内边距，72 图标，标题 24/32 **常规字重**，副标题 8，操作区 24 |
+| Modal | 520 宽，20/24 内边距，8 圆角，标题 16/600，标题下 8，页脚上 12，关闭按钮 32×32 |
+| Drawer | 378 宽，头部 57，内容 24，页脚 49（8/16 + 1px 上边线） |
+| Message | 40 高，9/12 内边距，8 圆角，图标 16 间距 8 |
+| Notification | 384 宽，20/24 内边距，8 圆角，标题 16/24，描述 8 间距，图标 24 间距 12 |
+| Popconfirm | 12 内边距，8 圆角，标题 14/600，描述间距 4，按钮行上 8（24 高），文案左缩进 22 |
+
+两个容易踩的点：
+
+1. **动画没关就别量**。`--virtual-time-budget` 下 CSS 动画不会推进，Modal 停在 `scale(0.2)`，
+   `.ant-modal` 量出来只有 104×29。给浮层套 `ConfigProvider theme={{token:{motion:false}}}` 才是稳定值。
+2. **外边距塌陷**。`<p>` 的 margin 会穿过没有 padding 的 `.ant-modal-body`，让 body 的 y 比
+   「内边距 + 标题高度」多出 6px。真实间距以 CSS 的 `margin-bottom: 8` / `margin-top: 12` 为准。
+
+## 7. M4 的已知差异
+
+| 项 | 差距 | 原因 |
+|---|---|---|
+| 阴影 | 弹窗、抽屉、气泡、toast 都没有投影 | 与 Dropdown/Popover 保持一致，留到 M5 统一做阴影分层 |
+| 退出动效 | 只有入场（缩放/滑入），关闭是瞬时的 | 需要 Storyboard 完成回调，留到 M5 动效系统 |
+| Result 插画 | 404/500 用大号数字，其他状态用图标 | 未移植 antd 的 SVG 插画 |
+| 遮罩点击 | 只响应左键按下 | antd 同样如此，此处一致 |

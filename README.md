@@ -2,9 +2,9 @@
 
 Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 与 **.NET 8+**。
 
-当前状态：**M1 / M2 组件清单已完成，M3 进行中（50/71 组件，69 个控件类型）**。M0/M1 已完成；M2 已交付表单控件
-（InputNumber/Checkbox/Radio/Switch/Rate/Slider/Select/Form）。
-日期选择、级联、上传等 8 个复杂组件待做，见 `docs/m2-implementation-notes.md`。
+当前状态：**M1–M4 组件清单全部落地（69/71）**。余下 2 项与 M5 打磨（无障碍、i18n、动效降级、阴影分层）尚未开始，
+逐项说明见 `docs/progress.md`。
+每个组件的能力边界都写在 `docs/progress.md` 里，避免把「能跑」当成「对齐 antd」。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
 M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-notes.md)。
 
@@ -26,6 +26,10 @@ dotnet run --project tests/Antd.Wpf.TokenParity -f net48
 # 控件冒烟 + 主题切换 + 架构边界，附带渲染截图
 dotnet run --project tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --shot artifacts
 dotnet run --project tests/Antd.Wpf.SmokeTests -f net48
+
+# M4 反馈层（Alert / Result / Modal / Drawer / Popconfirm / Message / Notification）
+dotnet run --project tests/Antd.Wpf.FeedbackTests -f net8.0-windows -- --shot artifacts
+dotnet run --project tests/Antd.Wpf.FeedbackTests -f net48
 ```
 
 进度与能力边界见 `docs/progress.md`。
@@ -62,7 +66,7 @@ src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSe
 src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
 src/Antd.Wpf.Controls   net48;net8        92 个控件类型 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        演示程序
-tests/                  两个可执行断言程序（不依赖任何测试框架）
+tests/                  三个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token
 tools/icon-gen          Node 脚本，从 @ant-design/icons-svg 生成 Geometry
 tools/visual-ref        真实 antd 参照页 + 尺寸对比脚本（视觉对齐用）
