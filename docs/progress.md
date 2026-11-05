@@ -79,6 +79,8 @@ Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若
 
 - M1：「截图基准差异 < 0.5%」「主题切换 < 120ms」没有度量。
 - M2：「Form 异步校验」「Select 万项虚拟化」「DatePicker 区间」未达标。
+- M4：「Modal 焦点陷阱与 Esc 通过 UIA 测试」只做了进程内断言（TabNavigation=Cycle、Esc 关窗），
+  没有 FlaUI / UIA 用例；「Message 队列合并」未做，因为当前 API 没有 key。
 - 全部：无自动化无障碍测试，无 UI 自动化测试。
 
 ## 测试
