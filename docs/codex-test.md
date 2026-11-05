@@ -24,7 +24,7 @@
 
 | # | 问题 | 处理 | 断言 |
 |---|---|---|---|
-| 1 | InputNumber 外部赋值绕过范围 | `OnValueChanged` 统一走 `CoerceToLimits()`，Value / Minimum / Maximum 任一变化都收敛；上下限写反时按区间处理而不是返回区间外的值 | 5 条 |
+| 1 | InputNumber 外部赋值绕过范围 | `OnValueChanged` 统一走 `CoerceToLimits()`，Value / Minimum / Maximum 任一变化都收敛；上下限写反时按区间处理而不是返回区间外的值 | 6 条 |
 | 2 | Form 的 Layout / LabelWidth 没有行为 | 两个依赖属性改由 `FormItem` 声明并带 `Inherits`，Form 用 `AddOwner` 复用；模板换成行列网格，代码按布局摆放（横向 120px 标签列、标签上移 5px 对齐 32px 控件中线） | 7 条 |
 | 3 | Upload 筛选串缺 `*` | 新增 `ParseAccept` 统一解析（`.png` / `png` / `*.png` / MIME 通配），`BuildFilter` 与 `Accepts` 共用同一份解析 | 6 条 |
 | 4 | 明暗切换丢掉 Compact | `ApplyLight` / `ApplyDark` 改为只改 Dark 位（内部 `SetDark`），Compact 保留 | 3 条 |
