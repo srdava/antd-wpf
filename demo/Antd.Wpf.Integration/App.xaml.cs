@@ -42,6 +42,12 @@ namespace Antd.Wpf.Integration
 
             if (e.Args.Any(a => a == "--editor")) window.BeginCreate();
 
+            if (e.Args.Any(a => a == "--toast"))
+            {
+                Antd.Wpf.Controls.Message.Success("实例已创建：edge-cache");
+                Antd.Wpf.Controls.Notification.Info("批量操作完成", "2 个实例已停止。");
+            }
+
             if (shotPath != null)
             {
                 ShutdownMode = ShutdownMode.OnExplicitShutdown;

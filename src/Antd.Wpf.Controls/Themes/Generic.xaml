@@ -8,6 +8,17 @@
     <theme:RatioConverter x:Key="Antd.HalfRatio" Ratio="0.5" />
     <theme:RatioConverter x:Key="Antd.NegHalfRatio" Ratio="-0.5" />
 
+    <!-- antd layers three box-shadows; WPF has one blur, so this is tuned to look like the
+         same elevation without a shadow gutter. Popups that size to their content still clip
+         it - see docs/visual-parity.md. -->
+    <DropShadowEffect x:Key="Antd.Effect.Elevated"
+                      BlurRadius="18"
+                      ShadowDepth="4"
+                      Direction="270"
+                      Opacity="0.16"
+                      Color="#000000"
+                      RenderingBias="Quality" />
+
     <!-- ============================================================ Button -->
 
     <Style TargetType="{x:Type antd:Button}">
@@ -2540,7 +2551,7 @@
         <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextHeading}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
-        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Padding" Value="16,16" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="Template">
             <Setter.Value>
@@ -2603,7 +2614,7 @@
                     <Border Background="Transparent"
                             BorderBrush="{DynamicResource Antd.colorSplit}"
                             BorderThickness="0,0,0,1"
-                            Padding="12,0">
+                            Padding="16,16">
                         <ContentPresenter VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
@@ -2619,7 +2630,7 @@
 
     <Style x:Key="Antd.Table.Row" TargetType="{x:Type DataGridRow}">
         <Setter Property="Background" Value="{DynamicResource Antd.colorBgContainer}" />
-        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="MinHeight" Value="55" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource Antd.colorFillAlter}" />
@@ -4246,6 +4257,7 @@
                                         CornerRadius="8"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
+                                        Effect="{StaticResource Antd.Effect.Elevated}"
                                         Focusable="True"
                                         KeyboardNavigation.TabNavigation="Cycle">
                                     <Grid Margin="24,20,24,20">
@@ -4329,6 +4341,7 @@
                                         Background="{TemplateBinding Background}"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Stretch"
+                                        Effect="{StaticResource Antd.Effect.Elevated}"
                                         Focusable="True"
                                         KeyboardNavigation.TabNavigation="Cycle">
                                     <Grid>

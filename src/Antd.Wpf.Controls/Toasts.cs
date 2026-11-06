@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using Antd.Wpf.Icons;
 using Antd.Wpf.Theme;
@@ -205,6 +206,26 @@ namespace Antd.Wpf.Controls
     internal sealed class ToastHost
     {
         private const int MaxMessages = 5;
+        /// <summary>
+        /// One frozen effect shared by every toast. antd stacks three box-shadows; a single blur
+        /// is the closest WPF equivalent, and freezing keeps it cheap to attach repeatedly.
+        /// </summary>
+        private static readonly DropShadowEffect ToastShadow = CreateShadow();
+
+        private static DropShadowEffect CreateShadow()
+        {
+            var effect = new DropShadowEffect
+            {
+                BlurRadius = 18,
+                ShadowDepth = 4,
+                Direction = 270,
+                Opacity = 0.16,
+                Color = Colors.Black,
+                RenderingBias = RenderingBias.Quality
+            };
+            effect.Freeze();
+            return effect;
+        }
 
         private static readonly Dictionary<Window, ToastHost> MessageHosts = new Dictionary<Window, ToastHost>();
         private static readonly Dictionary<Window, ToastHost> NotificationHosts = new Dictionary<Window, ToastHost>();
@@ -473,6 +494,7 @@ namespace Antd.Wpf.Controls
                 CornerRadius = new CornerRadius(t.BorderRadiusLG),
                 Padding = new Thickness(12, 9, 12, 9),
                 Child = row,
+                Effect = ToastShadow,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
         }
@@ -536,7 +558,8 @@ namespace Antd.Wpf.Controls
                 CornerRadius = new CornerRadius(t.BorderRadiusLG),
                 Padding = new Thickness(24, 20, 24, 20),
                 Width = 384,
-                Child = grid
+                Child = grid,
+                Effect = ToastShadow
             };
 
             if (config.Closable)

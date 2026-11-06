@@ -80,7 +80,7 @@ python compare.py out/metrics.json out/ours.json
 | Badge 自身高度 | 18.6 vs 14 | antd 用 `line-height:1`；WPF 没有可继承的 `TextElement.LineHeight` |
 | Empty 插图 | 用的是 inbox 图标 | 官方是专属 SVG，尚未移植 |
 | 动画细节 | 四点同时旋转，官方是分时透明度 | 需要逐点 Storyboard，成本高于收益 |
-| 阴影 | 只有字符串 token，未转成 WPF `DropShadowEffect` | 待做，影响 Dropdown/Modal 等浮层 |
+| 阴影 | Modal / Drawer / Toast 已加单层 `DropShadowEffect`（Blur 18 / Depth 4 / 12% 黑）；下拉类浮层没有 | WPF 只有一个模糊，antd 叠三层；且 `Popup` 尺寸跟着内容走，超出内容的阴影会被裁掉，需要预留阴影边距 |
 
 ## 5. 回归门禁
 

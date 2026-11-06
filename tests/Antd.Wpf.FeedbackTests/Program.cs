@@ -578,7 +578,7 @@ namespace Antd.Wpf.FeedbackTests
             toastWindow.Close();
         }
 
-        private static readonly Brush ToastedBackdrop = new SolidColorBrush(Color.FromRgb(0xF0, 0xF0, 0xF0));
+        private static readonly Brush ToastedBackdrop = Brushes.White;
 
         private static Window Host(double width, double height, object content)
         {
