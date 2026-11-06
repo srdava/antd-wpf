@@ -135,6 +135,21 @@ namespace Antd.Wpf.Controls
             "ContentHeight", typeof(double), typeof(Input), new FrameworkPropertyMetadata(22.0));
 
         public static readonly DependencyProperty ContentHeightProperty = ContentHeightKey.DependencyProperty;
+        private static readonly DependencyPropertyKey HostHeightKey = DependencyProperty.RegisterReadOnly(
+            "HostHeight", typeof(double), typeof(Input), new FrameworkPropertyMetadata(30.0));
+
+        public static readonly DependencyProperty HostHeightProperty = HostHeightKey.DependencyProperty;
+
+        /// <summary>
+        /// Height of the text host. WPF copies TextBox.Padding into the host's own padding, so the
+        /// host has to be taller than the text area by the vertical padding; giving it the text
+        /// height (22) clipped the top of every glyph.
+        /// </summary>
+        public double HostHeight
+        {
+            get { return (double)GetValue(HostHeightProperty); }
+            private set { SetValue(HostHeightKey, value); }
+        }
 
         /// <summary>
         /// Height of the editable area: controlHeight - border - padding. Pinning it keeps the
@@ -226,6 +241,9 @@ namespace Antd.Wpf.Controls
         {
             base.OnApplyTemplate();
 
+            _prefixHost = GetTemplateChild("PrefixHost") as FrameworkElement;
+            _accessory = GetTemplateChild("PART_Accessory") as FrameworkElement;
+
             var clearButton = GetTemplateChild("PART_ClearButton") as System.Windows.Controls.Button;
             if (clearButton != null)
             {
@@ -234,6 +252,20 @@ namespace Antd.Wpf.Controls
             }
         }
 
+        private FrameworkElement _prefixHost;
+        private FrameworkElement _accessory;
+
+        /// <summary>
+        /// The chrome border no longer carries the padding (the text host applies TextBox.Padding
+        /// itself), so the prefix and the suffix stack inset themselves to stay on the text's
+        /// baseline instead of hugging the border.
+        /// </summary>
+        private void ApplyInsets()
+        {
+            Thickness padding = Padding;
+            if (_prefixHost != null) _prefixHost.Margin = new Thickness(padding.Left, 0, 6, 0);
+            if (_accessory != null) _accessory.Margin = new Thickness(0, 0, padding.Left, 0);
+        }
         private void OnClearClicked(object sender, RoutedEventArgs e)
         {
             Text = string.Empty;
@@ -293,6 +325,8 @@ namespace Antd.Wpf.Controls
             double block = Size == AntdSize.Large ? 6.5 : (Size == AntdSize.Small ? 0 : 4);
             SetCurrentValue(PaddingProperty, new Thickness(inline, block, inline, block));
             SetValue(ContentHeightKey, height - 2 * t.LineWidth - 2 * block);
+            SetValue(HostHeightKey, height - 2 * t.LineWidth);
+            ApplyInsets();
             SetCurrentValue(PlaceholderBrushProperty, snapshot.Brush("colorTextPlaceholder"));
             SetValue(IsFocusedStateKey, focused && IsEnabled);
             SetValue(CanClearKey, AllowClear && !string.IsNullOrEmpty(Text) && IsEnabled);

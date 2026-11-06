@@ -67,6 +67,11 @@ python compare.py out/metrics.json out/ours.json
 11. **加载指示器**。原来是 1/4 圆弧，官方是四点环形；Button 与 Spin 都改掉了。
 12. **清除按钮**。官方是灰色实心圆 + 白色叉，我们原来是裸叉。
 
+13. **输入框文字被裁**（接入真实页面时才发现）。`TextBox.Padding` 会被 WPF 复制到模板里的
+    `PART_ContentHost`（`ScrollViewer.Padding` 也变成 11,4,11,4），而我们又在边框上吃了一次，
+    22px 的文字区只剩 14.4px。实测：`input h=32 / scroll h=22.4 / scroll padding=11,4,11,4`。
+    修法：边框不再绑 `Padding`，内容宿主高度改为"控件高 − 上下边框"（30），前缀/后缀/占位符
+    在代码里补内缩。`InputNumber` 同样处理，并同步收窄上下箭头。
 ## 4. 仍然存在的差异（已知，不打算假装没有）
 
 | 项 | 差距 | 原因 |

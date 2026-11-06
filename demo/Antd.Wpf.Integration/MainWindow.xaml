@@ -1,0 +1,204 @@
+<Window x:Class="Antd.Wpf.Integration.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:antd="clr-namespace:Antd.Wpf.Controls;assembly=Antd.Wpf.Controls"
+        Title="Service console — Antd.Wpf integration sample"
+        Width="1120" Height="760"
+        MinWidth="880" MinHeight="560"
+        Background="{DynamicResource Antd.colorBgLayout}"
+        FontFamily="{DynamicResource Antd.FontFamily}"
+        TextOptions.TextFormattingMode="Ideal"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  ============================================================ header  -->
+        <Border Grid.Row="0"
+                Padding="24,16"
+                Background="{DynamicResource Antd.colorBgContainer}"
+                BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="服务实例"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Antd.colorTextHeading}" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="真实页面接入验证：表格、筛选、分页、表单校验、弹窗、提示与主题切换跑在同一条路径上。" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <antd:Button x:Name="ThemeButton" Content="切换主题" Click="OnToggleTheme" />
+                    <antd:Button x:Name="CreateButton"
+                                 Margin="8,0,0,0"
+                                 Content="新建实例"
+                                 Variant="Primary"
+                                 Click="OnCreate" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  ============================================================ content  -->
+        <Border Grid.Row="1"
+                Margin="24"
+                Background="{DynamicResource Antd.colorBgContainer}"
+                BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
+                BorderThickness="1"
+                CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- toolbar -->
+                <Grid Grid.Row="0" Margin="24,20,24,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <antd:Input x:Name="SearchInput"
+                                Width="260"
+                                Placeholder="搜索名称或镜像"
+                                TextChanged="OnFilterChanged" />
+
+                    <antd:Select x:Name="StatusFilter"
+                                 Grid.Column="1"
+                                 Width="150"
+                                 Margin="12,0,0,0"
+                                 SelectionChanged="OnFilterChanged" />
+
+                    <TextBlock x:Name="Summary"
+                               Grid.Column="2"
+                               Margin="16,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}" />
+
+                    <antd:Button x:Name="BatchButton"
+                                 Grid.Column="3"
+                                 Content="批量停止"
+                                 Danger="True"
+                                 IsEnabled="False"
+                                 Click="OnBatchStop" />
+                </Grid>
+
+                <!-- table -->
+                <antd:Table x:Name="ServiceTable"
+                            Grid.Row="1"
+                            Margin="24,0"
+                            SelectionMode="Extended"
+                            SelectionChanged="OnSelectionChanged"
+                            EmptyText="没有匹配的实例">
+                    <antd:Table.Columns>
+                        <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="2*" />
+                        <DataGridTextColumn Header="镜像" Binding="{Binding Image}" Width="3*" />
+                        <DataGridTemplateColumn Header="状态" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <antd:Tag Content="{Binding StatusText}"
+                                              Color="{Binding StatusColor}"
+                                              HorizontalAlignment="Left" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="副本数" Binding="{Binding Replicas}" Width="90" />
+                        <DataGridTextColumn Header="创建时间" Binding="{Binding CreatedAt}" Width="130" />
+                        <DataGridTemplateColumn Header="操作" Width="150">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <antd:Button Content="编辑"
+                                                     Size="Small"
+                                                     Variant="Link"
+                                                     Click="OnEditRow" />
+                                        <antd:Popconfirm Title="删除这个实例？"
+                                                         Description="删除后无法恢复，副本会立即回收。"
+                                                         ConfirmText="删除"
+                                                         CancelText="取消"
+                                                         ShowIcon="True"
+                                                         Margin="8,0,0,0"
+                                                         Confirmed="OnDeleteConfirmed">
+                                            <antd:Button Content="删除"
+                                                         Size="Small"
+                                                         Variant="Link"
+                                                         Danger="True" />
+                                        </antd:Popconfirm>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </antd:Table.Columns>
+                </antd:Table>
+
+                <!-- footer -->
+                <Grid Grid.Row="2" Margin="24,12,24,16">
+                    <TextBlock x:Name="SelectionHint"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Foreground="{DynamicResource Antd.colorTextDescription}"
+                               Text="未选择行" />
+                    <antd:Pagination x:Name="Pager"
+                                     HorizontalAlignment="Right"
+                                     Current="1"
+                                     PageSize="6"
+                                     PageChanged="OnPageChanged" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!--  ============================================================ editor  -->
+        <antd:Modal x:Name="Editor"
+                    Title="新建实例"
+                    OkText="保存"
+                    CancelText="取消"
+                    MaskClosable="False">
+            <antd:Form x:Name="EditorForm">
+                <antd:FormItem x:Name="NameItem"
+                               Label="名称"
+                               Required="True"
+                               Help="2–20 个字符，且不能与现有实例重名。">
+                    <antd:Input x:Name="NameInput" Placeholder="api-gateway" />
+                </antd:FormItem>
+
+                <antd:FormItem x:Name="ImageItem" Label="镜像">
+                    <antd:Input x:Name="ImageInput" Placeholder="registry.local/app:1.4.0" />
+                </antd:FormItem>
+
+                <antd:FormItem Label="副本数">
+                    <antd:InputNumber x:Name="ReplicasInput"
+                                      Width="160"
+                                      HorizontalAlignment="Left"
+                                      Minimum="1"
+                                      Maximum="20"
+                                      Value="2" />
+                </antd:FormItem>
+
+                <antd:FormItem Label="状态">
+                    <antd:Select x:Name="StatusInput"
+                                 Width="200"
+                                 HorizontalAlignment="Left" />
+                </antd:FormItem>
+
+                <antd:FormItem Label="健康检查">
+                    <antd:Switch x:Name="HealthInput"
+                                 HorizontalAlignment="Left"
+                                 IsChecked="True" />
+                </antd:FormItem>
+            </antd:Form>
+        </antd:Modal>
+    </Grid>
+</Window>

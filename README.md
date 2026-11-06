@@ -13,8 +13,8 @@ M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-no
 
 ```bash
 dotnet build Antd.Wpf.sln          # 双目标全量构建
-dotnet run --project demo/Antd.Wpf.Gallery -f net8.0-windows
-dotnet run --project demo/Antd.Wpf.Gallery -f net48
+dotnet run --project demo/Antd.Wpf.Gallery -f net8.0-windows      # 组件图册
+dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows  # 真实页面接入示例
 ```
 
 ## 验证
@@ -31,6 +31,10 @@ dotnet run --project tests/Antd.Wpf.SmokeTests -f net48
 # M4 反馈层（Alert / Result / Modal / Drawer / Popconfirm / Message / Notification）
 dotnet run --project tests/Antd.Wpf.FeedbackTests -f net8.0-windows -- --shot artifacts
 dotnet run --project tests/Antd.Wpf.FeedbackTests -f net48
+
+# 真实页面接入自检（28 项：筛选、分页、校验、编辑、删除、主题切换）
+dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows -- --selftest
+dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows -- --shot artifacts/integration-light.png
 ```
 
 进度与能力边界见 `docs/progress.md`。
@@ -66,7 +70,8 @@ src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，�
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
 src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
 src/Antd.Wpf.Controls   net48;net8        97 个控件类型 + Generic.xaml
-demo/Antd.Wpf.Gallery   net48;net8        演示程序
+demo/Antd.Wpf.Gallery   net48;net8        组件图册（逐个控件看外观）
+demo/Antd.Wpf.Integration net48;net8   真实页面接入示例：表格 + 表单校验 + 弹窗 + 主题切换，自带 --selftest
 tests/                  三个可执行断言程序（不依赖任何测试框架）
 tools/token-sync        Node 脚本，从 antd 导出 golden token
 tools/icon-gen          Node 脚本，从 @ant-design/icons-svg 生成 Geometry

@@ -174,8 +174,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{TemplateBinding CornerRadius}"
-                                Padding="{TemplateBinding Padding}">
+                                CornerRadius="{TemplateBinding CornerRadius}">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -195,8 +194,8 @@
                                  than controlHeight - border - padding. -->
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Grid.Column="1"
-                                          Height="{TemplateBinding ContentHeight}"
-                                          VerticalContentAlignment="Center"
+                                          Height="{TemplateBinding HostHeight}"
+                                          VerticalContentAlignment="Top"
                                           Focusable="False"
                                           HorizontalScrollBarVisibility="Disabled"
                                           VerticalScrollBarVisibility="Disabled" />
@@ -205,10 +204,11 @@
                                        Grid.Column="1"
                                        IsHitTestVisible="False"
                                        VerticalAlignment="Center"
+                                       Margin="{TemplateBinding Padding}"
                                        Text="{TemplateBinding Placeholder}"
                                        Foreground="{TemplateBinding PlaceholderBrush}" />
 
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel x:Name="PART_Accessory" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                 <ContentPresenter x:Name="SuffixHost"
                                                   Content="{TemplateBinding Suffix}"
                                                   VerticalAlignment="Center" />
@@ -900,8 +900,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            Padding="{TemplateBinding Padding}">
+                            CornerRadius="{TemplateBinding CornerRadius}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -909,11 +908,12 @@
                             </Grid.ColumnDefinitions>
 
                             <ScrollViewer x:Name="PART_ContentHost" Grid.Column="0"
+                                          Height="{TemplateBinding HostHeight}"
                                           VerticalAlignment="Center" Focusable="False"
                                           HorizontalScrollBarVisibility="Hidden"
                                           VerticalScrollBarVisibility="Hidden" />
 
-                            <Grid Grid.Column="1" Width="18" Margin="0,1,1,1">
+                            <Grid x:Name="PART_Spinner" Grid.Column="1" Width="18" Margin="0,1,1,1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="*" />

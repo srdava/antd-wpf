@@ -19,6 +19,23 @@
 Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
 余下 2 项不在任何里程碑内，属计划里标为「不实现」的部分。
 
+## 接入验证（真实页面）
+
+`demo/Antd.Wpf.Integration` 是一个能直接跑的页面：服务实例列表。它把控件放进真实流程里，
+而不是像 Gallery 那样一件件摆开：
+
+- 搜索框 + 状态筛选实时过滤，分页跟随结果重置；
+- 表格多选驱动"批量停止"，行内"编辑 / 删除"；
+- 新建 / 编辑走同一个弹窗：Required + 自定义校验（长度、重名），校验失败弹窗不关；
+- 保存、删除、批量操作分别走 Message / Notification；
+- 顶部"切换主题"在弹窗打开时也能切换，弹窗和提示层跟着换色。
+
+`--selftest` 会驱动这个页面本身跑 28 项断言（不是另建一套控件），双 TFM 通过。
+
+这一轮接入**抓到一个真 bug**：`Input` 的边框和内层 `ScrollViewer` 各吃了一次 `Padding`——
+WPF 会把 `TextBox.Padding` 复制到内容宿主上，于是 22px 的文字区实际只剩 14.4px，字的上半截被裁掉。
+同一问题也影响 `InputNumber`。修法：边框不再承担内边距，内容宿主高度改为"控件高 - 上下边框"，
+前缀 / 后缀 / 占位符在代码里补内缩。**只跑断言发现不了这种问题，必须看真实页面。**
 ## 能力完成度（别把组件数量当成能力齐全）
 
 上面的 69/71 是**基础版本**：属性、外观与常用交互可用。按「完整能力」口径，只有
@@ -104,7 +121,7 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 ## 测试
 
 - `tests/Antd.Wpf.TokenParity`：536 token × 10 配置 × 双 TFM 逐值对拍。
-- `tests/Antd.Wpf.SmokeTests`：233 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
+- `tests/Antd.Wpf.SmokeTests`：255 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
   附带渲染截图与 `--metrics` 尺寸导出。
 - `tests/Antd.Wpf.FeedbackTests`：62 项断言（M4 反馈层：配色、尺寸、弹层锚定、焦点陷阱、
   Esc/遮罩关闭、toast 队列与自动关闭），双 TFM 通过，`--shot` 输出 `m4-*.png`。

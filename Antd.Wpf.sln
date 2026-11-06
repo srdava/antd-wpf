@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antd.Wpf.Icons", "src\Antd.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antd.Wpf.FeedbackTests", "tests\Antd.Wpf.FeedbackTests\Antd.Wpf.FeedbackTests.csproj", "{1090EABA-8B23-4A4C-8729-CA0C6A69EB80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antd.Wpf.Integration", "demo\Antd.Wpf.Integration\Antd.Wpf.Integration.csproj", "{64F81F62-3091-4A0B-A140-8178A878D329}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,18 @@ Global
 		{1090EABA-8B23-4A4C-8729-CA0C6A69EB80}.Release|x64.Build.0 = Release|Any CPU
 		{1090EABA-8B23-4A4C-8729-CA0C6A69EB80}.Release|x86.ActiveCfg = Release|Any CPU
 		{1090EABA-8B23-4A4C-8729-CA0C6A69EB80}.Release|x86.Build.0 = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|x64.Build.0 = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Debug|x86.Build.0 = Debug|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|x64.ActiveCfg = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|x64.Build.0 = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|x86.ActiveCfg = Release|Any CPU
+		{64F81F62-3091-4A0B-A140-8178A878D329}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,5 +158,6 @@ Global
 		{A0286848-1B07-4B53-BE5B-36C01891D60D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{FB12375A-B291-49C5-A64C-5FBD84BD1D96} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{1090EABA-8B23-4A4C-8729-CA0C6A69EB80} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{64F81F62-3091-4A0B-A140-8178A878D329} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
 	EndGlobalSection
 EndGlobal

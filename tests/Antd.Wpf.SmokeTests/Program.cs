@@ -508,9 +508,16 @@ namespace Antd.Wpf.SmokeTests
             DoEvents();
             inputHost.UpdateLayout();
             var contentHost = antdInput.Template.FindName("PART_ContentHost", antdInput) as FrameworkElement;
+            // WPF copies TextBox.Padding into the content host, so the host is taller than the
+            // text area by the vertical padding. Measure the area the text actually gets.
+            double textArea = contentHost == null
+                ? 0
+                : contentHost.ActualHeight - antdInput.Padding.Top - antdInput.Padding.Bottom;
             Check("input text area is 22 tall",
-                contentHost != null && Math.Abs(contentHost.ActualHeight - 22) < 0.51,
-                contentHost == null ? "missing" : contentHost.ActualHeight.ToString("0.#"));
+                contentHost != null && Math.Abs(textArea - 22) < 0.51
+                && Math.Abs(antdInput.ContentHeight - 22) < 0.01,
+                contentHost == null ? "missing" : textArea.ToString("0.#")
+                    + " (host " + contentHost.ActualHeight.ToString("0.#") + ")");
             inputHost.Close();
 
             var toggleProbe = new Antd.Wpf.Controls.Switch();

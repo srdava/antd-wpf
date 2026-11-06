@@ -33,6 +33,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Antd.Wpf.FeedbackTests</_Parameter1>
     </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Antd.Wpf.Integration</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

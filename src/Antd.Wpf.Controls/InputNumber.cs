@@ -121,6 +121,22 @@ namespace Antd.Wpf.Controls
             private set { SetValue(StepDownEnabledKey, value); }
         }
 
+        private FrameworkElement _spinner;
+
+        private static readonly DependencyPropertyKey HostHeightKey = DependencyProperty.RegisterReadOnly(
+            "HostHeight", typeof(double), typeof(InputNumber), new FrameworkPropertyMetadata(30.0));
+
+        public static readonly DependencyProperty HostHeightProperty = HostHeightKey.DependencyProperty;
+
+        /// <summary>
+        /// Height of the text host. The TextBox pushes its Padding into this host, so it has to be
+        /// the control height minus the border, not the 22px text area, or glyphs get clipped.
+        /// </summary>
+        public double HostHeight
+        {
+            get { return (double)GetValue(HostHeightProperty); }
+            private set { SetValue(HostHeightKey, value); }
+        }
         private bool _syncing;
 
         private static void OnAppearanceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -193,6 +209,8 @@ namespace Antd.Wpf.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            _spinner = GetTemplateChild("PART_Spinner") as FrameworkElement;
 
             Hook("PART_UpButton", delegate { StepBy(Step); });
             Hook("PART_DownButton", delegate { StepBy(-Step); });
@@ -274,6 +292,8 @@ namespace Antd.Wpf.Controls
         // antd's vertical 4px (0 for small, 6.5 for large).
         double block = Size == AntdSize.Large ? 6.5 : (Size == AntdSize.Small ? 0 : 4);
         SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), block, 0, block));
+        SetValue(HostHeightKey, height - 2 * t.LineWidth);
+        if (_spinner != null) _spinner.Margin = new Thickness(0, block + 1, 1, block + 1);
             SetCurrentValue(CaretBrushProperty, snapshot.Brush("colorText"));
 
             double? value = Value;
