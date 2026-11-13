@@ -239,9 +239,23 @@ namespace Antd.Wpf.FeedbackTests
                 ok.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
                 DoEvents();
             }
-            Check("modal OK closes and reports", okRaised && !modal.IsOpen && closedCount == 1,
+            Check("modal OK flips IsOpen immediately", okRaised && !modal.IsOpen,
+                okRaised + "/" + modal.IsOpen);
+
+            // The layer is torn down only after the exit motion, so wait it out before reopening.
+            Pump(400);
+            Check("modal OK closes and reports",
+                !modal.IsOpen && closedCount == 1 && popup != null && !popup.IsOpen,
                 okRaised + "/" + modal.IsOpen + "/" + closedCount);
 
+            // Reopening while the exit motion is still running must not leave the dialog closing.
+            modal.IsOpen = false;
+            DoEvents();
+            modal.IsOpen = true;
+            DoEvents();
+            Pump(500);
+            Check("reopening during the exit motion keeps the dialog open", modal.IsOpen,
+                modal.IsOpen.ToString());
             modal.MaskClosable = false;
             modal.IsOpen = true;
             DoEvents();

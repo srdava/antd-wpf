@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
 using Antd.Wpf.Tokens;
@@ -24,6 +25,10 @@ namespace Antd.Wpf.Controls
         private UIElement _mask;
         private Window _owner;
         private IInputElement _focusBeforeOpen;
+        private bool _closing;
+        private bool _closedRaised;
+        private bool _opened;
+        private DispatcherTimer _closeTimer;
 
         protected DialogBase()
         {
@@ -229,6 +234,10 @@ namespace Antd.Wpf.Controls
 
             if (open)
             {
+                CancelClose();
+                _opened = true;
+                _closedRaised = false;
+
                 EnsureOwner();
                 if (_owner == null) return;
 
@@ -239,14 +248,110 @@ namespace Antd.Wpf.Controls
                 _focusBeforeOpen = Keyboard.FocusedElement;
                 AnimateIn();
                 FocusFirst();
+                return;
             }
-            else
+
+            RestoreFocus();
+
+            if (!_popup.IsOpen)
             {
-                bool wasOpen = _popup.IsOpen;
-                _popup.IsOpen = false;
-                RestoreFocus();
-                if (wasOpen) RaiseClosed();
+                CompleteClose();
+                return;
             }
+
+            BeginClose();
+        }
+
+        /// <summary>
+        /// Plays the exit motion, then tears the layer down. A dispatcher timer backs the
+        /// animation up so a dropped frame (or a hidden window) cannot leave the dialog stuck
+        /// on screen with IsOpen already false.
+        /// </summary>
+        private void BeginClose()
+        {
+            if (_closing) return;
+            _closing = true;
+
+            if (_card == null)
+            {
+                CompleteClose();
+                return;
+            }
+
+            int duration = ExitDurationMilliseconds();
+            var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
+
+            var fade = new DoubleAnimation(0, TimeSpan.FromMilliseconds(duration))
+            {
+                EasingFunction = ease,
+                FillBehavior = FillBehavior.Stop
+            };
+            fade.Completed += delegate { CompleteClose(); };
+            _card.BeginAnimation(UIElement.OpacityProperty, fade);
+            AnimateOut(duration, ease);
+
+            _closeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(duration + 150) };
+            _closeTimer.Tick += delegate
+            {
+                _closeTimer.Stop();
+                _closeTimer = null;
+                CompleteClose();
+            };
+            _closeTimer.Start();
+        }
+
+        private void CompleteClose()
+        {
+            if (_closeTimer != null)
+            {
+                _closeTimer.Stop();
+                _closeTimer = null;
+            }
+            _closing = false;
+
+            if (_popup != null && _popup.IsOpen) _popup.IsOpen = false;
+
+            bool hadOpened = _opened;
+            _opened = false;
+
+            if (!hadOpened || _closedRaised) return;
+            _closedRaised = true;
+            RaiseClosed();
+        }
+
+        private void CancelClose()
+        {
+            if (_closeTimer != null)
+            {
+                _closeTimer.Stop();
+                _closeTimer = null;
+            }
+            _closing = false;
+
+            if (_card == null) return;
+
+            _card.BeginAnimation(UIElement.OpacityProperty, null);
+            _card.Opacity = 1;
+        }
+
+        /// <summary>Exit motion length. Drawer overrides it because it also slides.</summary>
+        protected virtual int ExitDurationMilliseconds()
+        {
+            return 200;
+        }
+
+        /// <summary>Zoom-out for the dialog card; Drawer overrides to slide back out.</summary>
+        protected virtual void AnimateOut(int duration, IEasingFunction ease)
+        {
+            if (_card == null) return;
+
+            var scale = new ScaleTransform(1, 1);
+            _card.RenderTransformOrigin = new Point(0.5, 0.5);
+            _card.RenderTransform = scale;
+
+            TimeSpan span = TimeSpan.FromMilliseconds(duration);
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1, 0.94, span) { EasingFunction = ease });
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1, 0.94, span) { EasingFunction = ease });
         }
 
         private void EnsureOwner()
@@ -289,7 +394,14 @@ namespace Antd.Wpf.Controls
 
         private void OnPopupClosed(object sender, EventArgs e)
         {
-            if (IsOpen) SetCurrentValue(IsOpenProperty, false);
+            if (IsOpen)
+            {
+                SetCurrentValue(IsOpenProperty, false);
+                return;
+            }
+
+            // Closed from the outside (owner window closing, popup torn down): finish the bookkeeping.
+            CompleteClose();
         }
 
         private void OnMaskClick(object sender, MouseButtonEventArgs e)
@@ -730,6 +842,43 @@ namespace Antd.Wpf.Controls
 
             var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300)) { EasingFunction = ease };
             DialogCard.BeginAnimation(UIElement.OpacityProperty, fade);
+        }
+
+        protected override int ExitDurationMilliseconds()
+        {
+            return 260;
+        }
+
+        /// <summary>Slides the panel back out the edge it came from.</summary>
+        protected override void AnimateOut(int duration, IEasingFunction ease)
+        {
+            FrameworkElement card = DialogCard;
+            if (card == null) return;
+
+            double distance;
+            switch (Placement)
+            {
+                case AntdPlacement.Left: distance = -DrawerWidth; break;
+                case AntdPlacement.Top: distance = -DrawerHeight; break;
+                case AntdPlacement.Bottom: distance = DrawerHeight; break;
+                default: distance = DrawerWidth; break;
+            }
+
+            bool horizontal = Placement == AntdPlacement.Left || Placement == AntdPlacement.Right;
+            var slide = new TranslateTransform(0, 0);
+            SetCardTransform(slide);
+
+            TimeSpan span = TimeSpan.FromMilliseconds(duration);
+            if (horizontal)
+            {
+                slide.BeginAnimation(TranslateTransform.XProperty,
+                    new DoubleAnimation(0, distance, span) { EasingFunction = ease });
+            }
+            else
+            {
+                slide.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(0, distance, span) { EasingFunction = ease });
+            }
         }
     }
 }
