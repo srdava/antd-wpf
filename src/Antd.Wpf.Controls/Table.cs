@@ -33,9 +33,24 @@ namespace Antd.Wpf.Controls
             RowHeaderWidth = 0;
             IsReadOnly = true;
 
+            ApplyLocale();
+            LocaleLink.Attach(this, ApplyLocale);
+
 
         }
 
+        private string _localizedEmpty;
+
+        /// <summary>Only overwrites the placeholder while the host has not supplied its own.</summary>
+        private void ApplyLocale()
+        {
+            string text = AntdLocale.Current.NoData;
+            if (EmptyText == null || EmptyText == _localizedEmpty)
+            {
+                SetCurrentValue(EmptyTextProperty, text);
+            }
+            _localizedEmpty = text;
+        }
         public static readonly DependencyProperty BorderedProperty = DependencyProperty.Register(
             "Bordered", typeof(bool), typeof(Table), new FrameworkPropertyMetadata(true));
 
@@ -47,7 +62,7 @@ namespace Antd.Wpf.Controls
         }
 
         public static readonly DependencyProperty EmptyTextProperty = DependencyProperty.Register(
-            "EmptyText", typeof(string), typeof(Table), new FrameworkPropertyMetadata("No data"));
+            "EmptyText", typeof(string), typeof(Table), new FrameworkPropertyMetadata(null));
 
         public string EmptyText
         {

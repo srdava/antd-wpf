@@ -55,10 +55,24 @@ namespace Antd.Wpf.Controls
             Variant = ButtonVariant.Link;
             Size = AntdSize.Small;
             Margin = new Thickness(8, 0, 0, 0);
-            Content = "Remove";
+            Content = AntdLocale.Current.Remove;
             Click += OnClick;
+            LocaleLink.Attach(this, ApplyLocale);
         }
 
+        private string _localizedContent;
+
+        /// <summary>Only overwrites the label while the host has not supplied its own.</summary>
+        private void ApplyLocale()
+        {
+            string text = AntdLocale.Current.Remove;
+            string current = Content as string;
+            if (current == null || current == _localizedContent)
+            {
+                Content = text;
+            }
+            _localizedContent = text;
+        }
         private void OnClick(object sender, RoutedEventArgs e)
         {
             var file = DataContext as UploadFile;
@@ -199,7 +213,7 @@ namespace Antd.Wpf.Controls
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
                 Multiselect = Multiple,
-                Filter = string.IsNullOrEmpty(Accept) ? "All files (*.*)|*.*" : BuildFilter(Accept)
+                Filter = string.IsNullOrEmpty(Accept) ? AntdLocale.Current.AllFiles : BuildFilter(Accept)
             };
 
             if (dialog.ShowDialog() == true)
@@ -241,7 +255,7 @@ namespace Antd.Wpf.Controls
         internal static string BuildFilter(string accept)
         {
             string[] extensions = ParseAccept(accept);
-            if (extensions.Length == 0) return "All files (*.*)|*.*";
+            if (extensions.Length == 0) return AntdLocale.Current.AllFiles;
 
             var patterns = new StringBuilder();
             foreach (string extension in extensions)

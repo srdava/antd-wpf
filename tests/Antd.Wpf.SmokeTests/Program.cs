@@ -104,6 +104,7 @@ namespace Antd.Wpf.SmokeTests
             CheckNavigationAndMedia();
             CheckReviewFixes();
             CheckAutomation();
+            CheckLocalization();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2248,6 +2249,74 @@ namespace Antd.Wpf.SmokeTests
 
         }
 
+        // ---------------------------------------------------------------- localization
+
+        private static void CheckLocalization()
+        {
+            AntdLocale.Use(AntdStrings.CreateChinese());
+
+            var required = new FormItem { Required = true, Content = new AntdInput() };
+            bool valid = required.Validate();
+            Check("required message follows the locale",
+                !valid && required.Error == "请填写此项", required.Error);
+
+            var empty = new Empty();
+            Check("empty state follows the locale", empty.Description == "暂无数据", empty.Description);
+
+            var removeButton = new UploadRemoveButton();
+            Check("upload remove label follows the locale",
+                (removeButton.Content as string) == "移除", "" + removeButton.Content);
+
+            var table = new Antd.Wpf.Controls.Table();
+            Check("table placeholder follows the locale", table.EmptyText == "暂无数据", table.EmptyText);
+
+            Check("file dialog filter follows the locale",
+                Upload.BuildFilter(string.Empty) == "所有文件 (*.*)|*.*", Upload.BuildFilter(string.Empty));
+
+            var modal = new Modal { Title = "标题" };
+            var hostContent = new Grid();
+            hostContent.Children.Add(modal);
+            var host = new Window
+            {
+                Width = 600, Height = 400, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = hostContent
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            modal.IsOpen = true;
+            DoEvents();
+            Pump(350);
+
+            var close = modal.Template.FindName("PART_Close", modal) as FrameworkElement;
+            Check("dialog close button is named in the locale",
+                close != null && AutomationProperties.GetName(close) == "关闭",
+                close == null ? "missing" : AutomationProperties.GetName(close));
+
+            modal.Close();
+            Pump(400);
+            host.Close();
+
+            AntdLocale.Use(AntdStrings.CreateEnglish());
+            var back = new FormItem { Required = true, Content = new AntdInput() };
+            back.Validate();
+            Check("switching back restores English",
+                back.Error == "Please fill in this field", back.Error);
+        }
+
+        private static void Pump(int milliseconds)
+        {
+            var frame = new DispatcherFrame();
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(milliseconds);
+            timer.Tick += delegate
+            {
+                timer.Stop();
+                frame.Continue = false;
+            };
+            timer.Start();
+            Dispatcher.PushFrame(frame);
+        }
         private static void DoEvents()
         {
             var frame = new DispatcherFrame();

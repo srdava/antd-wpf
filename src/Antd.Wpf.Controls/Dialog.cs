@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -285,6 +286,13 @@ namespace Antd.Wpf.Controls
         private void BeginClose()
         {
             if (_closing) return;
+
+            // Reduced motion: skip straight to the end state.
+            if (!AntdMotion.Enabled)
+            {
+                CompleteClose();
+                return;
+            }
             _closing = true;
 
             if (_card == null)
@@ -473,6 +481,7 @@ namespace Antd.Wpf.Controls
         protected virtual void AnimateIn()
         {
             if (_card == null) return;
+            if (!AntdMotion.Enabled) { _card.Opacity = 1; return; }
 
             var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
             var scale = new ScaleTransform(0.9, 0.9);
@@ -652,6 +661,7 @@ namespace Antd.Wpf.Controls
             if (_closeHost != null) { _closeHost.MouseLeftButtonUp -= OnCloseClick; _closeHost = null; }
             _closeHost = GetTemplateChild("PART_Close") as FrameworkElement;
             if (_closeHost != null) _closeHost.MouseLeftButtonUp += OnCloseClick;
+            if (_closeHost != null) AutomationProperties.SetName(_closeHost, AntdLocale.Current.Close);
         }
 
         protected override void DetachParts()
@@ -794,6 +804,7 @@ namespace Antd.Wpf.Controls
 
             _closeHost = GetTemplateChild("PART_Close") as FrameworkElement;
             if (_closeHost != null) _closeHost.MouseLeftButtonUp += OnCloseClick;
+            if (_closeHost != null) AutomationProperties.SetName(_closeHost, AntdLocale.Current.Close);
         }
 
         protected override void DetachParts()
@@ -854,6 +865,7 @@ namespace Antd.Wpf.Controls
         protected override void AnimateIn()
         {
             if (DialogCard == null) return;
+            if (!AntdMotion.Enabled) { DialogCard.Opacity = 1; return; }
 
             double distance;
             switch (Placement)

@@ -13,7 +13,7 @@
 | M2 录入层 | 19 | **19** | 清单全部落地（能力边界见下） |
 | M3 展示层 | 21 | **21** | 清单全部落地（能力边界见下） |
 | M4 反馈层 | 7 | **7** | 清单全部落地（能力边界见下） |
-| M5 打磨 | — | 进行中 | 阴影：Modal / Drawer / Toast；动效：入退场都有；无障碍：Button/Alert/Result/Tag/Modal/Drawer 已补 Peer + 按钮焦点环；i18n 未做 |
+| M5 打磨 | — | **完成** | 无障碍：13 个控件补 Peer + 按钮焦点环；i18n：`AntdLocale` 中/英切换；动效：入退场 + 减动效开关；阴影：弹窗 / 抽屉 / Toast / 浮层 |
 
 **组件进度：69 / 71。** 公开控件类型 97 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
 Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
@@ -36,6 +36,16 @@ Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若
 WPF 会把 `TextBox.Padding` 复制到内容宿主上，于是 22px 的文字区实际只剩 14.4px，字的上半截被裁掉。
 同一问题也影响 `InputNumber`。修法：边框不再承担内边距，内容宿主高度改为"控件高 - 上下边框"，
 前缀 / 后缀 / 占位符在代码里补内缩。**只跑断言发现不了这种问题，必须看真实页面。**
+## M5 交付说明
+
+| 能力 | 做法 | 验证 |
+|---|---|---|
+| 无障碍 | `Automation.cs`：Button（Invoke）/ Alert / Result / Tag / Modal / Drawer 专用 Peer，容器类用 `AntdContainerAutomationPeer`（Card、Pagination、Menu、Collapse、Steps、Descriptions、Timeline、List、Statistic、QRCode、Carousel、Transfer、Tour）。Button 补 2px 焦点环 | SmokeTests 8 项、FeedbackTests 8 项 |
+| i18n | `AntdLocale` + `AntdStrings`（中/英）：必填提示、空状态、上传移除、文件对话框筛选、关闭按钮朗读名；控件通过 `LocaleLink` 跟随切换 | SmokeTests 7 项 |
+| 动效降级 | `AntdMotion.Enabled` 默认跟随 `SystemParameters.ClientAreaAnimation`；关闭时弹窗直接到终态，不等动画 | FeedbackTests 2 项 |
+| 阴影分层 | `Antd.Effect.Elevated`（弹窗/抽屉）、冻结的 Toast 阴影、浮层 16px 阴影槽 + 定位补偿 | FeedbackTests 2 项 |
+
+文档站不在 M5 内，单列为 M6（见路线图）。
 ## 能力完成度（别把组件数量当成能力齐全）
 
 上面的 69/71 是**基础版本**：属性、外观与常用交互可用。按「完整能力」口径，只有

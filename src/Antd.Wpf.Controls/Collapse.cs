@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -13,6 +14,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Collapse : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Collapse");
+        }
         static Collapse()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Collapse), new FrameworkPropertyMetadata(typeof(Collapse)));
@@ -252,6 +257,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class List : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.List, "List");
+        }
         static List()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(List), new FrameworkPropertyMetadata(typeof(List)));

@@ -52,6 +52,7 @@ namespace Antd.Wpf.FeedbackTests
             CheckMessage();
             CheckNotification();
             CheckAutomation();
+            CheckReducedMotion();
 
             if (shotDir != null) Capture(shotDir);
 
@@ -397,6 +398,14 @@ namespace Antd.Wpf.FeedbackTests
             popconfirm.Confirmed += delegate { confirmed = true; };
             popconfirm.Canceled += delegate { canceled = true; };
 
+            var popup = popconfirm.Template.FindName("PART_Popup", popconfirm) as System.Windows.Controls.Primitives.Popup;
+            var panel = popup == null ? null : popup.Child as FrameworkElement;
+            Check("popup reserves room for its shadow",
+                panel != null && Math.Abs(panel.Margin.Left - 16) < 0.01 && panel.Effect != null,
+                panel == null ? "missing" : panel.Margin.Left + "/" + (panel.Effect == null ? "no effect" : "effect"));
+            Check("popup offset gives the gutter back",
+                popup != null && Math.Abs(popup.VerticalOffset - (-12)) < 0.01,
+                popup == null ? "missing" : popup.VerticalOffset.ToString());
             popconfirm.IsOpen = true;
             DoEvents();
 
@@ -716,6 +725,46 @@ namespace Antd.Wpf.FeedbackTests
             Check("an untitled dialog reports an empty name, not null",
                 untitledPeer != null && untitledPeer.GetName() == string.Empty,
                 untitledPeer == null ? "none" : "\"" + untitledPeer.GetName() + "\"");
+        }
+
+        // ---------------------------------------------------------------- reduced motion
+
+        private static void CheckReducedMotion()
+        {
+            AntdMotion.Enabled = false;
+
+            var modal = new Modal { Title = "Instant" };
+            var hostContent = new Grid();
+            hostContent.Children.Add(modal);
+            var host = new Window
+            {
+                Width = 600, Height = 400, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = hostContent
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            int closed = 0;
+            modal.Closed += delegate { closed++; };
+
+            var popup = modal.Template.FindName("PART_Popup", modal) as System.Windows.Controls.Primitives.Popup;
+            var card = modal.Template.FindName("PART_Card", modal) as FrameworkElement;
+
+            modal.IsOpen = true;
+            DoEvents();
+            Check("reduced motion opens straight to the end state",
+                popup != null && popup.IsOpen && card != null && Math.Abs(card.Opacity - 1) < 0.001,
+                popup == null ? "missing" : card == null ? "no card" : card.Opacity.ToString());
+
+            modal.IsOpen = false;
+            DoEvents();
+            Check("reduced motion closes without waiting for an animation",
+                !modal.IsOpen && popup != null && !popup.IsOpen && closed == 1,
+                closed + "/" + (popup == null ? "missing" : popup.IsOpen.ToString()));
+
+            host.Close();
+            AntdMotion.UseSystemDefault();
         }
 
         private static void DoEvents()

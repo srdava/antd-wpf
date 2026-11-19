@@ -369,7 +369,7 @@ namespace Antd.Wpf.Controls
 
             if (Required && IsEmpty(Content))
             {
-                message = "Please fill in this field";
+                message = AntdLocale.Current.RequiredField;
             }
             else if (Validator != null)
             {

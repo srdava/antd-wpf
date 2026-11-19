@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -334,6 +335,7 @@ namespace Antd.Wpf.Controls
             {
                 close.MouseLeftButtonUp -= OnCloseClick;
                 close.MouseLeftButtonUp += OnCloseClick;
+                AutomationProperties.SetName(close, AntdLocale.Current.Close);
             }
         }
 

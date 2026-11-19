@@ -22,12 +22,27 @@ namespace Antd.Wpf.Controls
         public Empty()
         {
             ThemeLink.Attach(this, UpdateVisualState);
+            ApplyLocale();
+            LocaleLink.Attach(this, ApplyLocale);
             UpdateVisualState();
+        }
+
+        private string _localizedDescription;
+
+        /// <summary>Only overwrites the description while the host has not supplied its own.</summary>
+        private void ApplyLocale()
+        {
+            string text = AntdLocale.Current.NoData;
+            if (Description == null || Description == _localizedDescription)
+            {
+                SetCurrentValue(DescriptionProperty, text);
+            }
+            _localizedDescription = text;
         }
 
         public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(
             "Description", typeof(string), typeof(Empty),
-            new FrameworkPropertyMetadata("No Data"));
+            new FrameworkPropertyMetadata(null));
 
         public string Description
         {

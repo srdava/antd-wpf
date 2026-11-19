@@ -4,7 +4,7 @@ Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 
 
 当前状态：M1–M4 的**基础版本**全部落地（69/71 组件）。**能力完成度以 `docs/progress.md` 为准**——
 组件数量不等于能力齐全（Select 无搜索/多选、DatePicker 无区间、Table 无固定列等），接入前请先看那份能力表。
-M5 打磨（无障碍、i18n、动效降级、阴影分层）尚未开始。
+M5 打磨已完成：无障碍 Peer 与焦点环、`AntdLocale` 中英文案、入退场动效与减动效开关、弹窗/抽屉/Toast/浮层的阴影分层。文档站单列为 M6。
 每个组件的能力边界都写在 `docs/progress.md` 里，避免把「能跑」当成「对齐 antd」。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
 M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-notes.md)。

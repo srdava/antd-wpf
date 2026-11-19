@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
 using Antd.Wpf.Tokens;
@@ -63,6 +65,45 @@ namespace Antd.Wpf.Controls
         /// <summary>Gap between the trigger and the panel, matching antd's 4px margin.</summary>
         protected const double Gap = 4;
 
+        /// <summary>
+        /// Shadow room around the panel. A Popup sizes itself to its child, so an effect drawn
+        /// outside the child would be clipped; the panel is inset by this much and the placement
+        /// offsets give the space back.
+        /// </summary>
+        protected virtual double ShadowGutter
+        {
+            get { return 16; }
+        }
+
+        private static readonly DropShadowEffect PopupShadow = CreatePopupShadow();
+
+        private static DropShadowEffect CreatePopupShadow()
+        {
+            var effect = new DropShadowEffect
+            {
+                BlurRadius = 14,
+                ShadowDepth = 3,
+                Direction = 270,
+                Opacity = 0.16,
+                Color = Colors.Black,
+                RenderingBias = RenderingBias.Quality
+            };
+            effect.Freeze();
+            return effect;
+        }
+
+        /// <summary>Gives the panel a margin for its shadow and attaches the effect.</summary>
+        private void ApplyShadowGutter()
+        {
+            if (_popup == null) return;
+
+            var child = _popup.Child as FrameworkElement;
+            if (child == null) return;
+
+            double gutter = ShadowGutter;
+            child.Margin = new Thickness(gutter);
+            child.Effect = gutter > 0 ? PopupShadow : null;
+        }
         protected Popup Popup
         {
             get { return _popup; }
@@ -81,6 +122,7 @@ namespace Antd.Wpf.Controls
                 _popup.IsOpen = IsOpen;
             }
 
+            ApplyShadowGutter();
             ApplyPlacement();
         }
 
@@ -132,22 +174,22 @@ namespace Antd.Wpf.Controls
                 case AntdPlacement.Top:
                     _popup.Placement = PlacementMode.Top;
                     _popup.HorizontalOffset = 0;
-                    _popup.VerticalOffset = -Gap;
+                    _popup.VerticalOffset = ShadowGutter - Gap;
                     break;
                 case AntdPlacement.Left:
                     _popup.Placement = PlacementMode.Left;
-                    _popup.HorizontalOffset = -Gap;
+                    _popup.HorizontalOffset = ShadowGutter - Gap;
                     _popup.VerticalOffset = 0;
                     break;
                 case AntdPlacement.Right:
                     _popup.Placement = PlacementMode.Right;
-                    _popup.HorizontalOffset = Gap;
+                    _popup.HorizontalOffset = Gap - ShadowGutter;
                     _popup.VerticalOffset = 0;
                     break;
                 default:
                     _popup.Placement = PlacementMode.Bottom;
                     _popup.HorizontalOffset = 0;
-                    _popup.VerticalOffset = Gap;
+                    _popup.VerticalOffset = Gap - ShadowGutter;
                     break;
             }
         }

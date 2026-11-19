@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -22,6 +23,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Steps : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Steps");
+        }
         static Steps()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Steps), new FrameworkPropertyMetadata(typeof(Steps)));

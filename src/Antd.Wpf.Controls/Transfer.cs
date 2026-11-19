@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Controls.Internal;
 
@@ -37,6 +38,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Transfer : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.List, "Transfer");
+        }
         private ListBox _source;
         private ListBox _target;
 

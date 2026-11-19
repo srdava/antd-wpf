@@ -203,4 +203,36 @@ namespace Antd.Wpf.Controls
             return modal != null ? "Modal" : "Drawer";
         }
     }
+
+    /// <summary>
+    /// Generic peer for the container controls: they have no interactive behaviour of their own,
+    /// but a screen reader still needs the role (group, list, menu, image) to announce structure.
+    /// </summary>
+    internal sealed class AntdContainerAutomationPeer : AntdAutomationPeer
+    {
+        private readonly AutomationControlType _type;
+        private readonly string _className;
+
+        public AntdContainerAutomationPeer(FrameworkElement owner, AutomationControlType type, string className)
+            : base(owner)
+        {
+            _type = type;
+            _className = className;
+        }
+
+        protected override string AutomationName
+        {
+            get { return null; }
+        }
+
+        protected override AutomationControlType GetAutomationControlTypeCore()
+        {
+            return _type;
+        }
+
+        protected override string GetClassNameCore()
+        {
+            return _className;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -600,7 +601,9 @@ namespace Antd.Wpf.Controls
             };
 
             button.MouseEnter += delegate { button.Background = snapshot.Brush("colorFillTertiary"); };
+
             button.MouseLeave += delegate { button.Background = Brushes.Transparent; };
+            AutomationProperties.SetName(button, AntdLocale.Current.Close);
             return button;
         }
 
