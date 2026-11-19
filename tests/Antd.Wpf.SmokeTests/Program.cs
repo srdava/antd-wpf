@@ -2374,8 +2374,13 @@ namespace Antd.Wpf.SmokeTests
         private static void CheckIcons()
         {
             int count = AntdIcons.Names.Count();
-            Check("the icon set covers the full outlined library", count >= 400, count.ToString());
+            Check("the icon set covers outlined, filled and twotone", count >= 800, count.ToString());
 
+            Check("filled variants resolve by name and property",
+                AntdIcons.ByName("star-filled") != null && AntdIcons.StarFilled != null, "missing filled");
+            Check("two-tone variants resolve by name and property",
+                AntdIcons.ByName("check-circle-twotone") != null && AntdIcons.CheckCircleTwoTone != null,
+                "missing twotone");
             var rocket = AntdIcons.ByName("rocket");
             Check("icons resolve by antd name", rocket != null, rocket == null ? "missing" : "ok");
             Check("unknown icon names resolve to null", AntdIcons.ByName("not-a-real-icon") == null, "not null");
