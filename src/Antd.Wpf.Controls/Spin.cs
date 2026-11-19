@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -9,6 +10,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Spin: a loading indicator, optionally wrapping content.</summary>
     public class Spin : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ProgressBar, "Spin");
+        }
         static Spin()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Spin), new FrameworkPropertyMetadata(typeof(Spin)));

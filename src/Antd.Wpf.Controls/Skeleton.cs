@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -14,6 +15,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Skeleton : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Pane, "Skeleton");
+        }
         private const double BarHeight = 16;
         private const double Gap = 16;
         private static readonly double AvatarSize = 32;

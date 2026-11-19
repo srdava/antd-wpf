@@ -208,6 +208,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class CarouselDotButton : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Button, "CarouselDotButton");
+        }
         static CarouselDotButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CarouselDotButton),

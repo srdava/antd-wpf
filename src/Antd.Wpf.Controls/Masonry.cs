@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
@@ -57,6 +58,10 @@ namespace Antd.Wpf.Controls
     /// <summary>Balancing panel behind <see cref="Masonry"/>.</summary>
     public class MasonryPanel : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "MasonryPanel");
+        }
         public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(
             "Columns", typeof(int), typeof(MasonryPanel),
             new FrameworkPropertyMetadata(3, FrameworkPropertyMetadataOptions.AffectsMeasure));

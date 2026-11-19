@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
@@ -105,6 +106,7 @@ namespace Antd.Wpf.SmokeTests
             CheckReviewFixes();
             CheckAutomation();
             CheckLocalization();
+            CheckAutomationCoverage();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2317,6 +2319,40 @@ namespace Antd.Wpf.SmokeTests
             timer.Start();
             Dispatcher.PushFrame(frame);
         }
+        // ---------------------------------------------------------------- automation coverage
+
+        private static void CheckAutomationCoverage()
+        {
+            var assembly = typeof(AntdButton).Assembly;
+            var missing = new List<string>();
+            int examined = 0;
+
+            foreach (Type type in assembly.GetExportedTypes())
+            {
+                if (type.IsAbstract || type.IsInterface || type.IsEnum) continue;
+                if (!typeof(UIElement).IsAssignableFrom(type)) continue;
+                if (type.GetConstructor(Type.EmptyTypes) == null) continue;
+
+                UIElement element;
+                try
+                {
+                    element = (UIElement)Activator.CreateInstance(type);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                examined++;
+                var peer = UIElementAutomationPeer.CreatePeerForElement(element);
+                if (peer == null) missing.Add(type.Name);
+            }
+
+            Check("every constructible control exposes an automation peer",
+                missing.Count == 0,
+                examined + " checked, missing: " + string.Join(", ", missing.ToArray()));
+        }
+
         private static void DoEvents()
         {
             var frame = new DispatcherFrame();

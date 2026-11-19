@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -14,6 +15,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Space : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Space");
+        }
         public Space()
         {
             ThemeLink.Attach(this, OnThemeChanged);

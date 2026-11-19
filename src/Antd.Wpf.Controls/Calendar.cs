@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Antd.Wpf.Controls.Internal;
@@ -44,6 +45,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Calendar : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Calendar, "Calendar");
+        }
         private ListBox _grid;
         private Button _prev;
         private Button _next;

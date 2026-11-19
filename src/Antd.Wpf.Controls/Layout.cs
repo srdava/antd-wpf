@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
@@ -14,6 +15,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Layout : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Layout");
+        }
         public Layout()
         {
             ThemeLink.Attach(this, ApplyBackground);
@@ -154,6 +159,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Layout.Sider.</summary>
     public class Sider : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Sider");
+        }
         static Sider()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Sider),
@@ -211,6 +220,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Layout.Header.</summary>
     public class Header : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Header");
+        }
         static Header()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Header),
@@ -235,6 +248,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Layout.Footer.</summary>
     public class Footer : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Footer");
+        }
         static Footer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Footer),
@@ -258,6 +275,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Layout.Content: takes the remaining space of its parent layout.</summary>
     public class Content : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Content");
+        }
         static Content()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Content),

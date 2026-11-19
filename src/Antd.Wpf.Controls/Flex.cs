@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
@@ -39,6 +40,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Flex : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Flex");
+        }
         public Flex()
         {
             ThemeLink.Attach(this, OnThemeChanged);

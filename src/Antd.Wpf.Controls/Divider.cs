@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Divider: a rule between or around content.</summary>
     public class Divider : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Separator, "Divider");
+        }
         static Divider()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Divider), new FrameworkPropertyMetadata(typeof(Divider)));

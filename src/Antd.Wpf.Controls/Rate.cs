@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Rate : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Slider, "Rate");
+        }
         private double _hoverValue = -1;
 
         static Rate()

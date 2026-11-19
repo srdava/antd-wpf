@@ -136,6 +136,10 @@ namespace Antd.Wpf.Controls
     /// <summary>A single disclosure row: a 46-tall header over a 16-padded body.</summary>
     public class CollapseItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "CollapseItem");
+        }
         static CollapseItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CollapseItem), new FrameworkPropertyMetadata(typeof(CollapseItem)));
@@ -353,6 +357,10 @@ namespace Antd.Wpf.Controls
     /// <summary>One list row.</summary>
     public class ListItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ListItem, "ListItem");
+        }
         static ListItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListItem), new FrameworkPropertyMetadata(typeof(ListItem)));

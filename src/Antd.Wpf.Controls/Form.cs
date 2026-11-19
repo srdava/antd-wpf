@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -22,6 +23,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Form : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Form");
+        }
         private readonly List<FormItem> _items = new List<FormItem>();
 
         public Form()
@@ -145,6 +150,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Form.Item: label row, content and error/help line.</summary>
     public class FormItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "FormItem");
+        }
         static FormItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FormItem), new FrameworkPropertyMetadata(typeof(FormItem)));

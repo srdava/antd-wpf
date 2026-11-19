@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Controls.Internal;
 using Antd.Wpf.Theme;
@@ -80,6 +81,10 @@ namespace Antd.Wpf.Controls
     /// <summary>One crumb. The last one is the current page and loses its separator.</summary>
     public class BreadcrumbItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Hyperlink, "BreadcrumbItem");
+        }
         static BreadcrumbItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BreadcrumbItem), new FrameworkPropertyMetadata(typeof(BreadcrumbItem)));

@@ -235,4 +235,40 @@ namespace Antd.Wpf.Controls
             return _className;
         }
     }
+
+    /// <summary>Invokable element that is not our Button (FloatButton): name comes from UIA only.</summary>
+    internal sealed class AntdInvokableAutomationPeer : AntdAutomationPeer, IInvokeProvider
+    {
+        public AntdInvokableAutomationPeer(FrameworkElement owner)
+            : base(owner)
+        {
+        }
+
+        protected override string AutomationName
+        {
+            get { return null; }
+        }
+
+        protected override AutomationControlType GetAutomationControlTypeCore()
+        {
+            return AutomationControlType.Button;
+        }
+
+        protected override string GetClassNameCore()
+        {
+            return "Button";
+        }
+
+        public override object GetPattern(PatternInterface patternInterface)
+        {
+            return patternInterface == PatternInterface.Invoke ? this : base.GetPattern(patternInterface);
+        }
+
+        public void Invoke()
+        {
+            var button = Owner as ButtonBase;
+            if (button == null || !button.IsEnabled) return;
+            button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent, button));
+        }
+    }
 }

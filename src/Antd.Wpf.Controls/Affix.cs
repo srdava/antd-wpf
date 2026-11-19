@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Affix : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Affix");
+        }
         private ScrollViewer _scroller;
         private double _origin = double.NaN;
 

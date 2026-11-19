@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -12,6 +13,10 @@ namespace Antd.Wpf.Controls
     [ContentProperty("Content")]
     public class Badge : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Text, "Badge");
+        }
         static Badge()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Badge), new FrameworkPropertyMetadata(typeof(Badge)));

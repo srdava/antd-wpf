@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Image : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Image, "Image");
+        }
         private Popup _popup;
         private FrameworkElement _mask;
 

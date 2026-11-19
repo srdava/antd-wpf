@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Theme;
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class BorderBeam : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Pane, "BorderBeam");
+        }
         private double _beamOffset;
 
         static BorderBeam()

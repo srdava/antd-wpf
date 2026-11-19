@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -15,6 +16,10 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Avatar: image, initials or icon in a circular/square frame.</summary>
     public class Avatar : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Image, "Avatar");
+        }
         static Avatar()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Avatar), new FrameworkPropertyMetadata(typeof(Avatar)));

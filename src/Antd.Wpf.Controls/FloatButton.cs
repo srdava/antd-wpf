@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -29,6 +30,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class FloatButton : System.Windows.Controls.Primitives.ButtonBase
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdInvokableAutomationPeer(this);
+        }
         static FloatButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FloatButton), new FrameworkPropertyMetadata(typeof(FloatButton)));

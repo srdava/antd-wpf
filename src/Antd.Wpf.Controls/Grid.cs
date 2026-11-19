@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using Antd.Wpf.Theme;
 
@@ -31,6 +32,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Col : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Col");
+        }
         static Col()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Col),
@@ -100,6 +105,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Row : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Row");
+        }
         private sealed class Placement
         {
             public UIElement Child;

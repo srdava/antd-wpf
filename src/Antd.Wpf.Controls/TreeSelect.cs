@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -17,6 +18,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class TreeSelect : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ComboBox, "TreeSelect");
+        }
         private Border _field;
         private Popup _popup;
         private Tree _tree;

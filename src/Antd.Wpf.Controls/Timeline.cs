@@ -76,6 +76,10 @@ namespace Antd.Wpf.Controls
     /// <summary>One timeline entry: a dot, an optional rail and the content.</summary>
     public class TimelineItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ListItem, "TimelineItem");
+        }
         static TimelineItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TimelineItem), new FrameworkPropertyMetadata(typeof(TimelineItem)));

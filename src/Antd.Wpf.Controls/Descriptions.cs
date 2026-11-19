@@ -72,6 +72,10 @@ namespace Antd.Wpf.Controls
     /// <summary>One label/value pair.</summary>
     public class DescriptionsItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "DescriptionsItem");
+        }
         static DescriptionsItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DescriptionsItem), new FrameworkPropertyMetadata(typeof(DescriptionsItem)));
@@ -130,6 +134,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class DescriptionsPanel : Panel
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "DescriptionsPanel");
+        }
         public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(
             "Columns", typeof(int), typeof(DescriptionsPanel),
             new FrameworkPropertyMetadata(3, FrameworkPropertyMetadataOptions.AffectsMeasure));

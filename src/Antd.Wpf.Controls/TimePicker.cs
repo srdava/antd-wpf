@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -18,6 +19,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class TimePicker : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ComboBox, "TimePicker");
+        }
         private Border _field;
         private Popup _popup;
         private ListBox _hours;

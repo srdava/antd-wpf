@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -13,6 +14,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Watermark : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Pane, "Watermark");
+        }
         static Watermark()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Watermark), new FrameworkPropertyMetadata(typeof(Watermark)));

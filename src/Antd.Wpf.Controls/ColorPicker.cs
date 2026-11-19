@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,6 +21,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class ColorPicker : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ComboBox, "ColorPicker");
+        }
         private FrameworkElement _saturation;
         private FrameworkElement _hue;
         private double _h = 217;

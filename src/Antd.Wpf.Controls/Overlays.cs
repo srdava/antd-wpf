@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -103,6 +104,16 @@ namespace Antd.Wpf.Controls
             double gutter = ShadowGutter;
             child.Margin = new Thickness(gutter);
             child.Effect = gutter > 0 ? PopupShadow : null;
+        }
+        /// <summary>UIA role of the bubble; Tooltip narrows it to ControlType.ToolTip.</summary>
+        protected virtual AutomationControlType AutomationRole
+        {
+            get { return AutomationControlType.Pane; }
+        }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationRole, GetType().Name);
         }
         protected Popup Popup
         {
@@ -211,6 +222,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Tooltip : OverlayBase
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ToolTip, "Tooltip");
+        }
         static Tooltip()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Tooltip), new FrameworkPropertyMetadata(typeof(Tooltip)));

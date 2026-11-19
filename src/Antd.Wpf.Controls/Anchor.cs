@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -174,6 +175,10 @@ namespace Antd.Wpf.Controls
     /// <summary>One anchor row: a text link with a left rail that turns primary when active.</summary>
     public class AnchorLink : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Hyperlink, "AnchorLink");
+        }
         static AnchorLink()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AnchorLink),

@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -29,6 +30,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Progress : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ProgressBar, "Progress");
+        }
         private const double LineThickness = 8;
 
         static Progress()

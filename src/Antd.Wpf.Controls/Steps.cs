@@ -120,6 +120,10 @@ namespace Antd.Wpf.Controls
     /// <summary>A single step: numbered or checked icon, title and description.</summary>
     public class StepsItem : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ListItem, "StepsItem");
+        }
         static StepsItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(StepsItem), new FrameworkPropertyMetadata(typeof(StepsItem)));

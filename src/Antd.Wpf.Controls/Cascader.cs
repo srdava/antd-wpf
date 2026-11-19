@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -41,6 +42,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Cascader : Control
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ComboBox, "Cascader");
+        }
         private Border _field;
         private Popup _popup;
         private StackPanel _columns;
