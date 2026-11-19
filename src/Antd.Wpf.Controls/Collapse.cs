@@ -177,15 +177,38 @@ namespace Antd.Wpf.Controls
         {
             base.OnApplyTemplate();
 
-            if (_header != null) _header.MouseLeftButtonUp -= OnHeaderClick;
+            if (_header != null)
+            {
+                _header.MouseLeftButtonUp -= OnHeaderClick;
+                _header.KeyDown -= OnHeaderKeyDown;
+            }
+
             _header = GetTemplateChild("PART_Header") as FrameworkElement;
             if (_header != null)
             {
                 _header.MouseLeftButtonUp += OnHeaderClick;
                 _header.Cursor = System.Windows.Input.Cursors.Hand;
+
+                // Keyboard parity with the mouse: the header is a Border, so it has to opt in to focus.
+                _header.Focusable = true;
+                System.Windows.Input.KeyboardNavigation.SetIsTabStop(_header, true);
+                _header.KeyDown += OnHeaderKeyDown;
+
+                var headerText = Header as string;
+                if (!string.IsNullOrEmpty(headerText))
+                {
+                    System.Windows.Automation.AutomationProperties.SetName(_header, headerText);
+                }
             }
         }
 
+        private void OnHeaderKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key != System.Windows.Input.Key.Enter && e.Key != System.Windows.Input.Key.Space) return;
+
+            SetCurrentValue(IsExpandedProperty, !IsExpanded);
+            e.Handled = true;
+        }
         private void OnHeaderClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             SetCurrentValue(IsExpandedProperty, !IsExpanded);

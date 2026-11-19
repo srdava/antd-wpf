@@ -131,7 +131,7 @@ namespace Antd.Wpf.Controls
         {
             base.OnApplyTemplate();
 
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             _mask = GetTemplateChild("PART_Mask") as FrameworkElement;
             _spotlight = GetTemplateChild("PART_Spotlight") as Path;
             _card = GetTemplateChild("PART_Card") as FrameworkElement;

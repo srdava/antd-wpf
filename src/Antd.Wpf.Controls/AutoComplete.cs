@@ -141,7 +141,7 @@ namespace Antd.Wpf.Controls
             if (_popup != null) _popup.Closed -= OnPopupClosed;
 
             _editor = GetTemplateChild("PART_EditableTextBox") as TextBox;
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             PopupAnchor.Attach(_popup, this);
             _list = GetTemplateChild("PART_Suggestions") as ListBox;
 

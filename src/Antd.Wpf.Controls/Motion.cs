@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace Antd.Wpf.Controls
 {
@@ -19,6 +20,18 @@ namespace Antd.Wpf.Controls
             set { _enabled = value; }
         }
 
+        /// <summary>
+        /// Applies the preference to a popup. Called from each control's template hook so the
+        /// fade in dropdowns/tooltips stops when the user asked for less motion.
+        /// </summary>
+        public static Popup Configure(Popup popup)
+        {
+            if (popup != null)
+            {
+                popup.PopupAnimation = Enabled ? PopupAnimation.Fade : PopupAnimation.None;
+            }
+            return popup;
+        }
         /// <summary>Goes back to following the operating system.</summary>
         public static void UseSystemDefault()
         {

@@ -143,7 +143,7 @@ namespace Antd.Wpf.Controls
             if (_calendar != null) _calendar.SelectedDateChanged -= OnCalendarPicked;
 
             _field = GetTemplateChild("PART_Field") as Border;
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             PopupAnchor.Attach(_popup, this);
             _calendar = GetTemplateChild("PART_Calendar") as Calendar;
             _clear = GetTemplateChild("PART_ClearButton") as Button;

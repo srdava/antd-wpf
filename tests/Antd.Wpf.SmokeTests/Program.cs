@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
@@ -108,6 +109,7 @@ namespace Antd.Wpf.SmokeTests
             CheckLocalization();
             CheckAutomationCoverage();
             CheckIcons();
+            CheckKeyboardAndFocus();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2270,6 +2272,15 @@ namespace Antd.Wpf.SmokeTests
             Check("upload remove label follows the locale",
                 (removeButton.Content as string) == "移除", "" + removeButton.Content);
 
+            var localizedModal = new Modal();
+            Check("modal buttons follow the locale",
+                localizedModal.OkText == "确定" && localizedModal.CancelText == "取消",
+                localizedModal.OkText + "/" + localizedModal.CancelText);
+
+            var localizedConfirm = new Popconfirm();
+            Check("popconfirm buttons follow the locale",
+                localizedConfirm.ConfirmText == "确定" && localizedConfirm.CancelText == "取消",
+                localizedConfirm.ConfirmText + "/" + localizedConfirm.CancelText);
             var table = new Antd.Wpf.Controls.Table();
             Check("table placeholder follows the locale", table.EmptyText == "暂无数据", table.EmptyText);
 
@@ -2301,6 +2312,10 @@ namespace Antd.Wpf.SmokeTests
             host.Close();
 
             AntdLocale.Use(AntdStrings.CreateEnglish());
+            var englishModal = new Modal();
+            Check("switching back restores the English buttons",
+                englishModal.OkText == "OK" && englishModal.CancelText == "Cancel",
+                englishModal.OkText + "/" + englishModal.CancelText);
             var back = new FormItem { Required = true, Content = new AntdInput() };
             back.Validate();
             Check("switching back restores English",
@@ -2369,6 +2384,157 @@ namespace Antd.Wpf.SmokeTests
             Check("icons keep the normalised 896 box",
                 Math.Abs(AntdIcons.BoxSize - 896) < 0.01 && AntdIcons.Search != null,
                 AntdIcons.BoxSize.ToString());
+        }
+
+        // ---------------------------------------------------------------- keyboard and focus
+
+        private static void CheckKeyboardAndFocus()
+        {
+            // Every key control should get the shared adorner rather than nothing at all.
+            var focusables = new UIElement[]
+            {
+                new Checkbox(), new Radio(), new Switch(), new Select(), new Antd.Wpf.Controls.DatePicker(),
+                new TimePicker(), new Pagination(), new Tabs(), new Antd.Wpf.Controls.Menu(), new Antd.Wpf.Controls.Table()
+            };
+            int missingStyle = 0;
+            foreach (UIElement element in focusables)
+            {
+                var control = element as Control;
+                if (control != null && control.FocusVisualStyle == null) missingStyle++;
+            }
+            Check("keyboard focus is visible on non-Input controls", missingStyle == 0,
+                missingStyle + " without a focus visual");
+
+            // Collapse: the header is a Border, so it has to opt into focus and handle Enter/Space.
+            var collapse = new Collapse();
+            var item = new CollapseItem { Header = "Details", Content = new AntdInput() };
+            collapse.Items.Add(item);
+            var hostContent = new StackPanel();
+            hostContent.Children.Add(collapse);
+            var host = new Window
+            {
+                Width = 420, Height = 320, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = hostContent
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var header = item.Template.FindName("PART_Header", item) as FrameworkElement;
+            Check("collapse header is focusable", header != null && header.Focusable,
+                header == null ? "missing" : header.Focusable.ToString());
+
+            bool expandedBefore = item.IsExpanded;
+            if (header != null)
+            {
+                header.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(host), 0, Key.Space)
+                {
+                    RoutedEvent = UIElement.KeyDownEvent
+                });
+            }
+            DoEvents();
+            Check("space toggles the collapse item", item.IsExpanded != expandedBefore,
+                item.IsExpanded.ToString());
+            host.Close();
+
+            // Rate: arrows adjust the value, Home/End jump to the bounds.
+            var rate = new Rate { Count = 5, Value = 2 };
+            var rateHost = new Window
+            {
+                Width = 300, Height = 120, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = rate
+            };
+            rateHost.Show();
+            DoEvents();
+            rateHost.UpdateLayout();
+
+            PresentationSource rateSource = PresentationSource.FromVisual(rate);
+            rate.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, rateSource, 0, Key.Right)
+            {
+                RoutedEvent = UIElement.KeyDownEvent
+            });
+            Check("right arrow raises the rating", Math.Abs(rate.Value - 3) < 0.001, rate.Value.ToString());
+
+            rate.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, rateSource, 0, Key.Home)
+            {
+                RoutedEvent = UIElement.KeyDownEvent
+            });
+            Check("home resets the rating", Math.Abs(rate.Value) < 0.001, rate.Value.ToString());
+            rateHost.Close();
+
+            // Upload: the drop zone must be reachable by Tab and answer Enter/Space.
+            var upload = new Upload();
+            var uploadHost = new Window
+            {
+                Width = 420, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = upload
+            };
+            uploadHost.Show();
+            DoEvents();
+            uploadHost.UpdateLayout();
+            var zone = upload.Template.FindName("PART_DropZone", upload) as FrameworkElement;
+            Check("upload drop zone is focusable", zone != null && zone.Focusable,
+                zone == null ? "missing" : zone.Focusable.ToString());
+            uploadHost.Close();
+            // Menu: arrows move between sibling nodes, Enter selects a leaf.
+            var menu = new Antd.Wpf.Controls.Menu();
+            var firstNode = new MenuNode { Header = "One" };
+            var secondNode = new MenuNode { Header = "Two" };
+            menu.Items.Add(firstNode);
+            menu.Items.Add(secondNode);
+
+            var menuHost = new Window
+            {
+                Width = 320, Height = 220, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = menu
+            };
+            menuHost.Show();
+            DoEvents();
+            menuHost.UpdateLayout();
+
+            firstNode.Focus();
+            DoEvents();
+
+            PresentationSource menuSource = PresentationSource.FromVisual(firstNode);
+            firstNode.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, menuSource, 0, Key.Down)
+            {
+                RoutedEvent = UIElement.KeyDownEvent
+            });
+            DoEvents();
+            Check("down arrow moves focus between menu nodes",
+                secondNode.IsKeyboardFocused, secondNode.IsKeyboardFocused.ToString());
+
+            bool selectedNode = false;
+            menu.ItemSelected += delegate { selectedNode = true; };
+            secondNode.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, menuSource, 0, Key.Enter)
+            {
+                RoutedEvent = UIElement.KeyDownEvent
+            });
+            DoEvents();
+            Check("enter selects a menu leaf", selectedNode, selectedNode.ToString());
+            menuHost.Close();
+
+            // Reduced motion also has to quiet the popup fade, not just the dialogs.
+            AntdMotion.Enabled = false;
+            var quietSelect = new Select();
+            var quietHost = new Window
+            {
+                Width = 320, Height = 160, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = quietSelect
+            };
+            quietHost.Show();
+            DoEvents();
+            quietHost.UpdateLayout();
+
+            var quietPopup = quietSelect.Template.FindName("PART_Popup", quietSelect)
+                as System.Windows.Controls.Primitives.Popup;
+            Check("reduced motion turns off the dropdown fade",
+                quietPopup != null
+                && quietPopup.PopupAnimation == System.Windows.Controls.Primitives.PopupAnimation.None,
+                quietPopup == null ? "missing" : quietPopup.PopupAnimation + " enabled=" + AntdMotion.Enabled);
+
+            quietHost.Close();
+            AntdMotion.UseSystemDefault();
         }
 
         private static void DoEvents()

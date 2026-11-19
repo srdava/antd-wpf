@@ -125,7 +125,7 @@ namespace Antd.Wpf.Controls
 
             DetachParts();
 
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             _surface = GetTemplateChild("PART_Surface") as FrameworkElement;
             _card = GetTemplateChild("PART_Card") as FrameworkElement;
             _mask = GetTemplateChild("PART_Mask") as UIElement;
@@ -509,6 +509,26 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Modal : DialogBase
     {
+        public Modal()
+        {
+            ApplyLocale();
+            LocaleLink.Attach(this, ApplyLocale);
+        }
+
+        private string _localizedOk;
+        private string _localizedCancel;
+
+        /// <summary>Only overwrites the labels while the host has not supplied its own.</summary>
+        private void ApplyLocale()
+        {
+            string ok = AntdLocale.Current.Ok;
+            if (OkText == null || OkText == _localizedOk) SetCurrentValue(OkTextProperty, ok);
+            _localizedOk = ok;
+
+            string cancel = AntdLocale.Current.Cancel;
+            if (CancelText == null || CancelText == _localizedCancel) SetCurrentValue(CancelTextProperty, cancel);
+            _localizedCancel = cancel;
+        }
         protected override AutomationPeer OnCreateAutomationPeer()
         {
             return new DialogAutomationPeer(this);
@@ -572,7 +592,7 @@ namespace Antd.Wpf.Controls
         }
 
         public static readonly DependencyProperty OkTextProperty = DependencyProperty.Register(
-            "OkText", typeof(string), typeof(Modal), new FrameworkPropertyMetadata("OK"));
+            "OkText", typeof(string), typeof(Modal), new FrameworkPropertyMetadata(null));
 
         public string OkText
         {
@@ -581,7 +601,7 @@ namespace Antd.Wpf.Controls
         }
 
         public static readonly DependencyProperty CancelTextProperty = DependencyProperty.Register(
-            "CancelText", typeof(string), typeof(Modal), new FrameworkPropertyMetadata("Cancel"));
+            "CancelText", typeof(string), typeof(Modal), new FrameworkPropertyMetadata(null));
 
         public string CancelText
         {

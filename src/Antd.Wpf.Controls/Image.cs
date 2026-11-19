@@ -85,7 +85,7 @@ namespace Antd.Wpf.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             _mask = GetTemplateChild("PART_Mask") as FrameworkElement;
             if (_popup != null) _popup.IsOpen = IsPreviewVisible;
 

@@ -46,6 +46,18 @@ WPF 会把 `TextBox.Padding` 复制到内容宿主上，于是 22px 的文字区
 | 阴影分层 | `Antd.Effect.Elevated`（弹窗/抽屉）、冻结的 Toast 阴影、浮层 16px 阴影槽 + 定位补偿 | FeedbackTests 2 项 |
 | 图标全量 | `@ant-design/icons-svg` 全部 446 个 outlined 图标，生成改为懒加载属性 + 缓存（原 57 个静态字段会在类型初始化时全部解析） | SmokeTests 5 项 |
 
+### 收尾补丁（同一天）
+
+上面四项交付后，又按「能不能真的用键盘走完」补了一轮：
+
+| 项 | 做法 |
+|---|---|
+| 焦点可视化 | 新增共享 `Antd.FocusVisual`（adorner 焦点环），17 个原本 `FocusVisualStyle=null` 的样式全部启用；Input/Button 保留模板内焦点环 |
+| 键盘操作 | Collapse 头部可聚焦、Enter/Space 展开；Menu 节点方向键移动、Enter/Space 激活；Rate 方向键/Home/End 调值；Upload 拖拽区可聚焦并用 Enter/Space 打开 |
+| 文案 | `AntdStrings.Ok/Cancel`；Modal、Popconfirm 的按钮文案改为「宿主没覆盖时跟随 locale」 |
+| 动效 | `AntdMotion.Configure(popup)` 应用于 13 处 PART_Popup，减动效时不再淡入；Carousel 自动播放在减动效时停止 |
+
+已知取舍：Spin 的旋转保留（属于「必要反馈」）；日期格式仍跟随 `CultureInfo`，与 `AntdLocale` 是两套机制。
 文档站不在 M5 内，单列为 M6（见路线图）。
 ## 能力完成度（别把组件数量当成能力齐全）
 

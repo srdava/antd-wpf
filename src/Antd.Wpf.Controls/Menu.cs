@@ -138,6 +138,10 @@ namespace Antd.Wpf.Controls
 
         public MenuNode()
         {
+            // Menu nodes are the tab stops: arrows move between them, Enter/Space activates.
+            Focusable = true;
+            KeyboardNavigation.SetIsTabStop(this, true);
+
             ThemeLink.Attach(this, UpdateVisualState);
             UpdateVisualState();
             AddHandler(PreviewMouseUpEvent, new MouseButtonEventHandler(OnClick), true);
@@ -251,10 +255,79 @@ namespace Antd.Wpf.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             if (_popup != null) _popup.IsOpen = IsExpanded;
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                case Key.Space:
+                    Activate();
+                    break;
+                case Key.Down:
+                    MoveFocus(1);
+                    break;
+                case Key.Up:
+                    MoveFocus(-1);
+                    break;
+                case Key.Right:
+                    if (HasChildren) SetCurrentValue(IsExpandedProperty, true);
+                    break;
+                case Key.Left:
+                    if (HasChildren) SetCurrentValue(IsExpandedProperty, false);
+                    break;
+                default:
+                    base.OnKeyDown(e);
+                    return;
+            }
+
+            e.Handled = true;
+        }
+
+        private void Activate()
+        {
+            if (HasChildren)
+            {
+                SetCurrentValue(IsExpandedProperty, !IsExpanded);
+                return;
+            }
+
+            Menu menu = FindMenu();
+            if (menu != null) menu.Select(this);
+        }
+
+        private Menu FindMenu()
+        {
+            DependencyObject node = VisualTreeHelper.GetParent(this);
+            while (node != null)
+            {
+                var menu = node as Menu;
+                if (menu != null) return menu;
+                node = VisualTreeHelper.GetParent(node);
+            }
+            return null;
+        }
+
+        /// <summary>Focuses the previous or next sibling, keeping the menu a single tab stop.</summary>
+        private void MoveFocus(int delta)
+        {
+            var parent = ItemsControl.ItemsControlFromItemContainer(this);
+            if (parent == null) return;
+
+            int index = parent.ItemContainerGenerator.IndexFromContainer(this);
+            if (index < 0) index = parent.Items.IndexOf(this);
+            if (index < 0) return;
+
+            int next = index + delta;
+            if (next < 0 || next >= parent.Items.Count) return;
+
+            var node = parent.ItemContainerGenerator.ContainerFromIndex(next) as MenuNode;
+            if (node == null) node = parent.Items[next] as MenuNode;
+            if (node != null) node.Focus();
+        }
         private void OnClick(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton != MouseButton.Left) return;

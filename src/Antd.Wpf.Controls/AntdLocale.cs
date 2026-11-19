@@ -17,6 +17,8 @@ namespace Antd.Wpf.Controls
             Remove = "Remove";
             AllFiles = "All files (*.*)|*.*";
             Close = "Close";
+            Ok = "OK";
+            Cancel = "Cancel";
         }
 
         /// <summary>Validation message for a required <see cref="FormItem"/> that is empty.</summary>
@@ -34,6 +36,12 @@ namespace Antd.Wpf.Controls
         /// <summary>Accessible name of close buttons (Alert, Modal, Drawer, toast).</summary>
         public string Close { get; set; }
 
+        /// <summary>Default confirm button of Modal and Popconfirm.</summary>
+        public string Ok { get; set; }
+
+        /// <summary>Default dismiss button of Modal and Popconfirm.</summary>
+        public string Cancel { get; set; }
+
         public static AntdStrings CreateEnglish()
         {
             return new AntdStrings();
@@ -47,6 +55,8 @@ namespace Antd.Wpf.Controls
             strings.Remove = "移除";
             strings.AllFiles = "所有文件 (*.*)|*.*";
             strings.Close = "关闭";
+            strings.Ok = "确定";
+            strings.Cancel = "取消";
             return strings;
         }
 
@@ -58,7 +68,9 @@ namespace Antd.Wpf.Controls
                 NoData = NoData,
                 Remove = Remove,
                 AllFiles = AllFiles,
-                Close = Close
+                Close = Close,
+                Ok = Ok,
+                Cancel = Cancel
             };
         }
     }

@@ -200,6 +200,12 @@ namespace Antd.Wpf.Controls
             if (_dropZone != null)
             {
                 _dropZone.MouseLeftButtonUp += OnZoneClick;
+
+                // The drop zone is a Border: make it reachable and operable from the keyboard.
+                _dropZone.Focusable = true;
+                System.Windows.Input.KeyboardNavigation.SetIsTabStop(_dropZone, true);
+                _dropZone.KeyDown -= OnZoneKeyDown;
+                _dropZone.KeyDown += OnZoneKeyDown;
                 _dropZone.DragOver += OnDragOver;
                 _dropZone.Drop += OnDrop;
                 _dropZone.DragLeave += OnDragLeave;
@@ -211,7 +217,20 @@ namespace Antd.Wpf.Controls
             SetValue(HasFilesKey, Files.Count > 0);
         }
 
+        private void OnZoneKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter && e.Key != Key.Space) return;
+            Browse();
+            e.Handled = true;
+        }
+
         private void OnZoneClick(object sender, MouseButtonEventArgs e)
+        {
+            Browse();
+            if (e != null) e.Handled = true;
+        }
+
+        private void Browse()
         {
             if (!IsEnabled) return;
 
@@ -225,7 +244,6 @@ namespace Antd.Wpf.Controls
             {
                 AddFiles(dialog.FileNames);
             }
-            e.Handled = true;
         }
 
         /// <summary>

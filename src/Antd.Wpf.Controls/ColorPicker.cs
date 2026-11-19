@@ -191,7 +191,7 @@ namespace Antd.Wpf.Controls
             _saturation = GetTemplateChild("PART_Saturation") as FrameworkElement;
             _hue = GetTemplateChild("PART_Hue") as FrameworkElement;
             var button = GetTemplateChild("PART_ClearButton") as Button;
-            var popup = GetTemplateChild("PART_Popup") as System.Windows.Controls.Primitives.Popup;
+            var popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as System.Windows.Controls.Primitives.Popup);
             var field = GetTemplateChild("PART_Field") as FrameworkElement;
             PopupAnchor.Attach(popup, this);
 

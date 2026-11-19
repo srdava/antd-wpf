@@ -29,6 +29,8 @@ namespace Antd.Wpf.Controls
 
         public Rate()
         {
+            Focusable = true;
+            System.Windows.Input.KeyboardNavigation.SetIsTabStop(this, true);
             ThemeLink.Attach(this, InvalidateVisual);
         }
 
@@ -96,6 +98,36 @@ namespace Antd.Wpf.Controls
             return new Size(count * StarSize + (count - 1) * Gap, StarSize);
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            double step = AllowHalf ? 0.5 : 1;
+            double current = Value;
+            double next = current;
+
+            switch (e.Key)
+            {
+                case Key.Right:
+                case Key.Up:
+                    next = Math.Min(Count, current + step);
+                    break;
+                case Key.Left:
+                case Key.Down:
+                    next = Math.Max(0, current - step);
+                    break;
+                case Key.Home:
+                    next = 0;
+                    break;
+                case Key.End:
+                    next = Count;
+                    break;
+                default:
+                    base.OnKeyDown(e);
+                    return;
+            }
+
+            SetCurrentValue(ValueProperty, next);
+            e.Handled = true;
+        }
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);

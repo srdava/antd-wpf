@@ -125,7 +125,7 @@ namespace Antd.Wpf.Controls
             base.OnApplyTemplate();
 
             if (_popup != null) _popup.Closed -= OnPopupClosed;
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             if (_popup != null)
             {
                 PopupAnchor.Attach(_popup, this);
@@ -388,8 +388,25 @@ namespace Antd.Wpf.Controls
         {
             Placement = AntdPlacement.Bottom;
             Trigger = AntdTrigger.Click;
-        }
 
+            ApplyLocale();
+            LocaleLink.Attach(this, ApplyLocale);        }
+
+
+        private string _localizedConfirm;
+        private string _localizedCancel;
+
+        /// <summary>Only overwrites the labels while the host has not supplied its own.</summary>
+        private void ApplyLocale()
+        {
+            string confirm = AntdLocale.Current.Ok;
+            if (ConfirmText == null || ConfirmText == _localizedConfirm) SetCurrentValue(ConfirmTextProperty, confirm);
+            _localizedConfirm = confirm;
+
+            string cancel = AntdLocale.Current.Cancel;
+            if (CancelText == null || CancelText == _localizedCancel) SetCurrentValue(CancelTextProperty, cancel);
+            _localizedCancel = cancel;
+        }
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
             "Title", typeof(object), typeof(Popconfirm),
             new FrameworkPropertyMetadata(null, OnTextChanged));
@@ -411,7 +428,7 @@ namespace Antd.Wpf.Controls
         }
 
         public static readonly DependencyProperty ConfirmTextProperty = DependencyProperty.Register(
-            "ConfirmText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata("OK"));
+            "ConfirmText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata(null));
 
         public string ConfirmText
         {
@@ -420,7 +437,7 @@ namespace Antd.Wpf.Controls
         }
 
         public static readonly DependencyProperty CancelTextProperty = DependencyProperty.Register(
-            "CancelText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata("Cancel"));
+            "CancelText", typeof(string), typeof(Popconfirm), new FrameworkPropertyMetadata(null));
 
         public string CancelText
         {

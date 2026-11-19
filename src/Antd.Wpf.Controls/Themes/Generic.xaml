@@ -19,12 +19,30 @@
                       Color="#000000"
                       RenderingBias="Quality" />
 
+    <!-- Shared keyboard focus ring: an adorner, so any control can use it without editing its
+         template. Input and Button draw their own ring inside the template and keep it off. -->
+    <Style x:Key="Antd.FocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="-3"
+                               RadiusX="6"
+                               RadiusY="6"
+                               Stroke="{DynamicResource Antd.controlOutline}"
+                               StrokeThickness="2"
+                               SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ============================================================ Button -->
 
     <Style TargetType="{x:Type antd:Button}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -179,8 +197,9 @@
 
     <Style TargetType="{x:Type antd:Input}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -915,7 +934,7 @@
     <Style TargetType="{x:Type antd:InputNumber}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
@@ -956,7 +975,7 @@
 
     <Style TargetType="{x:Type antd:Checkbox}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -1005,7 +1024,7 @@
 
     <Style TargetType="{x:Type antd:Radio}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -1034,7 +1053,7 @@
 
     <Style TargetType="{x:Type antd:Switch}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -1123,7 +1142,7 @@
 
     <Style TargetType="{x:Type antd:Slider}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type antd:Slider}">
@@ -1177,7 +1196,7 @@
     <Style TargetType="{x:Type antd:Select}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource Antd.Select.Item}" />
         <Setter Property="MaxDropDownHeight" Value="256" />
@@ -1346,7 +1365,7 @@
     <Style TargetType="{x:Type antd:AutoComplete}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -1486,7 +1505,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Antd.colorBorderSecondary}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -1567,7 +1586,7 @@
     <Style TargetType="{x:Type antd:DatePicker}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -1861,7 +1880,7 @@
     <Style TargetType="{x:Type antd:Tree}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
         <Setter Property="Background" Value="Transparent" />
@@ -1929,7 +1948,7 @@
     <Style TargetType="{x:Type antd:TimePicker}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -2129,7 +2148,7 @@
 
     <Style TargetType="{x:Type antd:Upload}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -2390,7 +2409,7 @@
 
     <Style TargetType="{x:Type antd:ColorPicker}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -2620,7 +2639,7 @@
 
     <Style x:Key="Antd.Table.Cell" TargetType="{x:Type DataGridCell}">
         <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -2854,7 +2873,7 @@
 
     <Style TargetType="{x:Type antd:TabsItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="FontSize" Value="{DynamicResource Antd.fontSize}" />
         <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
         <!-- antd pins the label row at 46 (12 + 22 + 12). WPF's default line box for 14px
@@ -3704,7 +3723,7 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -3835,7 +3854,7 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="{DynamicResource Antd.colorText}" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Antd.FocusVisual}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>

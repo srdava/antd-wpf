@@ -172,7 +172,7 @@ namespace Antd.Wpf.Controls
 
         private void StartTimer()
         {
-            if (!Autoplay || !IsLoaded) return;
+            if (!Autoplay || !IsLoaded || !AntdMotion.Enabled) return;
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(Math.Max(200, Interval)) };
             _timer.Tick += OnTick;

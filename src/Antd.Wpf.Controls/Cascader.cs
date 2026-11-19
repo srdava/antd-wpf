@@ -166,7 +166,7 @@ namespace Antd.Wpf.Controls
             if (_field != null) _field.MouseLeftButtonUp -= OnFieldClick;
 
             _field = GetTemplateChild("PART_Field") as Border;
-            _popup = GetTemplateChild("PART_Popup") as Popup;
+            _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
             PopupAnchor.Attach(_popup, this);
             _columns = GetTemplateChild("PART_Columns") as StackPanel;
             _clear = GetTemplateChild("PART_ClearButton") as Button;

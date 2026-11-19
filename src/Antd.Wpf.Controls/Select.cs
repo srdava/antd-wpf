@@ -145,7 +145,7 @@ namespace Antd.Wpf.Controls
         {
             base.OnApplyTemplate();
 
-            PopupAnchor.Attach(GetTemplateChild("PART_Popup") as System.Windows.Controls.Primitives.Popup, this);
+            PopupAnchor.Attach(AntdMotion.Configure(GetTemplateChild("PART_Popup") as System.Windows.Controls.Primitives.Popup), this);
 
             var clear = GetTemplateChild("PART_ClearButton") as System.Windows.Controls.Button;
             if (clear != null)
