@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -100,6 +103,7 @@ namespace Antd.Wpf.SmokeTests
             CheckQrEncoder();
             CheckNavigationAndMedia();
             CheckReviewFixes();
+            CheckAutomation();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2186,6 +2190,64 @@ namespace Antd.Wpf.SmokeTests
             ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
             DoEvents();
         }
+        // ---------------------------------------------------------------- automation
+
+        private static void CheckAutomation()
+        {
+            var button = new AntdButton { Content = "Save" };
+            var peer = UIElementAutomationPeer.CreatePeerForElement(button);
+
+            Check("button exposes an automation peer", peer != null, peer == null ? "none" : "ok");
+            Check("button reports ControlType.Button",
+                peer != null && peer.GetAutomationControlType() == AutomationControlType.Button,
+                peer == null ? "none" : peer.GetAutomationControlType().ToString());
+            Check("button name falls back to its content",
+                peer != null && peer.GetName() == "Save", peer == null ? "none" : peer.GetName());
+
+            var invoke = peer == null ? null : peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+            Check("button answers the Invoke pattern", invoke != null, invoke == null ? "missing" : "ok");
+
+            bool clicked = false;
+            button.Click += delegate { clicked = true; };
+            if (invoke != null) invoke.Invoke();
+            DoEvents();
+            Check("invoking the peer raises Click", clicked, clicked.ToString());
+
+            AutomationProperties.SetName(button, "Save record");
+            Check("explicit AutomationProperties.Name wins over content",
+                peer != null && peer.GetName() == "Save record", peer == null ? "none" : peer.GetName());
+
+            var disabled = new AntdButton { Content = "Nope", IsEnabled = false };
+            var disabledPeer = UIElementAutomationPeer.CreatePeerForElement(disabled);
+            var disabledInvoke = disabledPeer == null ? null : disabledPeer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+            bool disabledClicked = false;
+            disabled.Click += delegate { disabledClicked = true; };
+            if (disabledInvoke != null) disabledInvoke.Invoke();
+            Check("invoking a disabled button does nothing", !disabledClicked, disabledClicked.ToString());
+            var focusButton = new AntdButton { Content = "Focus me" };
+            var focusHost = new Window
+            {
+                Width = 260, Height = 100, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = new StackPanel { Margin = new Thickness(12), Children = { focusButton } }
+            };
+            focusHost.Show();
+            DoEvents();
+            focusHost.UpdateLayout();
+
+            var ring = focusButton.Template.FindName("FocusRing", focusButton) as FrameworkElement;
+            Check("button focus ring is hidden until focused",
+                ring != null && ring.Visibility == Visibility.Collapsed,
+                ring == null ? "missing" : ring.Visibility.ToString());
+
+            focusButton.Focus();
+            DoEvents();
+            Check("focused button shows a focus ring",
+                ring != null && ring.Visibility == Visibility.Visible,
+                ring == null ? "missing" : ring.Visibility + " focused=" + focusButton.IsKeyboardFocused);
+            focusHost.Close();
+
+        }
+
         private static void DoEvents()
         {
             var frame = new DispatcherFrame();

@@ -83,9 +83,22 @@
                                               VerticalAlignment="Center"
                                               RecognizesAccessKey="True" />
                         </StackPanel>
+
+                        <!-- Keyboard focus has to be visible: antd draws a 2px ring in controlOutline. -->
+                        <Border x:Name="FocusRing"
+                                Margin="-2"
+                                IsHitTestVisible="False"
+                                Visibility="Collapsed"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource Antd.controlOutline}"
+                                CornerRadius="{TemplateBinding CornerRadius}" />
                     </Grid>
 
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="FocusRing" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
                         <Trigger Property="IsDashed" Value="True">
                             <Setter TargetName="DashedOutline" Property="Visibility" Value="Visible" />
                             <Setter TargetName="SolidOutline" Property="BorderThickness" Value="0" />

@@ -13,7 +13,7 @@
 | M2 录入层 | 19 | **19** | 清单全部落地（能力边界见下） |
 | M3 展示层 | 21 | **21** | 清单全部落地（能力边界见下） |
 | M4 反馈层 | 7 | **7** | 清单全部落地（能力边界见下） |
-| M5 打磨 | — | 进行中 | 阴影：Modal / Drawer / Toast 已做；动效：入退场都有；无障碍、i18n 未做 |
+| M5 打磨 | — | 进行中 | 阴影：Modal / Drawer / Toast；动效：入退场都有；无障碍：Button/Alert/Result/Tag/Modal/Drawer 已补 Peer + 按钮焦点环；i18n 未做 |
 
 **组件进度：69 / 71。** 公开控件类型 97 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
 Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
@@ -121,8 +121,8 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 ## 测试
 
 - `tests/Antd.Wpf.TokenParity`：536 token × 10 配置 × 双 TFM 逐值对拍。
-- `tests/Antd.Wpf.SmokeTests`：255 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
+- `tests/Antd.Wpf.SmokeTests`：264 项断言（控件行为 + 视觉规格 + 架构边界），双 TFM 通过，
   附带渲染截图与 `--metrics` 尺寸导出。
-- `tests/Antd.Wpf.FeedbackTests`：62 项断言（M4 反馈层：配色、尺寸、弹层锚定、焦点陷阱、
+- `tests/Antd.Wpf.FeedbackTests`：72 项断言（M4 反馈层：配色、尺寸、弹层锚定、焦点陷阱、
   Esc/遮罩关闭、toast 队列与自动关闭），双 TFM 通过，`--shot` 输出 `m4-*.png`。
 - `tools/visual-ref`：真实 antd 在 Chrome 中的尺寸基线，用于视觉对拍。

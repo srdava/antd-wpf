@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -37,6 +38,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Alert : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AlertAutomationPeer(this);
+        }
         static Alert()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Alert), new FrameworkPropertyMetadata(typeof(Alert)));
@@ -346,6 +351,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Result : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new ResultAutomationPeer(this);
+        }
         static Result()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Result), new FrameworkPropertyMetadata(typeof(Result)));

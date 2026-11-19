@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -29,6 +30,8 @@ namespace Antd.Wpf.Controls
         private bool _closedRaised;
         private bool _opened;
         private DispatcherTimer _closeTimer;
+        private bool _retryScheduled;
+        private int _openAttempts;
 
         protected DialogBase()
         {
@@ -239,11 +242,23 @@ namespace Antd.Wpf.Controls
                 _closedRaised = false;
 
                 EnsureOwner();
-                if (_owner == null) return;
+                if (_owner == null)
+                {
+                    ScheduleOpenRetry();
+                    return;
+                }
 
                 PositionPopup();
                 SyncSurface();
                 _popup.IsOpen = true;
+
+                if (!_popup.IsOpen)
+                {
+                    ScheduleOpenRetry();
+                    return;
+                }
+
+                _openAttempts = 0;
 
                 _focusBeforeOpen = Keyboard.FocusedElement;
                 AnimateIn();
@@ -354,6 +369,24 @@ namespace Antd.Wpf.Controls
             scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1, 0.94, span) { EasingFunction = ease });
         }
 
+        /// <summary>
+        /// A dialog can be asked to open before it is plugged into a window (or before its template
+        /// is applied). Retry on the next idle pass instead of silently staying closed; two attempts
+        /// are enough and stop a hidden window from spinning forever.
+        /// </summary>
+        private void ScheduleOpenRetry()
+        {
+            if (_retryScheduled || _openAttempts >= 2) return;
+
+            _retryScheduled = true;
+            _openAttempts++;
+
+            Dispatcher.BeginInvoke(new Action(delegate
+            {
+                _retryScheduled = false;
+                if (IsOpen) ApplyOpenState(true);
+            }), DispatcherPriority.Loaded);
+        }
         private void EnsureOwner()
         {
             if (_owner != null) return;
@@ -467,6 +500,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Modal : DialogBase
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new DialogAutomationPeer(this);
+        }
         static Modal()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Modal), new FrameworkPropertyMetadata(typeof(Modal)));
@@ -675,6 +712,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Drawer : DialogBase
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new DialogAutomationPeer(this);
+        }
         static Drawer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Drawer), new FrameworkPropertyMetadata(typeof(Drawer)));

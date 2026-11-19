@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Antd.Wpf.Controls.Internal;
@@ -19,6 +20,11 @@ namespace Antd.Wpf.Controls
     /// <summary>antd Tag: a small status label, optionally closable.</summary>
     public class Tag : ContentControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new TagAutomationPeer(this);
+        }
+
         static Tag()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Tag), new FrameworkPropertyMetadata(typeof(Tag)));

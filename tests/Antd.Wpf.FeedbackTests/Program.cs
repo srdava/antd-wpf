@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -49,6 +51,7 @@ namespace Antd.Wpf.FeedbackTests
             CheckPopconfirm();
             CheckMessage();
             CheckNotification();
+            CheckAutomation();
 
             if (shotDir != null) Capture(shotDir);
 
@@ -661,6 +664,58 @@ namespace Antd.Wpf.FeedbackTests
         {
             var solid = brush as SolidColorBrush;
             return solid == null ? "null" : solid.Color.ToString();
+        }
+
+        // ---------------------------------------------------------------- automation
+
+        private static void CheckAutomation()
+        {
+            var alert = new Alert { Message = "Upload complete" };
+            var alertPeer = UIElementAutomationPeer.CreatePeerForElement(alert);
+            Check("alert exposes a peer named after its message",
+                alertPeer != null && alertPeer.GetName() == "Upload complete",
+                alertPeer == null ? "none" : alertPeer.GetName());
+            Check("alert reports ControlType.Text",
+                alertPeer != null && alertPeer.GetAutomationControlType() == AutomationControlType.Text,
+                alertPeer == null ? "none" : alertPeer.GetAutomationControlType().ToString());
+
+            var banner = new Alert { Banner = true, Description = "Only the description is set" };
+            var bannerPeer = UIElementAutomationPeer.CreatePeerForElement(banner);
+            Check("alert falls back to its description",
+                bannerPeer != null && bannerPeer.GetName() == "Only the description is set",
+                bannerPeer == null ? "none" : bannerPeer.GetName());
+
+            var result = new Result { Title = "Operation successful" };
+            var resultPeer = UIElementAutomationPeer.CreatePeerForElement(result);
+            Check("result announces its title",
+                resultPeer != null && resultPeer.GetName() == "Operation successful",
+                resultPeer == null ? "none" : resultPeer.GetName());
+
+            var tag = new Tag { Content = "Running" };
+            var tagPeer = UIElementAutomationPeer.CreatePeerForElement(tag);
+            Check("tag reads its content",
+                tagPeer != null && tagPeer.GetName() == "Running",
+                tagPeer == null ? "none" : tagPeer.GetName());
+
+            var modal = new Modal { Title = "Modal title" };
+            var modalPeer = UIElementAutomationPeer.CreatePeerForElement(modal);
+            Check("modal is a pane named after its title",
+                modalPeer != null && modalPeer.GetAutomationControlType() == AutomationControlType.Pane
+                && modalPeer.GetName() == "Modal title",
+                modalPeer == null ? "none" : modalPeer.GetAutomationControlType() + "/" + modalPeer.GetName());
+
+            var drawer = new Drawer { Title = "Drawer title" };
+            var drawerPeer = UIElementAutomationPeer.CreatePeerForElement(drawer);
+            Check("drawer is a pane named after its title",
+                drawerPeer != null && drawerPeer.GetAutomationControlType() == AutomationControlType.Pane
+                && drawerPeer.GetName() == "Drawer title",
+                drawerPeer == null ? "none" : drawerPeer.GetAutomationControlType() + "/" + drawerPeer.GetName());
+
+            var untitled = new Modal();
+            var untitledPeer = UIElementAutomationPeer.CreatePeerForElement(untitled);
+            Check("an untitled dialog reports an empty name, not null",
+                untitledPeer != null && untitledPeer.GetName() == string.Empty,
+                untitledPeer == null ? "none" : "\"" + untitledPeer.GetName() + "\"");
         }
 
         private static void DoEvents()

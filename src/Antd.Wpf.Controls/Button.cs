@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -38,6 +39,10 @@ namespace Antd.Wpf.Controls
         }
 
         // ---------------------------------------------------------------- properties
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdButtonAutomationPeer(this);
+        }
 
         public static readonly DependencyProperty VariantProperty = DependencyProperty.Register(
             "Variant", typeof(ButtonVariant), typeof(Button),
