@@ -15,6 +15,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Anchor : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Anchor");
+        }
         private ScrollViewer _hooked;
 
         static Anchor()

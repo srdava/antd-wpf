@@ -68,7 +68,7 @@ cd tools/token-sync && npm install && node dump-tokens.js
 ```
 src/Antd.Wpf.Tokens     netstandard2.0   纯计算：Seed → Map → Alias，无 WPF 依赖
 src/Antd.Wpf.Theme      net48;net8        ThemeManager / ThemeSnapshot / BrushSet / XAML 扩展
-src/Antd.Wpf.Icons      net48;net8        57 个 antd 图标的冻结 Geometry（由 tools/icon-gen 生成）
+src/Antd.Wpf.Icons      net48;net8        446 个 outlined 图标的懒加载 Geometry（由 tools/icon-gen 生成）
 src/Antd.Wpf.Controls   net48;net8        97 个控件类型 + Generic.xaml
 demo/Antd.Wpf.Gallery   net48;net8        组件图册（逐个控件看外观）
 demo/Antd.Wpf.Integration net48;net8   真实页面接入示例：表格 + 表单校验 + 弹窗 + 主题切换，自带 --selftest

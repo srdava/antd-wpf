@@ -107,6 +107,7 @@ namespace Antd.Wpf.SmokeTests
             CheckAutomation();
             CheckLocalization();
             CheckAutomationCoverage();
+            CheckIcons();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2351,6 +2352,23 @@ namespace Antd.Wpf.SmokeTests
             Check("every constructible control exposes an automation peer",
                 missing.Count == 0,
                 examined + " checked, missing: " + string.Join(", ", missing.ToArray()));
+        }
+
+        // ---------------------------------------------------------------- icon set
+
+        private static void CheckIcons()
+        {
+            int count = AntdIcons.Names.Count();
+            Check("the icon set covers the full outlined library", count >= 400, count.ToString());
+
+            var rocket = AntdIcons.ByName("rocket");
+            Check("icons resolve by antd name", rocket != null, rocket == null ? "missing" : "ok");
+            Check("unknown icon names resolve to null", AntdIcons.ByName("not-a-real-icon") == null, "not null");
+            Check("geometries are cached after first use",
+                ReferenceEquals(AntdIcons.ByName("rocket"), rocket), "different instance");
+            Check("icons keep the normalised 896 box",
+                Math.Abs(AntdIcons.BoxSize - 896) < 0.01 && AntdIcons.Search != null,
+                AntdIcons.BoxSize.ToString());
         }
 
         private static void DoEvents()

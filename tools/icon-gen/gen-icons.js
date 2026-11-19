@@ -105,32 +105,48 @@ lines.push('        /// <summary>Side length of the normalised icon box.</summar
 lines.push('        public const double BoxSize = 896;');
 lines.push('');
 
+// Lazily materialised: the full outlined set is ~400 icons, and parsing every geometry at type
+// init would cost startup time for icons the app never draws.
 for (const icon of icons) {
-  lines.push('        public static readonly Geometry ' + icon.field + ' = Create(' + csharpString(icon.data) + ');');
+  lines.push('        public static Geometry ' + icon.field + ' { get { return Get(' + csharpString(icon.name) + '); } }');
 }
 
 lines.push('');
-lines.push('        private static readonly Dictionary<string, Geometry> Lookup =');
-lines.push('            new Dictionary<string, Geometry>(StringComparer.OrdinalIgnoreCase)');
+lines.push('        private static readonly Dictionary<string, string> Data =');
+lines.push('            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)');
 lines.push('            {');
 for (const icon of icons) {
-  lines.push('                { ' + csharpString(icon.name) + ', ' + icon.field + ' },');
+  lines.push('                { ' + csharpString(icon.name) + ', ' + csharpString(icon.data) + ' },');
 }
 lines.push('            };');
+lines.push('');
+lines.push('        private static readonly Dictionary<string, Geometry> Cache =');
+lines.push('            new Dictionary<string, Geometry>(StringComparer.OrdinalIgnoreCase);');
 lines.push('');
 lines.push('        /// <summary>Looks an icon up by its antd name, for example "search".</summary>');
 lines.push('        public static Geometry ByName(string name)');
 lines.push('        {');
-lines.push('            Geometry geometry;');
-lines.push('            return name != null && Lookup.TryGetValue(name, out geometry) ? geometry : null;');
+lines.push('            return name == null ? null : Get(name);');
 lines.push('        }');
 lines.push('');
 lines.push('        public static IEnumerable<string> Names');
 lines.push('        {');
-lines.push('            get { return Lookup.Keys; }');
+lines.push('            get { return Data.Keys; }');
 lines.push('        }');
 lines.push('');
-lines.push('        private static Geometry Create(string data)');
+lines.push('        private static Geometry Get(string name)');
+lines.push('        {');
+lines.push('            Geometry cached;');
+lines.push('            if (Cache.TryGetValue(name, out cached)) return cached;');
+lines.push('');
+lines.push('            string data;');
+lines.push('            if (!Data.TryGetValue(name, out data)) return null;');
+lines.push('');
+lines.push('            Geometry geometry = Create(data);');
+lines.push('            Cache[name] = geometry;');
+lines.push('            return geometry;');
+lines.push('        }');
+lines.push('');lines.push('        private static Geometry Create(string data)');
 lines.push('        {');
 lines.push('            // Geometry.Parse returns an already frozen StreamGeometry, so the viewBox');
 lines.push('            // offset has to live on a wrapping group instead of the geometry itself.');

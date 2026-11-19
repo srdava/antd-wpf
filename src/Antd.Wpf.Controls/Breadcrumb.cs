@@ -14,6 +14,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Breadcrumb : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.List, "Breadcrumb");
+        }
         static Breadcrumb()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Breadcrumb), new FrameworkPropertyMetadata(typeof(Breadcrumb)));

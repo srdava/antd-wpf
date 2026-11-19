@@ -14,6 +14,10 @@ namespace Antd.Wpf.Controls
     /// </summary>
     public class Masonry : ItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.Group, "Masonry");
+        }
         static Masonry()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Masonry), new FrameworkPropertyMetadata(typeof(Masonry)));

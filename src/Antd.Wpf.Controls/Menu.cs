@@ -127,6 +127,10 @@ namespace Antd.Wpf.Controls
     /// <summary>A menu entry; may own children, in which case clicking toggles instead of selecting.</summary>
     public class MenuNode : HeaderedItemsControl
     {
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new AntdContainerAutomationPeer(this, AutomationControlType.ListItem, "MenuNode");
+        }
         static MenuNode()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuNode), new FrameworkPropertyMetadata(typeof(MenuNode)));
