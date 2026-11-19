@@ -8,6 +8,7 @@
     <AssemblyName>Antd.Wpf.Icons</AssemblyName>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Description>847 antd icons as lazily frozen WPF Geometry: outlined, filled and two-tone.</Description>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 

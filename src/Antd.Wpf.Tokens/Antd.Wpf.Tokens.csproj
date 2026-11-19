@@ -7,6 +7,7 @@
     <AssemblyName>Antd.Wpf.Tokens</AssemblyName>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Description>antd design tokens (seed to map to alias) ported to C#, with JavaScript-exact rounding so values match theme.getDesignToken().</Description>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>

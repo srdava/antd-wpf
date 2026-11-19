@@ -8,6 +8,7 @@
     <AssemblyName>Antd.Wpf.Theme</AssemblyName>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Description>Theme engine for Antd.Wpf: immutable token snapshots, frozen brushes and runtime light/dark/compact switching.</Description>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 

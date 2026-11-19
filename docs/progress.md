@@ -1,6 +1,6 @@
 # 进度状态
 
-最后更新：2026-11-05
+最后更新：2026-11-19
 
 对照 `docs/antd-wpf-implementation-plan.md` 的 71 项组件清单。
 
@@ -13,7 +13,8 @@
 | M2 录入层 | 19 | **19** | 清单全部落地（能力边界见下） |
 | M3 展示层 | 21 | **21** | 清单全部落地（能力边界见下） |
 | M4 反馈层 | 7 | **7** | 清单全部落地（能力边界见下） |
-| M5 打磨 | — | **完成** | 无障碍全量 Peer + 焦点环；i18n 中/英；入退场 + 减动效；弹窗/抽屉/Toast/浮层阴影；446 个 outlined 图标（懒加载） |
+| M5 打磨 | — | **完成** | 无障碍全量 Peer + 焦点环；i18n 中/英；入退场 + 减动效；弹窗/抽屉/Toast/浮层阴影；847 个图标（outlined/filled/twotone，懒加载） |
+| M6 稳定发布 | — | 进行中 | 1.0.0 四包 + snupkg 已打、文档站与迁移指南已产出；待定许可证与 nuget.org 发布 |
 
 **组件进度：69 / 71。** 公开控件类型 97 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
 Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
@@ -59,6 +60,24 @@ WPF 会把 `TextBox.Padding` 复制到内容宿主上，于是 22px 的文字区
 
 已知取舍：Spin 的旋转保留（属于「必要反馈」）；日期格式仍跟随 `CultureInfo`，与 `AntdLocale` 是两套机制。
 文档站不在 M5 内，单列为 M6（见路线图）。
+## M6 发布物
+
+| 产物 | 位置 | 说明 |
+|---|---|---|
+| NuGet 包 | `artifacts/packages/*.nupkg` | Tokens / Theme / Icons / Controls，各含 net48 + net8-windows 与 snupkg；包内含 README |
+| 组件文档站 | `docs/site/index.html` | 单文件、零外部依赖；73 个组件的属性表由 `tools/docs-gen` 反射程序集生成，不会与代码漂移 |
+| 迁移指南 | `docs/migration.md` | antd / AntDesign.WPF / 0.x 三条迁移路线 + 常见坑 |
+
+**发布前仍需**：选一个许可证（仓库目前没有 LICENSE，NuGet 要求）；连续 4 周无 P0/P1；给 nuget.org 一个 API Key 后 `dotnet nuget push`。
+
+打包命令：
+
+```bash
+dotnet pack src/Antd.Wpf.Controls -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Theme    -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Icons    -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Tokens   -c Release -o artifacts/packages
+```
 ## 能力完成度（别把组件数量当成能力齐全）
 
 上面的 69/71 是**基础版本**：属性、外观与常用交互可用。按「完整能力」口径，只有

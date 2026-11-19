@@ -8,6 +8,7 @@
     <AssemblyName>Antd.Wpf.Controls</AssemblyName>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Description>69 Ant Design controls for WPF on net48 and net8-windows, token driven, no third-party dependencies.</Description>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
