@@ -5,12 +5,16 @@ Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 
 当前状态：M1–M4 的**基础版本**全部落地（69/71 组件）。**能力完成度以 `docs/progress.md` 为准**——
 组件数量不等于能力齐全（Select 无搜索/多选、DatePicker 无区间、Table 无固定列等），接入前请先看那份能力表。
 M5 打磨已完成：无障碍 Peer 与焦点环、`AntdLocale` 中英文案、入退场动效与减动效开关、弹窗/抽屉/Toast/浮层的阴影分层。
-M6 已产出 1.0.0 包（`artifacts/packages`）、组件文档站（`docs/site/index.html`）与迁移指南（`docs/migration.md`），发布到 nuget.org 待定（需先定许可证）。
+**1.0.0 已于 2026-11-20 发布到 nuget.org**：[Controls](https://www.nuget.org/packages/Antd.Wpf.Controls) · [Theme](https://www.nuget.org/packages/Antd.Wpf.Theme) · [Icons](https://www.nuget.org/packages/Antd.Wpf.Icons) · [Tokens](https://www.nuget.org/packages/Antd.Wpf.Tokens)（MIT）。组件文档站见 `docs/site/index.html`，迁移指南见 `docs/migration.md`。
 每个组件的能力边界都写在 `docs/progress.md` 里，避免把「能跑」当成「对齐 antd」。
 完整路线图见 [`docs/antd-wpf-implementation-plan.md`](docs/antd-wpf-implementation-plan.md)，
 M0 落地记录见 [`docs/m0-implementation-notes.md`](docs/m0-implementation-notes.md)。
 
 ## 快速开始
+
+```bash
+dotnet add package Antd.Wpf.Controls --version 1.0.0
+```
 
 ```bash
 dotnet build Antd.Wpf.sln          # 双目标全量构建

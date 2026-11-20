@@ -14,7 +14,7 @@
 | M3 展示层 | 21 | **21** | 清单全部落地（能力边界见下） |
 | M4 反馈层 | 7 | **7** | 清单全部落地（能力边界见下） |
 | M5 打磨 | — | **完成** | 无障碍全量 Peer + 焦点环；i18n 中/英；入退场 + 减动效；弹窗/抽屉/Toast/浮层阴影；847 个图标（outlined/filled/twotone，懒加载） |
-| M6 稳定发布 | — | 进行中 | 1.0.0 四包 + snupkg（MIT）、文档站、迁移指南、包可用性检查；待 nuget.org 发布与 4 周观察期 |
+| M6 稳定发布 | — | **已发布** | 1.0.0 四包（MIT）2026-11-20 上线 nuget.org；文档站、迁移指南、包可用性检查齐备；剩 4 周观察期 |
 
 **组件进度：69 / 71。** 公开控件类型 97 个（Typography 拆 4、Layout 拆 5、Row/Col 拆 2、
 Tabs/Collapse/List/Steps/Timeline/Descriptions 各拆出 item 类型，另有若干数据模型类）。
@@ -68,6 +68,9 @@ WPF 会把 `TextBox.Padding` 复制到内容宿主上，于是 22px 的文字区
 | 组件文档站 | `docs/site/index.html` | 单文件、零外部依赖；73 个组件的属性表由 `tools/docs-gen` 反射程序集生成，不会与代码漂移 |
 | 迁移指南 | `docs/migration.md` | antd / AntDesign.WPF / 0.x 三条迁移路线 + 常见坑 |
 
+**发布记录**：2026-11-20 10:05–10:06 推送，10:19 全部索引完成（首次发布走了约 14 分钟校验）。
+线上验证方式：清空本地包缓存后，用 `-p:RestoreSources=https://api.nuget.org/v3/index.json`
+让 `tools/package-check` 只从 nuget.org 还原，输出 `VERIFY: PASS`。
 **发布前仍需**：连续 4 周无 P0/P1；给 nuget.org 一个 API Key 后 `dotnet nuget push`。许可证为 MIT：仓库根 `LICENSE` + 包内 `license type="expression"`；`tools/package-check` 会从 `artifacts/packages` 还原并验证包可用。
 
 四个包 ID 已核查：`Antd.Wpf.Tokens` / `.Theme` / `.Icons` / `.Controls` 在 nuget.org 上均未被占用（flatcontainer 返回 404），可直接上传。
