@@ -123,12 +123,31 @@ dotnet pack src/Antd.Wpf.Tokens   -c Release -o artifacts/packages
 # 2. 验证包能被真实项目安装并跑通（pack URI、主题、图标）
 dotnet run --project tools/package-check
 
-# 3. 发布（需要 nuget.org API Key）
+# 3. 发布（需要 nuget.org API Key，见下）
 dotnet nuget push "artifacts/packages/*.nupkg" -k $env:NUGET_API_KEY -s https://api.nuget.org/v3/index.json
 ```
 
 `tools/package-check` 是一个消费者工程：从 `artifacts/packages` 还原 `Antd.Wpf.Controls 1.0.0`，
 加载 `Themes/Framework.xaml`，实例化 Button/Modal，取图标集。包缺文件、依赖漏写都会在这里失败。
+
+### 首次发布：拿到 API Key
+
+1. 用 Microsoft 账号（Outlook / Hotmail / 企业 Entra ID）登录 <https://www.nuget.org>，
+   首次登录要注册一个用户名——它不可修改，会显示在包页面上。
+2. 在 Account settings 里开启 **两步验证**；没开 2FA 无法创建 API Key。
+3. 右上角头像 → **API Keys** → **Create**：
+   - Name：`antd-wpf-release`
+   - Expiration：90 天（上限 365）
+   - Scopes：**Push new packages and package versions**（首次发布必须有这个，否则新 ID 推不上去）
+   - Glob pattern：`Antd.Wpf.*`（限制这把钥匙只能推这四个包）
+4. 创建后**立刻复制**——页面只显示一次，丢了只能重新生成。
+5. 本地用环境变量保存，不要写进仓库：
+
+```bash
+setx NUGET_API_KEY "oy2xxxxxxxxxxxxxxxx"     # Windows，开新终端生效
+```
+
+推送后 nuget.org 有 10–60 秒的校验与索引时间，期间 `dotnet add package` 可能 404，属正常。
 
 ## 许可证
 
