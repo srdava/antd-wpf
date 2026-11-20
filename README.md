@@ -110,3 +110,26 @@ ThemeManager.Current.UpdateSeed(s => s.ColorPrimary = AntdColor.Parse("#00b96b")
 - XAML 用 `{DynamicResource Antd.<tokenName>}`（因为 `Setter.Value` 不允许 Binding），
   代码用 `ThemeManager.Current.Snapshot`，两条路径同源。
 - 所有 token 数值与 antd 官方实现逐值对拍，含 JS 与 C# 舍入差异、HSB/HSL 差异等坑。
+
+## 打包与发布
+
+```bash
+# 1. 打四个包（含 symbol 包）
+dotnet pack src/Antd.Wpf.Controls -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Theme    -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Icons    -c Release -o artifacts/packages
+dotnet pack src/Antd.Wpf.Tokens   -c Release -o artifacts/packages
+
+# 2. 验证包能被真实项目安装并跑通（pack URI、主题、图标）
+dotnet run --project tools/package-check
+
+# 3. 发布（需要 nuget.org API Key）
+dotnet nuget push "artifacts/packages/*.nupkg" -k $env:NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+```
+
+`tools/package-check` 是一个消费者工程：从 `artifacts/packages` 还原 `Antd.Wpf.Controls 1.0.0`，
+加载 `Themes/Framework.xaml`，实例化 Button/Modal，取图标集。包缺文件、依赖漏写都会在这里失败。
+
+## 许可证
+
+[MIT](LICENSE)。包内以 `<license type="expression">MIT</license>` 声明。
