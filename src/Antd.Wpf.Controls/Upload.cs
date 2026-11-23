@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
@@ -20,17 +22,60 @@ namespace Antd.Wpf.Controls
         Ready = 0,
         Uploading = 1,
         Done = 2,
-        Error = 3
+        Error = 3,
+        Cancelled = 4
     }
 
     /// <summary>One row in an <see cref="Upload"/> list.</summary>
-    public class UploadFile
+    public class UploadFile : System.ComponentModel.INotifyPropertyChanged
     {
         public string Name { get; set; }
         public string Path { get; set; }
         public long Size { get; set; }
-        public AntdUploadStatus Status { get; set; }
-        public double Progress { get; set; }
+
+        private AntdUploadStatus _status;
+        private double _progress;
+        private string _error;
+
+        public AntdUploadStatus Status
+        {
+            get { return _status; }
+            set { if (_status == value) return; _status = value; Raise("Status"); Raise("StatusText"); }
+        }
+
+        /// <summary>0-100, as reported by the host's uploader.</summary>
+        public double Progress
+        {
+            get { return _progress; }
+            set { if (Math.Abs(_progress - value) < 0.01) return; _progress = value; Raise("Progress"); }
+        }
+
+        public string Error
+        {
+            get { return _error; }
+            set { if (_error == value) return; _error = value; Raise("Error"); Raise("StatusText"); }
+        }
+
+        /// <summary>Short label for the row: "上传中 42%", "失败：xxx", "已取消".</summary>
+        public string StatusText
+        {
+            get
+            {
+                if (_status == AntdUploadStatus.Error) return string.IsNullOrEmpty(_error) ? AntdLocale.Current.UploadFailed : _error;
+                if (_status == AntdUploadStatus.Cancelled) return AntdLocale.Current.UploadCancelled;
+                if (_status == AntdUploadStatus.Uploading) return AntdLocale.Current.Uploading + " " + (int)_progress + "%";
+                if (_status == AntdUploadStatus.Done) return AntdLocale.Current.UploadDone;
+                return string.Empty;
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        private void Raise(string name)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) handler(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+        }
 
         /// <summary>Human readable size, the way antd prints it in the list.</summary>
         public string SizeText
@@ -121,6 +166,103 @@ namespace Antd.Wpf.Controls
         }
 
         public ObservableCollection<UploadFile> Files { get; private set; }
+        /// <summary>
+        /// Transport supplied by the host: report progress through the callback, honour the token.
+        /// The library never talks to the network itself, it only runs the queue.
+        /// </summary>
+        public Func<UploadFile, IProgress<double>, CancellationToken, Task> Uploader { get; set; }
+
+        /// <summary>How many files upload at the same time (default 3).</summary>
+        public int MaxConcurrent { get; set; }
+
+        /// <summary>Starts the queue as soon as files are added.</summary>
+        public bool AutoUpload { get; set; }
+
+        private readonly Dictionary<UploadFile, CancellationTokenSource> _tokens =
+            new Dictionary<UploadFile, CancellationTokenSource>();
+
+        /// <summary>Runs every pending file through <see cref="Uploader"/> with a concurrency cap.</summary>
+        public async Task StartUpload()
+        {
+            if (Uploader == null) return;
+
+            var pending = new List<UploadFile>();
+            for (int i = 0; i < Files.Count; i++)
+            {
+                UploadFile file = Files[i];
+                if (file.Status == AntdUploadStatus.Ready
+                    || file.Status == AntdUploadStatus.Error
+                    || file.Status == AntdUploadStatus.Cancelled)
+                {
+                    pending.Add(file);
+                }
+            }
+
+            if (pending.Count == 0) return;
+
+            var gate = new SemaphoreSlim(Math.Max(1, MaxConcurrent <= 0 ? 3 : MaxConcurrent));
+            var tasks = new List<Task>();
+            for (int i = 0; i < pending.Count; i++) tasks.Add(RunOne(pending[i], gate));
+
+            await Task.WhenAll(tasks).ConfigureAwait(true);
+        }
+
+        private async Task RunOne(UploadFile file, SemaphoreSlim gate)
+        {
+            await gate.WaitAsync().ConfigureAwait(true);
+
+            var source = new CancellationTokenSource();
+            _tokens[file] = source;
+
+            file.Error = null;
+            file.Progress = 0;
+            file.Status = AntdUploadStatus.Uploading;
+
+            try
+            {
+                var progress = new Progress<double>(delegate(double value) { file.Progress = value; });
+                await Uploader(file, progress, source.Token).ConfigureAwait(true);
+
+                if (source.IsCancellationRequested)
+                {
+                    file.Status = AntdUploadStatus.Cancelled;
+                }
+                else
+                {
+                    file.Progress = 100;
+                    file.Status = AntdUploadStatus.Done;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                file.Status = AntdUploadStatus.Cancelled;
+            }
+            catch (Exception error)
+            {
+                file.Error = error.Message;
+                file.Status = AntdUploadStatus.Error;
+            }
+            finally
+            {
+                _tokens.Remove(file);
+                source.Dispose();
+                gate.Release();
+            }
+        }
+
+        /// <summary>Cancels one in-flight file.</summary>
+        public void Cancel(UploadFile file)
+        {
+            CancellationTokenSource source;
+            if (file != null && _tokens.TryGetValue(file, out source)) source.Cancel();
+        }
+
+        /// <summary>Cancels everything still uploading.</summary>
+        public void CancelAll()
+        {
+            foreach (CancellationTokenSource source in _tokens.Values) source.Cancel();
+        }
+
 
         /// <summary>Raised with the files the user just picked or dropped.</summary>
         public event EventHandler<UploadFile[]> FileSelected;
@@ -215,6 +357,12 @@ namespace Antd.Wpf.Controls
         private void OnFilesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             SetValue(HasFilesKey, Files.Count > 0);
+
+            // Removing a row must not leave its request running in the background.
+            if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+            {
+                foreach (object removed in e.OldItems) Cancel(removed as UploadFile);
+            }
         }
 
         private void OnZoneKeyDown(object sender, KeyEventArgs e)
@@ -334,6 +482,11 @@ namespace Antd.Wpf.Controls
             }
 
             if (added.Count == 0) return;
+
+            if (AutoUpload && Uploader != null)
+            {
+                _ = StartUpload();
+            }
 
             EventHandler<UploadFile[]> handler = FileSelected;
             if (handler != null) handler(this, added.ToArray());

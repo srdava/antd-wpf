@@ -1541,6 +1541,10 @@
             <DataTrigger Binding="{Binding IsOutsideMonth}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsDisabled}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Antd.colorTextDisabled}" />
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding IsToday}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Antd.colorPrimary}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
@@ -2249,25 +2253,56 @@
                                             Margin="0,0,0,6"
                                             Padding="10,6">
                                         <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                            <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       VerticalAlignment="Center"
-                                                       FontSize="13"
-                                                       Foreground="{DynamicResource Antd.colorText}" />
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Column="1" Text="{Binding SizeText}"
-                                                       Margin="12,0,0,0"
-                                                       VerticalAlignment="Center"
-                                                       FontSize="12"
-                                                       Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="13"
+                                                           Foreground="{DynamicResource Antd.colorText}" />
 
-                                            <antd:UploadRemoveButton Grid.Column="2" />
+                                                <TextBlock Grid.Column="1" Text="{Binding SizeText}"
+                                                           Margin="12,0,0,0"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource Antd.colorTextTertiary}" />
+
+                                                <antd:UploadRemoveButton Grid.Column="2" />
+                                            </Grid>
+
+                                            <StackPanel Grid.Row="1" Margin="0,4,0,0">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="{x:Type StackPanel}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Ready">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+
+                                                <ProgressBar Height="2"
+                                                             Maximum="100"
+                                                             Value="{Binding Progress, Mode=OneWay}"
+                                                             BorderThickness="0"
+                                                             Background="{DynamicResource Antd.colorFillSecondary}"
+                                                             Foreground="{DynamicResource Antd.colorPrimary}" />
+
+                                                <TextBlock Text="{Binding StatusText}"
+                                                           FontSize="12"
+                                                           Margin="0,2,0,0"
+                                                           Foreground="{DynamicResource Antd.colorTextTertiary}" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -4390,7 +4425,8 @@
                                             <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Right"
                                                         Visibility="{TemplateBinding DefaultFooterVisibility}">
-                                                <antd:Button x:Name="PART_Cancel" Content="{TemplateBinding CancelText}" />
+                                                <antd:Button x:Name="PART_Cancel" Content="{TemplateBinding CancelText}"
+                                                             Visibility="{TemplateBinding ShowCancel, Converter={StaticResource Antd.BoolToVisibility}}" />
                                                 <antd:Button x:Name="PART_Ok"
                                                              Content="{TemplateBinding OkText}"
                                                              Variant="Primary"

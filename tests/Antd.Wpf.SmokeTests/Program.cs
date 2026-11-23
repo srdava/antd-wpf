@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -118,6 +119,10 @@ namespace Antd.Wpf.SmokeTests
             CheckFormAsync();
             CheckTableRowDetails();
             CheckRemoteSearch();
+            CheckImperativeModal();
+            CheckDisabledDates();
+            CheckTreeTable();
+            CheckUploadQueue();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2936,6 +2941,272 @@ namespace Antd.Wpf.SmokeTests
                 panel == null ? "no panel" : "panel ok");
 
             host.Close();
+        }
+
+        // ---------------------------------------------------------------- imperative modal
+
+        private static void CheckImperativeModal()
+        {
+            var root = new Grid();
+            var host = new Window
+            {
+                Width = 640, Height = 420, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = root
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            int oks = 0;
+            int cancels = 0;
+            var modal = Modal.Confirm(host, "删除确认", "确定要删除这条记录吗？",
+                delegate { oks++; }, delegate { cancels++; });
+
+            DoEvents();
+            Pump(200);
+
+            Check("confirm appends a modal to the owner window",
+                modal != null && root.Children.Contains(modal),
+                modal == null ? "null" : root.Children.Count.ToString());
+            Check("confirm opens itself", modal != null && modal.IsOpen,
+                modal == null ? "null" : modal.IsOpen.ToString());
+
+            var okButton = modal == null ? null : modal.Template.FindName("PART_Ok", modal) as Antd.Wpf.Controls.Button;
+            if (okButton != null)
+            {
+                okButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                DoEvents();
+                Pump(400);
+            }
+
+            Check("confirm runs the ok callback", oks == 1, oks.ToString());
+            Check("confirm removes itself once closed",
+                modal != null && !root.Children.Contains(modal),
+                root.Children.Count.ToString());
+
+            var info = Modal.Info("提示", "这是一条信息", host);
+            DoEvents();
+            Pump(200);
+
+            var cancelButton = info == null ? null : info.Template.FindName("PART_Cancel", info) as Antd.Wpf.Controls.Button;
+            Check("info hides the cancel button",
+                cancelButton != null && cancelButton.Visibility == Visibility.Collapsed,
+                cancelButton == null ? "missing" : cancelButton.Visibility.ToString());
+
+            if (info != null) info.Close();
+            DoEvents();
+            Pump(400);
+            Check("info leaves the window after closing",
+                info != null && !root.Children.Contains(info),
+                root.Children.Count.ToString());
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- disabled dates
+
+        private static void CheckDisabledDates()
+        {
+            var picker = new Antd.Wpf.Controls.DatePicker
+            {
+                Width = 240,
+                DisabledDate = delegate(DateTime d) { return d.DayOfWeek == DayOfWeek.Sunday; }
+            };
+
+            var host = new Window
+            {
+                Width = 720, Height = 420, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = picker
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            picker.IsDropDownOpen = true;
+            DoEvents();
+            Pump(150);
+
+            var calendar = picker.Template.FindName("PART_Calendar", picker) as Antd.Wpf.Controls.Calendar;
+            Check("calendar receives the disabled rule",
+                calendar != null && calendar.DisabledDate != null,
+                calendar == null ? "missing" : "ok");
+
+            CalendarDay sunday = null;
+            CalendarDay weekday = null;
+            if (calendar != null)
+            {
+                foreach (CalendarDay day in calendar.Days)
+                {
+                    if (day.IsOutsideMonth) continue;
+                    if (day.Date.DayOfWeek == DayOfWeek.Sunday && sunday == null) sunday = day;
+                    if (day.Date.DayOfWeek == DayOfWeek.Wednesday && weekday == null) weekday = day;
+                }
+            }
+
+            Check("sunday cells are flagged disabled",
+                sunday != null && sunday.IsDisabled, sunday == null ? "no sunday" : "flagged");
+            Check("weekday cells stay enabled",
+                weekday != null && !weekday.IsDisabled, weekday == null ? "no weekday" : "enabled");
+
+            var grid = calendar == null ? null : calendar.Template.FindName("PART_DayGrid", calendar) as System.Windows.Controls.ListBox;
+            if (grid != null && sunday != null)
+            {
+                grid.SelectedItem = sunday;
+                DoEvents();
+                Check("picking a disabled day is refused",
+                    !calendar.SelectedDate.HasValue || calendar.SelectedDate.Value.DayOfWeek != DayOfWeek.Sunday,
+                    calendar.SelectedDate.ToString());
+            }
+
+            if (grid != null && weekday != null)
+            {
+                grid.SelectedItem = weekday;
+                DoEvents();
+                Check("picking an enabled day still works",
+                    calendar.SelectedDate.HasValue && calendar.SelectedDate.Value.Day == weekday.Date.Day,
+                    calendar.SelectedDate.ToString());
+            }
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- tree table
+
+        private sealed class TreeRow
+        {
+            public string Name { get; set; }
+            public List<TreeRow> Children { get; set; }
+
+            public TreeRow(string name)
+            {
+                Name = name;
+                Children = new List<TreeRow>();
+            }
+        }
+
+        private static void CheckTreeTable()
+        {
+            var alpha = new TreeRow("alpha");
+            alpha.Children.Add(new TreeRow("alpha-1"));
+            alpha.Children.Add(new TreeRow("alpha-2"));
+
+            var beta = new TreeRow("beta");
+            var rows = new List<TreeRow> { alpha, beta };
+
+            var table = new Antd.Wpf.Controls.Table
+            {
+                TreeChildrenPath = "Children",
+                TreeTextPath = "Name"
+            };
+            table.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new System.Windows.Data.Binding("Name"),
+                Width = 180
+            });
+            table.ItemsSource = rows;
+            table.Height = 220;
+
+            var host = new Window
+            {
+                Width = 520, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = table
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            Check("tree table adds an expander column",
+                table.Columns.Count == 2 && table.Columns[0] is DataGridTemplateColumn,
+                table.Columns.Count.ToString());
+            Check("collapsed tree shows roots only", table.Items.Count == 2, table.Items.Count.ToString());
+
+            table.ToggleNode(alpha);
+            DoEvents();
+            Check("expanding a node reveals its children", table.Items.Count == 4, table.Items.Count.ToString());
+
+            table.ToggleNode(alpha);
+            DoEvents();
+            Check("collapsing hides them again", table.Items.Count == 2, table.Items.Count.ToString());
+
+            table.ExpandAllNodes();
+            DoEvents();
+            Check("expand all opens every node", table.Items.Count == 4, table.Items.Count.ToString());
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- upload queue
+
+        private static void CheckUploadQueue()
+        {
+            var upload = new Upload { MaxConcurrent = 2 };
+
+            int running = 0;
+            int peak = 0;
+            var gates = new List<TaskCompletionSource<bool>>();
+
+            upload.Uploader = delegate(UploadFile file, IProgress<double> progress, CancellationToken token)
+            {
+                running++;
+                if (running > peak) peak = running;
+
+                progress.Report(40);
+
+                var gate = new TaskCompletionSource<bool>();
+                gates.Add(gate);
+                token.Register(delegate { gate.TrySetCanceled(); });
+
+                return Task.Run(async delegate
+                {
+                    try
+                    {
+                        await gate.Task;
+                    }
+                    finally
+                    {
+                        running--;
+                    }
+                });
+            };
+
+            for (int i = 0; i < 3; i++)
+            {
+                upload.Files.Add(new UploadFile { Name = "file" + i, Status = AntdUploadStatus.Ready });
+            }
+
+            Task run = upload.StartUpload();
+            PumpUntil(delegate { return gates.Count >= 2; }, 3000);
+
+            Check("upload honours the concurrency cap", peak == 2, "peak=" + peak);
+            Check("only the capped files start",
+                upload.Files[0].Status == AntdUploadStatus.Uploading
+                && upload.Files[2].Status == AntdUploadStatus.Ready,
+                upload.Files[0].Status + "/" + upload.Files[2].Status);
+
+            PumpUntil(delegate { return Math.Abs(upload.Files[0].Progress - 40) < 0.01; }, 3000);
+            Check("progress reaches the row", Math.Abs(upload.Files[0].Progress - 40) < 0.01,
+                upload.Files[0].Progress.ToString());
+
+            upload.Cancel(upload.Files[0]);
+            PumpUntil(delegate { return upload.Files[0].Status == AntdUploadStatus.Cancelled; }, 3000);
+            Check("cancelling marks the row", upload.Files[0].Status == AntdUploadStatus.Cancelled,
+                upload.Files[0].Status.ToString());
+
+            // Third file starts once a slot frees up.
+            PumpUntil(delegate { return upload.Files[2].Status == AntdUploadStatus.Uploading; }, 3000);
+            Check("queued file starts after a slot frees", upload.Files[2].Status == AntdUploadStatus.Uploading,
+                upload.Files[2].Status.ToString());
+
+            for (int i = 0; i < gates.Count; i++) gates[i].TrySetResult(true);
+            PumpUntil(delegate { return run.IsCompleted; }, 4000);
+
+            Check("finishing marks rows done",
+                upload.Files[1].Status == AntdUploadStatus.Done && upload.Files[2].Status == AntdUploadStatus.Done,
+                upload.Files[1].Status + "/" + upload.Files[2].Status);
+            Check("finished rows read 100%", Math.Abs(upload.Files[1].Progress - 100) < 0.01,
+                upload.Files[1].Progress.ToString());
         }
 
         private static void DoEvents()

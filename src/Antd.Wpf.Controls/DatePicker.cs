@@ -109,6 +109,23 @@ namespace Antd.Wpf.Controls
             set { SetValue(CornerRadiusProperty, value); }
         }
 
+        public static readonly DependencyProperty DisabledDateProperty = DependencyProperty.Register(
+            "DisabledDate", typeof(Func<DateTime, bool>), typeof(DatePicker),
+            new FrameworkPropertyMetadata(null, OnDisabledDateChanged));
+
+        /// <summary>Returns true for dates that must not be selectable (weekends, past dates...).</summary>
+        public Func<DateTime, bool> DisabledDate
+        {
+            get { return (Func<DateTime, bool>)GetValue(DisabledDateProperty); }
+            set { SetValue(DisabledDateProperty, value); }
+        }
+
+        private static void OnDisabledDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var picker = (DatePicker)d;
+            if (picker._calendar != null) picker._calendar.DisabledDate = picker.DisabledDate;
+            if (picker._endCalendar != null) picker._endCalendar.DisabledDate = picker.DisabledDate;
+        }
         public static readonly DependencyProperty IsRangeProperty = DependencyProperty.Register(
             "IsRange", typeof(bool), typeof(DatePicker),
             new FrameworkPropertyMetadata(false, OnRangeModeChanged));
@@ -192,6 +209,8 @@ namespace Antd.Wpf.Controls
             _today = GetTemplateChild("PART_Today") as Button;
 
             if (_today != null) _today.Content = AntdLocale.Current.Today;
+            if (_calendar != null) _calendar.DisabledDate = DisabledDate;
+            if (_endCalendar != null) _endCalendar.DisabledDate = DisabledDate;
             if (_endCalendar != null) _endCalendar.Visibility = IsRange ? Visibility.Visible : Visibility.Collapsed;
             if (_field != null) _field.MouseLeftButtonUp += OnFieldClick;
             if (_clear != null) _clear.Click += OnClearClick;

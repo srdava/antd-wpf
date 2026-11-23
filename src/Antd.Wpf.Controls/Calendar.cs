@@ -29,6 +29,9 @@ namespace Antd.Wpf.Controls
         public bool IsOutsideMonth { get; private set; }
         public bool IsToday { get; private set; }
 
+        /// <summary>Blocked by the host (for example "no dates before today").</summary>
+        public bool IsDisabled { get; set; }
+
         /// <summary>Stable identity so re-rendering a month keeps the selection.</summary>
         public string Key { get; private set; }
 
@@ -49,6 +52,18 @@ namespace Antd.Wpf.Controls
         {
             return new AntdContainerAutomationPeer(this, AutomationControlType.Calendar, "Calendar");
         }
+        /// <summary>Returns true for dates the user must not be able to pick.</summary>
+        public Func<DateTime, bool> DisabledDate
+        {
+            get { return _disabledDate; }
+            set
+            {
+                _disabledDate = value;
+                Rebuild();
+            }
+        }
+
+        private Func<DateTime, bool> _disabledDate;
         private ListBox _grid;
         private Button _prev;
         private Button _next;
@@ -181,6 +196,16 @@ namespace Antd.Wpf.Controls
             var day = _grid.SelectedItem as CalendarDay;
             if (day == null) return;
 
+            if (day.IsDisabled)
+            {
+                // Put the highlight back where it was instead of accepting a blocked date.
+                _syncing = true;
+                _grid.SelectedItem = null;
+                if (SelectedDate.HasValue) { /* keep the model value untouched */ }
+                _syncing = false;
+                return;
+            }
+
             SetCurrentValue(SelectedDateProperty, day.Date);
             EventHandler<DateTime> handler = SelectedDateChanged;
             if (handler != null) handler(this, day.Date);
@@ -198,7 +223,9 @@ namespace Antd.Wpf.Controls
 
             for (int i = 0; i < 42; i++)
             {
-                cells.Add(new CalendarDay(cursor, cursor.Month != month.Month, cursor.Date == DateTime.Today));
+                var cell = new CalendarDay(cursor, cursor.Month != month.Month, cursor.Date == DateTime.Today);
+                cell.IsDisabled = _disabledDate != null && _disabledDate(cursor);
+                cells.Add(cell);
                 cursor = cursor.AddDays(1);
             }
 

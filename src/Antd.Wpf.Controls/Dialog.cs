@@ -659,6 +659,16 @@ namespace Antd.Wpf.Controls
                 ShowFooter && Footer == null ? Visibility.Visible : Visibility.Collapsed);
         }
 
+        public static readonly DependencyProperty ShowCancelProperty = DependencyProperty.Register(
+            "ShowCancel", typeof(bool), typeof(Modal),
+            new FrameworkPropertyMetadata(true, OnChromeChanged));
+
+        /// <summary>Hides the cancel button (Info / Success / Warning / Error use only OK).</summary>
+        public bool ShowCancel
+        {
+            get { return (bool)GetValue(ShowCancelProperty); }
+            set { SetValue(ShowCancelProperty, value); }
+        }
         /// <summary>Raised by the OK button. The dialog closes unless a handler sets <c>Handled</c>.</summary>
         public event EventHandler<ModalButtonEventArgs> Ok;
 
@@ -691,6 +701,92 @@ namespace Antd.Wpf.Controls
             if (_closeHost != null) { _closeHost.MouseLeftButtonUp -= OnCloseClick; _closeHost = null; }
         }
 
+        /// <summary>
+        /// antd's imperative API: builds the dialog, drops it into the owner window's content and
+        /// shows it. The dialog removes itself once closed, so callers do not have to hold a reference.
+        /// </summary>
+        public static Modal Confirm(string title, object content, Action onOk = null, Action onCancel = null)
+        {
+            return Confirm(null, title, content, onOk, onCancel);
+        }
+
+        public static Modal Confirm(Window owner, string title, object content, Action onOk = null, Action onCancel = null)
+        {
+            return ShowImperative(owner, title, content, true, onOk, onCancel);
+        }
+
+        public static Modal Info(string title, object content, Window owner = null)
+        {
+            return ShowImperative(owner, title, content, false, null, null);
+        }
+
+        public static Modal Success(string title, object content, Window owner = null)
+        {
+            return ShowImperative(owner, title, content, false, null, null);
+        }
+
+        public static Modal Warning(string title, object content, Window owner = null)
+        {
+            return ShowImperative(owner, title, content, false, null, null);
+        }
+
+        public static Modal Error(string title, object content, Window owner = null)
+        {
+            return ShowImperative(owner, title, content, false, null, null);
+        }
+
+        private static Modal ShowImperative(Window owner, string title, object content, bool withCancel,
+            Action onOk, Action onCancel)
+        {
+            Window window = owner;
+            if (window == null && Application.Current != null) window = Application.Current.MainWindow;
+            if (window == null) return null;
+
+            Panel host = EnsureOverlayHost(window);
+            if (host == null) return null;
+
+            var modal = new Modal
+            {
+                Title = title,
+                Content = content,
+                ShowCancel = withCancel,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            if (onOk != null)
+            {
+                modal.Ok += delegate(object sender, ModalButtonEventArgs e) { onOk(); };
+            }
+
+            if (onCancel != null)
+            {
+                modal.Canceled += delegate { onCancel(); };
+            }
+
+            modal.Closed += delegate
+            {
+                if (host.Children.Contains(modal)) host.Children.Remove(modal);
+            };
+
+            host.Children.Add(modal);
+            modal.Open();
+            return modal;
+        }
+
+        /// <summary>Returns a panel that spans the window, wrapping the content when needed.</summary>
+        private static Panel EnsureOverlayHost(Window window)
+        {
+            var grid = window.Content as Grid;
+            if (grid != null) return grid;
+
+            var content = window.Content as UIElement;
+            var host = new Grid();
+            window.Content = null;
+            if (content != null) host.Children.Add(content);
+            window.Content = host;
+            return host;
+        }
         private void OnOkClick(object sender, RoutedEventArgs e)
         {
             var args = new ModalButtonEventArgs();

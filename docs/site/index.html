@@ -514,6 +514,7 @@ AntdMotion.UseSystemDefault();</code></pre>
 <tr><td><code>AllowClear</code></td><td>Boolean</td><td>true</td></tr>
 <tr><td><code>CanClear</code></td><td>Boolean</td><td>false</td></tr>
 <tr><td><code>CornerRadius</code></td><td>CornerRadius</td><td>CornerRadius</td></tr>
+<tr><td><code>DisabledDate</code></td><td>Func`2</td><td>null</td></tr>
 <tr><td><code>DisplayText</code></td><td>String</td><td>&quot;&quot;</td></tr>
 <tr><td><code>Format</code></td><td>String</td><td>&quot;yyyy-MM-dd&quot;</td></tr>
 <tr><td><code>IsDropDownOpen</code></td><td>Boolean</td><td>false</td></tr>
@@ -870,6 +871,9 @@ AntdMotion.UseSystemDefault();</code></pre>
 <tr><td><code>EmptyText</code></td><td>String</td><td>null</td></tr>
 <tr><td><code>HasRows</code></td><td>Boolean</td><td>false</td></tr>
 <tr><td><code>ShowRowDetails</code></td><td>Boolean</td><td>false</td></tr>
+<tr><td><code>TreeChildrenPath</code></td><td>String</td><td>null</td></tr>
+<tr><td><code>TreeIndent</code></td><td>Double</td><td>16</td></tr>
+<tr><td><code>TreeTextPath</code></td><td>String</td><td>null</td></tr>
 </tbody></table>
 </section>
 <section class="comp" id="Tag">
@@ -969,6 +973,7 @@ AntdMotion.UseSystemDefault();</code></pre>
 <tr><td><code>Footer</code></td><td>Object</td><td>null</td></tr>
 <tr><td><code>OkLoading</code></td><td>Boolean</td><td>false</td></tr>
 <tr><td><code>OkText</code></td><td>String</td><td>null</td></tr>
+<tr><td><code>ShowCancel</code></td><td>Boolean</td><td>true</td></tr>
 <tr><td><code>ShowFooter</code></td><td>Boolean</td><td>true</td></tr>
 <tr><td><code>Title</code></td><td>Object</td><td>null</td></tr>
 </tbody></table>
@@ -1065,11 +1070,11 @@ AntdMotion.UseSystemDefault();</code></pre>
 <p>“已实现”指基础版本：属性、外观与常用交互可用。以下差距已知，接入前请确认：</p>
 <table><thead><tr><th>需求</th><th>组件</th><th>现状</th></tr></thead><tbody>
 <tr><td>分组 / 搜索节流</td><td>Select</td><td>单选/多选、本地与远程搜索、虚拟化都已支持</td></tr>
-<tr><td>禁用日期 / 快捷选项</td><td>DatePicker</td><td>单日期与双月区间已支持</td></tr>
+<tr><td>周/月/季/年视图</td><td>DatePicker</td><td>单日期、双月区间、禁用日期已支持</td></tr>
 <tr><td>树形行 / 可编辑单元格</td><td>Table</td><td>固定列与展开行已可用</td></tr>
 <tr><td>跨字段联动 / INotifyDataErrorInfo</td><td>Form</td><td>同步与异步校验都已支持</td></tr>
-<tr><td>上传队列 / 进度</td><td>Upload</td><td>只收集文件，不做传输</td></tr>
-<tr><td>树异步加载 / 拖拽</td><td>Tree</td><td>静态数据</td></tr>
+<tr><td>内置传输实现</td><td>Upload</td><td>队列/并发/进度/取消已由库管，传输函数由宿主提供</td></tr>
+<tr><td>树异步加载 / 拖拽</td><td>Tree</td><td>静态数据；表格侧的树形行已支持</td></tr>
 <tr><td>双色图标分色渲染</td><td>AntdIcons</td><td>two-tone 合并为单色</td></tr>
 </tbody></table>
 </section>

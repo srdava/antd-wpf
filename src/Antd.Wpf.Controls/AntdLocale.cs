@@ -21,6 +21,10 @@ namespace Antd.Wpf.Controls
             Cancel = "Cancel";
             Search = "Search";
             Today = "Today";
+            Uploading = "uploading";
+            UploadDone = "done";
+            UploadFailed = "upload failed";
+            UploadCancelled = "cancelled";
         }
 
         /// <summary>Validation message for a required <see cref="FormItem"/> that is empty.</summary>
@@ -50,6 +54,12 @@ namespace Antd.Wpf.Controls
         /// <summary>Footer shortcut in the date picker panel.</summary>
         public string Today { get; set; }
 
+        /// <summary>Upload row states.</summary>
+        public string Uploading { get; set; }
+        public string UploadDone { get; set; }
+        public string UploadFailed { get; set; }
+        public string UploadCancelled { get; set; }
+
         public static AntdStrings CreateEnglish()
         {
             return new AntdStrings();
@@ -67,6 +77,10 @@ namespace Antd.Wpf.Controls
             strings.Cancel = "取消";
             strings.Search = "搜索";
             strings.Today = "今天";
+            strings.Uploading = "上传中";
+            strings.UploadDone = "已完成";
+            strings.UploadFailed = "上传失败";
+            strings.UploadCancelled = "已取消";
             return strings;
         }
 
@@ -82,7 +96,11 @@ namespace Antd.Wpf.Controls
                 Ok = Ok,
                 Cancel = Cancel,
                 Search = Search,
-                Today = Today
+                Today = Today,
+                Uploading = Uploading,
+                UploadDone = UploadDone,
+                UploadFailed = UploadFailed,
+                UploadCancelled = UploadCancelled
             };
         }
     }
