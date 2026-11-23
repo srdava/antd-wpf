@@ -123,6 +123,7 @@ namespace Antd.Wpf.SmokeTests
             CheckDisabledDates();
             CheckTreeTable();
             CheckUploadQueue();
+            CheckSelectClickPath();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -3243,6 +3244,65 @@ namespace Antd.Wpf.SmokeTests
                 for (int i = 0; i < count; i++) queue.Enqueue(VisualTreeHelper.GetChild(node, i));
             }
             return found;
+        }
+
+        // ---------------------------------------------------------------- select click path
+
+        private static void CheckSelectClickPath()
+        {
+            var select = new Select { Width = 240, Placeholder = "请选择" };
+            select.Items.Add("甲");
+            select.Items.Add("乙");
+
+            var stack = new StackPanel();
+            stack.Children.Add(select);
+
+            var host = new Window
+            {
+                Width = 640, Height = 420, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = stack
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            var toggle = select.Template.FindName("PART_Toggle", select) as System.Windows.Controls.Primitives.ToggleButton;
+            Check("select exposes a toggle that opens the dropdown", toggle != null,
+                toggle == null ? "missing PART_Toggle" : "ok");
+
+            if (toggle != null)
+            {
+                toggle.IsChecked = true;
+                DoEvents();
+                Pump(150);
+            }
+
+            Check("toggling the field opens the dropdown", select.IsDropDownOpen, select.IsDropDownOpen.ToString());
+            Check("open dropdown builds item containers", CountContainers(select) == 2, CountContainers(select).ToString());
+
+            select.SelectedIndex = 1;
+            DoEvents();
+            Check("picking an item fills the field",
+                select.SelectionBoxItem != null && select.SelectionBoxItem.ToString() == "乙",
+                "" + select.SelectionBoxItem);
+
+            var clear = select.Template.FindName("PART_ClearButton", select) as System.Windows.Controls.Button;
+            if (clear != null) clear.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+            DoEvents();
+            Check("clear button still reaches the control", select.SelectedIndex == -1, select.SelectedIndex.ToString());
+
+            host.Close();
+        }
+
+        private static int CountContainers(ItemsControl control)
+        {
+            int count = 0;
+            for (int i = 0; i < control.Items.Count; i++)
+            {
+                if (control.ItemContainerGenerator.ContainerFromIndex(i) != null) count++;
+            }
+            return count;
         }
 
         private static void DoEvents()

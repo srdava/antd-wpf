@@ -1232,7 +1232,20 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
+                                <!-- ComboBox opens from a ToggleButton in WPF's default template; a custom
+                                     template has to provide one or clicking the field does nothing. -->
+                                <ToggleButton x:Name="PART_Toggle" Grid.ColumnSpan="3"
+                                              Focusable="False" ClickMode="Press"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Border Background="Transparent" />
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+
                                 <ContentPresenter x:Name="SelectionHost" Grid.Column="0"
+                                                  IsHitTestVisible="False"
                                                   Content="{TemplateBinding SelectionBoxItem}"
                                                   ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                                   ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
@@ -1242,6 +1255,7 @@
                                             Visibility="Collapsed" Margin="0,3,0,3" />
 
                                 <TextBlock x:Name="PlaceholderHost" Grid.Column="0"
+                                           IsHitTestVisible="False"
                                            Text="{TemplateBinding Placeholder}"
                                            Foreground="{TemplateBinding PlaceholderBrush}"
                                            VerticalAlignment="Center" Visibility="Collapsed" />

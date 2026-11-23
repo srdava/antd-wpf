@@ -2,7 +2,7 @@
 
   <!-- Package metadata shared by the four libraries. Demos and test harnesses are not packed. -->
   <PropertyGroup>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Antd.Wpf contributors</Authors>
     <Company>Antd.Wpf</Company>
     <Product>Ant Design for WPF</Product>
