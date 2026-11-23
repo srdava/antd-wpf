@@ -27,6 +27,16 @@
 | 断言 | 组件 347 + 反馈层 76 + 真实页面 28，net48 与 net8 双跑 |
 | 无障碍 | 92 个可构造控件 100% 有 AutomationPeer，统一焦点环，键盘可达 |
 
+## 截图
+
+核心组件（由 `tools/shots` 用真实控件渲染，随代码更新）：
+
+![核心组件](docs/assets/readme-components.png)
+
+真实页面（表格 + 表单校验 + 弹窗 + 主题切换，来自 `demo/Antd.Wpf.Integration`）：
+
+![真实页面](docs/assets/integration-light.png)
+
 ## 安装
 
 ```bash
@@ -118,6 +128,9 @@ dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows -- --selftest
 # 生成文档站与中英文手册
 dotnet run --project tools/docs-gen
 
+# 重新渲染 README 截图
+dotnet run --project tools/shots
+
 # 打包并验证包能被真实项目安装
 dotnet pack src/Antd.Wpf.Controls -c Release -o artifacts/packages
 dotnet run --project tools/package-check
@@ -136,6 +149,7 @@ tests/                                    三个零依赖断言程序
 tools/token-sync                          Node：从 antd 导出 golden token 对拍
 tools/icon-gen                            Node：从 @ant-design/icons-svg 生成 Geometry
 tools/docs-gen                            net8：反射程序集生成文档站与中英文手册
+tools/shots                               net8：用真实控件渲染 README 截图
 tools/package-check                       消费者工程：验证发布的包能装能用
 ```
 

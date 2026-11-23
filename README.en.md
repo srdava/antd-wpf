@@ -27,6 +27,16 @@ Ant Design's **token computation ported to C#**, so WPF controls read colours an
 | Assertions | 347 component + 76 feedback + 28 real-page checks, on both TFMs |
 | Accessibility | AutomationPeer on all 92 constructible controls, shared focus ring, keyboard paths |
 
+## Screenshots
+
+Core components (rendered from the real controls by `tools/shots`, so they track the code):
+
+![Core components](docs/assets/readme-components.png)
+
+A real page (table + form validation + dialog + theme switch, from `demo/Antd.Wpf.Integration`):
+
+![Real page](docs/assets/integration-light.png)
+
 ## Install
 
 ```bash
@@ -118,6 +128,9 @@ dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows -- --selftest
 # Regenerate the component site and both handbooks
 dotnet run --project tools/docs-gen
 
+# Re-render the README screenshots
+dotnet run --project tools/shots
+
 # Pack and prove the nupkg installs in a real project
 dotnet pack src/Antd.Wpf.Controls -c Release -o artifacts/packages
 dotnet run --project tools/package-check
@@ -136,6 +149,7 @@ tests/                                   Three assertion programs, zero dependen
 tools/token-sync                         Node: exports golden tokens from antd
 tools/icon-gen                           Node: builds Geometry from @ant-design/icons-svg
 tools/docs-gen                           net8: reflects the assembly into docs and handbooks
+tools/shots                              net8: renders the README screenshots from live controls
 tools/package-check                      Consumer project: proves the published packages work
 ```
 
