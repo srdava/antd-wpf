@@ -179,6 +179,7 @@ namespace Antd.Wpf.Controls
 
             _field = GetTemplateChild("PART_Field") as Border;
             _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
+            Internal.PopupShadow.Apply(_popup, this);
             PopupAnchor.Attach(_popup, this);
             _hours = GetTemplateChild("PART_Hours") as ListBox;
             _minutes = GetTemplateChild("PART_Minutes") as ListBox;

@@ -126,6 +126,7 @@ namespace Antd.Wpf.Controls
 
             _editor = GetTemplateChild("PART_Editor") as TextBox;
             _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
+            Internal.PopupShadow.Apply(_popup, this);
             _list = GetTemplateChild("PART_Suggestions") as ListBox;
 
             if (_editor != null)

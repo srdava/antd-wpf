@@ -125,6 +125,7 @@ namespace Antd.Wpf.SmokeTests
             CheckUploadQueue();
             CheckSelectClickPath();
             CheckSelectPopupGeometry();
+            CheckPickerShadows();
             if (Environment.GetCommandLineArgs().Contains("--shots")) DumpSelectPopup(System.IO.Path.Combine("artifacts", "select-popup.png"));
 
             if (shotDir != null) CaptureGallery(shotDir);
@@ -3410,6 +3411,64 @@ namespace Antd.Wpf.SmokeTests
             using (System.IO.FileStream stream = System.IO.File.Create(path)) encoder.Save(stream);
 
             Console.WriteLine("dumped " + path);
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- picker popup shadows
+
+        private static void CheckPickerShadows()
+        {
+            CheckPickerPopup("datepicker", new Antd.Wpf.Controls.DatePicker { Width = 260 });
+            CheckPickerPopup("timepicker", new Antd.Wpf.Controls.TimePicker { Width = 260 });
+            CheckPickerPopup("cascader", new Antd.Wpf.Controls.Cascader { Width = 260 });
+            CheckPickerPopup("mentions", new Antd.Wpf.Controls.Mentions { Width = 260 });
+            CheckPickerPopup("treeselect", new Antd.Wpf.Controls.TreeSelect { Width = 260 });
+        }
+
+        private static void CheckPickerPopup(string label, FrameworkElement picker)
+        {
+            var stack = new StackPanel { Margin = new Thickness(40, 30, 0, 0), HorizontalAlignment = HorizontalAlignment.Left };
+            stack.Children.Add(picker);
+
+            var host = new Window
+            {
+                Width = 760, Height = 620, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = stack
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            var openProperty = picker.GetType().GetProperty("IsDropDownOpen");
+            if (openProperty != null) openProperty.SetValue(picker, true, null);
+            DoEvents();
+            Pump(350);
+
+            var popupField = picker.GetType().GetField("_popup", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var popup = popupField == null ? null : popupField.GetValue(picker) as System.Windows.Controls.Primitives.Popup;
+            var panel = popup == null ? null : popup.Child as FrameworkElement;
+
+            Check(label + " popup opens", panel != null, panel == null ? "missing" : "ok");
+            if (panel == null)
+            {
+                host.Close();
+                return;
+            }
+
+            Check(label + " panel carries the shadow", panel.Effect != null,
+                panel.Effect == null ? "no effect" : panel.Effect.GetType().Name);
+            Check(label + " panel reserves the shadow gutter",
+                Math.Abs(panel.Margin.Left - 16) < 0.5, panel.Margin.ToString());
+
+            Point field = picker.PointToScreen(new Point(0, 0));
+            Point origin = panel.PointToScreen(new Point(0, 0));
+            double dx = origin.X - field.X;
+            double dy = origin.Y - (field.Y + picker.ActualHeight);
+
+            Check(label + " panel aligns with the field", Math.Abs(dx) < 1.5, dx.ToString("0.#"));
+            Check(label + " panel sits 4px under the field", Math.Abs(dy - 4) < 2.5, dy.ToString("0.#"));
+
             host.Close();
         }
 

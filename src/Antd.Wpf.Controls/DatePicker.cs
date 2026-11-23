@@ -202,6 +202,7 @@ namespace Antd.Wpf.Controls
 
             _field = GetTemplateChild("PART_Field") as Border;
             _popup = AntdMotion.Configure(GetTemplateChild("PART_Popup") as Popup);
+            Internal.PopupShadow.Apply(_popup, this);
             PopupAnchor.Attach(_popup, this);
             _calendar = GetTemplateChild("PART_Calendar") as Calendar;
             _endCalendar = GetTemplateChild("PART_EndCalendar") as Calendar;
