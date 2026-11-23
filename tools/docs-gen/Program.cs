@@ -810,7 +810,9 @@ namespace Antd.Wpf.DocsGen
 
         private static string EmbedScreenshot(string root)
         {
-            string shot = Path.Combine(root, "artifacts", "integration-light.png");
+            // Prefer the committed asset so the site renders the same in CI, where artifacts/ (gitignored) is absent.
+            string shot = Path.Combine(root, "docs", "assets", "integration-light.png");
+            if (!File.Exists(shot)) shot = Path.Combine(root, "artifacts", "integration-light.png");
             if (!File.Exists(shot)) return string.Empty;
 
             string base64 = Convert.ToBase64String(File.ReadAllBytes(shot));
