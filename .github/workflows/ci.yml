@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-and-verify:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Both target frameworks: net48 proves the .NET Framework build still compiles,
+      # net8.0-windows is the modern head.
+      - name: Build (net48 + net8.0-windows)
+        run: dotnet build Antd.Wpf.sln -c Release --nologo
+
+      # Pure computation, no UI: 536 tokens across 10 theme configurations, per target.
+      - name: Token parity (net8.0)
+        run: dotnet run --project tests/Antd.Wpf.TokenParity -c Release -f net8.0
+
+      - name: Token parity (net48)
+        run: dotnet run --project tests/Antd.Wpf.TokenParity -c Release -f net48
+
+      # The handbooks and the component site are generated from the assembly; if a dependency
+      # property changed without re-running the generator, this fails and shows the diff.
+      - name: Documentation is in sync
+        run: |
+          dotnet run --project tools/docs-gen -c Release
+          git diff --exit-code -- docs/
+
+      # UI suites create real windows, so they only run on an interactive desktop.
+      # Run them locally:
+      #   dotnet run --project tests/Antd.Wpf.SmokeTests -f net8.0-windows -- --shot artifacts
+      #   dotnet run --project tests/Antd.Wpf.FeedbackTests -f net8.0-windows
+      #   dotnet run --project demo/Antd.Wpf.Integration -f net8.0-windows -- --selftest
+      - name: Note on UI suites
+        run: echo "UI assertion suites are skipped on hosted runners (no interactive desktop). See the comment in ci.yml."

@@ -25,6 +25,8 @@ namespace Antd.Wpf.Controls
             UploadDone = "done";
             UploadFailed = "upload failed";
             UploadCancelled = "cancelled";
+            Expand = "Expand";
+            Collapse = "Collapse";
         }
 
         /// <summary>Validation message for a required <see cref="FormItem"/> that is empty.</summary>
@@ -60,6 +62,10 @@ namespace Antd.Wpf.Controls
         public string UploadFailed { get; set; }
         public string UploadCancelled { get; set; }
 
+        /// <summary>Tree/table expander names.</summary>
+        public string Expand { get; set; }
+        public string Collapse { get; set; }
+
         public static AntdStrings CreateEnglish()
         {
             return new AntdStrings();
@@ -81,6 +87,8 @@ namespace Antd.Wpf.Controls
             strings.UploadDone = "已完成";
             strings.UploadFailed = "上传失败";
             strings.UploadCancelled = "已取消";
+            strings.Expand = "展开";
+            strings.Collapse = "收起";
             return strings;
         }
 
@@ -100,7 +108,9 @@ namespace Antd.Wpf.Controls
                 Uploading = Uploading,
                 UploadDone = UploadDone,
                 UploadFailed = UploadFailed,
-                UploadCancelled = UploadCancelled
+                UploadCancelled = UploadCancelled,
+                Expand = Expand,
+                Collapse = Collapse
             };
         }
     }

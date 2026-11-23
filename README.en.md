@@ -8,6 +8,8 @@
 >
 > Issues and pull requests live on GitHub; Gitee is a synced mirror for mainland China (the 1.0.0 release assets currently sit in Gitee Releases).
 
+[![CI](https://github.com/srdava/antd-wpf/actions/workflows/ci.yml/badge.svg)](https://github.com/srdava/antd-wpf/actions/workflows/ci.yml)
+
 [Handbook](docs/manual.en.md) · [Component site](docs/site/index.html) · [Migration](docs/migration.md) · [Capability notes](docs/progress.md) · [Overview](docs/intro.md)
 
 ---

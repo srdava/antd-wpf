@@ -3134,6 +3134,25 @@ namespace Antd.Wpf.SmokeTests
             DoEvents();
             Check("expand all opens every node", table.Items.Count == 4, table.Items.Count.ToString());
 
+            // The expander must be keyboard reachable, not a mouse-only glyph.
+            var firstRow = table.ItemContainerGenerator.ContainerFromIndex(0) as DataGridRow;
+            var toggles = firstRow == null
+                ? new List<System.Windows.Controls.Primitives.ButtonBase>()
+                : FindVisualChildren<System.Windows.Controls.Primitives.ButtonBase>(firstRow);
+            var expander = toggles.FirstOrDefault(b =>
+                AutomationProperties.GetName(b) == AntdLocale.Current.Expand
+                || AutomationProperties.GetName(b) == AntdLocale.Current.Collapse);
+            Check("tree expander is a focusable button",
+                expander != null && expander.Focusable,
+                "buttons=" + toggles.Count + " named=" + (expander == null ? "none" : AutomationProperties.GetName(expander)));
+
+            if (expander != null)
+            {
+                expander.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                DoEvents();
+            }
+            Check("invoking the expander collapses the node", table.Items.Count == 2, table.Items.Count.ToString());
+
             host.Close();
         }
 
@@ -3207,6 +3226,23 @@ namespace Antd.Wpf.SmokeTests
                 upload.Files[1].Status + "/" + upload.Files[2].Status);
             Check("finished rows read 100%", Math.Abs(upload.Files[1].Progress - 100) < 0.01,
                 upload.Files[1].Progress.ToString());
+        }
+
+        private static List<T> FindVisualChildren<T>(DependencyObject root) where T : DependencyObject
+        {
+            var found = new List<T>();
+            var queue = new Queue<DependencyObject>();
+            queue.Enqueue(root);
+            while (queue.Count > 0)
+            {
+                DependencyObject node = queue.Dequeue();
+                var match = node as T;
+                if (match != null) found.Add(match);
+
+                int count = VisualTreeHelper.GetChildrenCount(node);
+                for (int i = 0; i < count; i++) queue.Enqueue(VisualTreeHelper.GetChild(node, i));
+            }
+            return found;
         }
 
         private static void DoEvents()

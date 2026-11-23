@@ -8,6 +8,8 @@
 >
 > Issue 与 PR 走 GitHub；Gitee 是同步镜像，仅供国内访问（1.0.0 的发行版附件目前也在 Gitee Releases）。
 
+[![CI](https://github.com/srdava/antd-wpf/actions/workflows/ci.yml/badge.svg)](https://github.com/srdava/antd-wpf/actions/workflows/ci.yml)
+
 [使用手册](docs/manual.zh.md) · [组件文档站](docs/site/index.html) · [迁移指南](docs/migration.md) · [能力边界](docs/progress.md) · [项目简介](docs/intro.md)
 
 ---
