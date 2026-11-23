@@ -111,6 +111,9 @@ namespace Antd.Wpf.SmokeTests
             CheckIcons();
             CheckKeyboardAndFocus();
             CheckSelectFiltering();
+            CheckTableFrozenColumns();
+            CheckSelectMultiple();
+            CheckDateRange();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2595,6 +2598,193 @@ namespace Antd.Wpf.SmokeTests
             Check("select panel keeps its 4px gap",
                 popup != null && Math.Abs(popup.VerticalOffset - (-12)) < 0.01,
                 popup == null ? "missing" : popup.VerticalOffset.ToString());
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- table fixed columns
+
+        private static void CheckTableFrozenColumns()
+        {
+            var table = new Antd.Wpf.Controls.Table();
+            for (int i = 0; i < 6; i++)
+            {
+                table.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "C" + i,
+                    Binding = new System.Windows.Data.Binding("P" + i),
+                    Width = 160
+                });
+            }
+
+            var rows = new List<object>();
+            for (int i = 0; i < 3; i++)
+            {
+                var row = new Dictionary<string, string>();
+                for (int c = 0; c < 6; c++) row["P" + c] = "r" + i + "c" + c;
+                rows.Add(row);
+            }
+            table.ItemsSource = rows;
+            table.FrozenColumnCount = 2;
+            table.Height = 200;
+
+            var host = new Window
+            {
+                Width = 420, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = table
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            Check("table exposes frozen columns", table.FrozenColumnCount == 2, table.FrozenColumnCount.ToString());
+
+            var scroller = FindScrollViewer(table);
+            Check("table scrolls horizontally when columns overflow",
+                scroller != null && scroller.ScrollableWidth > 0,
+                scroller == null ? "no scrollviewer" : scroller.ScrollableWidth.ToString());
+
+            if (scroller != null)
+            {
+                scroller.ScrollToHorizontalOffset(scroller.ScrollableWidth);
+                DoEvents();
+                Pump(80);
+                Check("frozen columns stay put while scrolling",
+                    scroller.HorizontalOffset > 0 && table.FrozenColumnCount == 2,
+                    scroller.HorizontalOffset + "/" + table.FrozenColumnCount);
+            }
+
+            host.Close();
+        }
+
+        private static System.Windows.Controls.ScrollViewer FindScrollViewer(DependencyObject root)
+        {
+            var queue = new Queue<DependencyObject>();
+            queue.Enqueue(root);
+            while (queue.Count > 0)
+            {
+                DependencyObject node = queue.Dequeue();
+                var scroller = node as System.Windows.Controls.ScrollViewer;
+                if (scroller != null) return scroller;
+
+                int count = VisualTreeHelper.GetChildrenCount(node);
+                for (int i = 0; i < count; i++) queue.Enqueue(VisualTreeHelper.GetChild(node, i));
+            }
+            return null;
+        }
+
+        // ---------------------------------------------------------------- select multiple
+
+        private static void CheckSelectMultiple()
+        {
+            var multi = new Select { IsMultiple = true, MaxTagCount = 2, Width = 280 };
+            multi.Items.Add("Alpha");
+            multi.Items.Add("Beta");
+            multi.Items.Add("Gamma");
+
+            var host = new Window
+            {
+                Width = 380, Height = 240, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = multi
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            multi.SelectedIndex = 0;
+            DoEvents();
+            Check("multiple select turns a pick into a tag",
+                multi.SelectedItems.Count == 1 && (multi.SelectedItems[0] as string) == "Alpha",
+                multi.SelectedItems.Count + "/" + multi.SelectedIndex);
+
+            multi.SelectedIndex = 1;
+            multi.SelectedIndex = 2;
+            DoEvents();
+            Check("multiple select accumulates tags", multi.SelectedItems.Count == 3,
+                multi.SelectedItems.Count.ToString());
+
+            var tagHost = multi.Template.FindName("PART_TagHost", multi) as System.Windows.Controls.Panel;
+            Check("tags fold into a +N chip",
+                tagHost != null && tagHost.Children.Count == 3,
+                tagHost == null ? "missing" : tagHost.Children.Count.ToString());
+
+            bool plusOne = false;
+            if (tagHost != null && tagHost.Children.Count == 3)
+            {
+                var overflow = tagHost.Children[2] as System.Windows.Controls.Border;
+                var text = overflow == null ? null : overflow.Child as System.Windows.Controls.TextBlock;
+                plusOne = text != null && text.Text == "+1";
+            }
+            Check("overflow chip reads +1", plusOne, plusOne.ToString());
+
+            var key = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(multi), 0, Key.Back)
+            {
+                RoutedEvent = UIElement.KeyDownEvent
+            };
+            multi.RaiseEvent(key);
+            DoEvents();
+            Check("backspace removes the last tag", multi.SelectedItems.Count == 2,
+                multi.SelectedItems.Count.ToString());
+
+            var clear = multi.Template.FindName("PART_ClearButton", multi) as System.Windows.Controls.Button;
+            if (clear != null) clear.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+            DoEvents();
+            Check("clearing empties every tag", multi.SelectedItems.Count == 0, multi.SelectedItems.Count.ToString());
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- date range
+
+        private static void CheckDateRange()
+        {
+            var picker = new Antd.Wpf.Controls.DatePicker { IsRange = true, AllowClear = true, Width = 260 };
+            var host = new Window
+            {
+                Width = 720, Height = 420, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = picker
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var startCal = picker.Template.FindName("PART_Calendar", picker) as Antd.Wpf.Controls.Calendar;
+            var endCal = picker.Template.FindName("PART_EndCalendar", picker) as Antd.Wpf.Controls.Calendar;
+            Check("range mode shows a second calendar",
+                endCal != null && endCal.Visibility == Visibility.Visible,
+                endCal == null ? "missing" : endCal.Visibility.ToString());
+
+            picker.IsDropDownOpen = true;
+            DoEvents();
+            Pump(120);
+
+            if (startCal != null) startCal.SelectedDate = new DateTime(2026, 11, 10);
+            DoEvents();
+            Check("first pick sets the range start",
+                picker.RangeStart.HasValue && picker.RangeStart.Value.Day == 10 && !picker.RangeEnd.HasValue,
+                picker.RangeStart + "/" + picker.RangeEnd);
+
+            if (endCal != null) endCal.SelectedDate = new DateTime(2026, 11, 18);
+            DoEvents();
+            Check("second pick closes the range",
+                picker.RangeEnd.HasValue && picker.RangeEnd.Value.Day == 18,
+                picker.RangeEnd.ToString());
+            Check("range text reads start ~ end",
+                picker.DisplayText == "2026-11-10 ~ 2026-11-18", picker.DisplayText);
+            Check("range closes the dropdown once both ends are set",
+                !picker.IsDropDownOpen, picker.IsDropDownOpen.ToString());
+
+            picker.RangeStart = new DateTime(2026, 12, 1);
+            DoEvents();
+            Check("editing the start clears a stale end", !picker.RangeEnd.HasValue,
+                picker.RangeEnd.ToString());
+
+            picker.Clear();
+            DoEvents();
+            Check("clearing resets both ends",
+                !picker.RangeStart.HasValue && !picker.RangeEnd.HasValue && picker.DisplayText == string.Empty,
+                picker.DisplayText + "/" + picker.RangeStart + "/" + picker.RangeEnd);
 
             host.Close();
         }

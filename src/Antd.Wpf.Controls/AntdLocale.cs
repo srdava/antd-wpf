@@ -20,6 +20,7 @@ namespace Antd.Wpf.Controls
             Ok = "OK";
             Cancel = "Cancel";
             Search = "Search";
+            Today = "Today";
         }
 
         /// <summary>Validation message for a required <see cref="FormItem"/> that is empty.</summary>
@@ -46,6 +47,9 @@ namespace Antd.Wpf.Controls
         /// <summary>Placeholder of the Select search box.</summary>
         public string Search { get; set; }
 
+        /// <summary>Footer shortcut in the date picker panel.</summary>
+        public string Today { get; set; }
+
         public static AntdStrings CreateEnglish()
         {
             return new AntdStrings();
@@ -62,6 +66,7 @@ namespace Antd.Wpf.Controls
             strings.Ok = "确定";
             strings.Cancel = "取消";
             strings.Search = "搜索";
+            strings.Today = "今天";
             return strings;
         }
 
@@ -76,7 +81,8 @@ namespace Antd.Wpf.Controls
                 Close = Close,
                 Ok = Ok,
                 Cancel = Cancel,
-                Search = Search
+                Search = Search,
+                Today = Today
             };
         }
     }

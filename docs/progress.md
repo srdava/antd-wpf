@@ -91,9 +91,9 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 
 | 业务常见需求 | 涉及组件 | 现状 |
 |---|---|---|
-| 多选、标签折叠 | Select | 单选 + 本地搜索（Filterable）已支持，无多选 |
-| 日期区间、快捷选项、禁用日期 | DatePicker | 只有单日期 |
-| 固定列、展开行、分页器 | Table | DataGrid 适配，无固定列/展开行 |
+| 远程搜索、万项虚拟化 | Select | 单选/多选（标签折叠 +N）、本地搜索都已支持 |
+| 快捷选项、禁用日期 | DatePicker | 单日期 + 区间（双月面板）已支持 |
+| 展开行、树形行、分页器 | Table | 固定列走 DataGrid 的 FrozenColumnCount，已可用；展开行/树形行没有 |
 | 异步校验、跨字段联动 | Form | 同步校验（`Validator` 委托） |
 | 上传队列、进度、取消 | Upload | 只收集文件，不做网络传输 |
 | 树异步加载、拖拽排序 | Tree / TreeSelect | 静态数据 |
@@ -105,9 +105,9 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 
 | 组件 | 现状 | antd 完整能力 |
 |---|---|---|
-| Select | 单选、本地搜索（Filterable）、无虚拟化 | 多选、标签折叠、远程搜索、万项虚拟化 |
-| Table | DataGrid 适配：虚拟化、排序、选择、列宽 | 固定列、树形行、展开行、可编辑、分页器 |
-| DatePicker | 单日期 | 区间、禁用日期、周/月/季/年 |
+| Select | 单选/多选、标签折叠、本地搜索 | 远程搜索、万项虚拟化 |
+| Table | DataGrid 适配：虚拟化、排序、选择、列宽、固定列 | 树形行、展开行、可编辑、分页器 |
+| DatePicker | 单日期、区间（双月） | 禁用日期、周/月/季/年 |
 | Slider | 单值 | 双值、刻度、竖向、带输入框 |
 | Form | 同步校验 | 异步校验、依赖联动、INotifyDataErrorInfo |
 | Input | 单行 | addon、password、textarea、字数统计 |
@@ -160,7 +160,7 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 ## DoD 未验证项
 
 - M1：「截图基准差异 < 0.5%」「主题切换 < 120ms」没有度量。
-- M2：「Form 异步校验」「Select 万项虚拟化」「DatePicker 区间」未达标。
+- M2：「Form 异步校验」「Select 万项虚拟化」仍未达标（区间已于 1.1.0 补齐）。
 - M4：「Modal 焦点陷阱与 Esc 通过 UIA 测试」只做了进程内断言（TabNavigation=Cycle、Esc 关窗），
   没有 FlaUI / UIA 用例；「Message 队列合并」未做，因为当前 API 没有 key。
 - 全部：无自动化无障碍测试，无 UI 自动化测试。

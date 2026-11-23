@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +35,10 @@ namespace Antd.Wpf.Controls
             // filter is reset from the property itself. Same trick Button uses for IsPressed.
             _openDescriptor = DependencyPropertyDescriptor.FromProperty(IsDropDownOpenProperty, typeof(Select));
             _openDescriptor.AddValueChanged(this, OnOpenStateChanged);
+
+            var selected = new ObservableCollection<object>();
+            selected.CollectionChanged += OnSelectedItemsChanged;
+            SetValue(SelectedItemsKey, selected);
         }
 
         private void OnOpenStateChanged(object sender, EventArgs e)
@@ -159,6 +165,42 @@ namespace Antd.Wpf.Controls
             set { SetValue(FilterableProperty, value); }
         }
 
+        public static readonly DependencyProperty IsMultipleProperty = DependencyProperty.Register(
+            "IsMultiple", typeof(bool), typeof(Select),
+            new FrameworkPropertyMetadata(false, OnMultipleChanged));
+
+        /// <summary>antd's mode="multiple": picks accumulate as tags and the dropdown stays open.</summary>
+        public bool IsMultiple
+        {
+            get { return (bool)GetValue(IsMultipleProperty); }
+            set { SetValue(IsMultipleProperty, value); }
+        }
+
+        public static readonly DependencyProperty MaxTagCountProperty = DependencyProperty.Register(
+            "MaxTagCount", typeof(int), typeof(Select),
+            new FrameworkPropertyMetadata(0, OnMultipleChanged));
+
+        /// <summary>How many tags stay visible before folding into "+N". 0 shows them all.</summary>
+        public int MaxTagCount
+        {
+            get { return (int)GetValue(MaxTagCountProperty); }
+            set { SetValue(MaxTagCountProperty, value); }
+        }
+
+        private static readonly DependencyPropertyKey SelectedItemsKey = DependencyProperty.RegisterReadOnly(
+            "SelectedItems", typeof(ObservableCollection<object>), typeof(Select),
+            new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty SelectedItemsProperty = SelectedItemsKey.DependencyProperty;
+
+        /// <summary>Tags currently selected in multiple mode, in click order.</summary>
+        public ObservableCollection<object> SelectedItems
+        {
+            get { return (ObservableCollection<object>)GetValue(SelectedItemsProperty); }
+        }
+
+        private System.Windows.Controls.Panel _tagHost;
+        private string _tagSignature;
+        private bool _suppressSelection;
         private System.Windows.Controls.TextBox _searchBox;
         private FrameworkElement _searchHost;
         private System.Windows.Controls.TextBlock _searchWatermark;
@@ -170,6 +212,19 @@ namespace Antd.Wpf.Controls
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
+
+            // Programmatic or keyboard selection still lands in SelectedItem; in multiple mode it
+            // becomes a tag and the single-selection slot is cleared again.
+            if (IsMultiple && !_suppressSelection && SelectedItem != null)
+            {
+                object picked = SelectedItem;
+                _suppressSelection = true;
+                SetCurrentValue(SelectedIndexProperty, -1);
+                _suppressSelection = false;
+
+                if (!SelectedItems.Contains(picked)) SelectedItems.Add(picked);
+            }
+
             UpdateVisualState();
         }
 
@@ -200,6 +255,112 @@ namespace Antd.Wpf.Controls
         {
             if (_searchBox != null && _searchBox.Text.Length > 0) _searchBox.Text = string.Empty;
             ApplyFilter(string.Empty);
+        }
+        private static void OnMultipleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var select = (Select)d;
+
+            if (select.IsMultiple && select.SelectedItem != null)
+            {
+                select.ToggleItem(select.SelectedItem);
+            }
+
+            select.RebuildTags();
+            select.UpdateVisualState();
+        }
+
+        private void OnSelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RebuildTags();
+            UpdateVisualState();
+        }
+
+        private void ToggleItem(object item)
+        {
+            if (item == null) return;
+
+            if (SelectedItems.Contains(item)) SelectedItems.Remove(item);
+            else SelectedItems.Add(item);
+        }
+
+        private void RebuildTags()
+        {
+            if (_tagHost == null) return;
+
+            var snapshot = ThemeManager.Current.Snapshot;
+            string signature = SelectedItems.Count + "|" + MaxTagCount + "|" + IsMultiple + "|"
+                               + snapshot.GetHashCode() + "|" + Metrics.FontSize(snapshot.Tokens, Size);
+
+            if (signature == _tagSignature) return;
+            _tagSignature = signature;
+
+            TagStrip.Build(_tagHost, SelectedItems, MaxTagCount, RemoveTag, snapshot, Metrics.FontSize(snapshot.Tokens, Size));
+        }
+
+        private void RemoveTag(object item)
+        {
+            if (item != null && SelectedItems.Contains(item)) SelectedItems.Remove(item);
+        }
+
+        /// <summary>Clicking a row toggles it and keeps the dropdown open, like antd's multiple mode.</summary>
+        /// <summary>Hooks the popup content once it exists (Child is not ready during ApplyTemplate).</summary>
+        private void OnPopupOpenedHookClicks(object sender, EventArgs e)
+        {
+            if (_popup == null) return;
+
+            var child = _popup.Child as UIElement;
+            if (child == null) return;
+
+            child.PreviewMouseLeftButtonDown -= OnPopupItemMouseDown;
+            child.PreviewMouseLeftButtonDown += OnPopupItemMouseDown;
+        }
+
+        private void OnPopupItemMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsMultiple) return;
+
+            var container = FindComboBoxItem(e.OriginalSource as DependencyObject);
+            if (container == null) return;
+
+            ToggleItem(container.Content ?? container.DataContext);
+            e.Handled = true;
+        }
+
+        private static ComboBoxItem FindComboBoxItem(DependencyObject node)
+        {
+            while (node != null)
+            {
+                var item = node as ComboBoxItem;
+                if (item != null) return item;
+                node = System.Windows.Media.VisualTreeHelper.GetParent(node);
+            }
+            return null;
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (IsMultiple)
+            {
+                if ((e.Key == Key.Enter || e.Key == Key.Space) && IsDropDownOpen)
+                {
+                    int index = SelectedIndex;
+                    if (index >= 0 && index < Items.Count)
+                    {
+                        ToggleItem(Items[index]);
+                        e.Handled = true;
+                        return;
+                    }
+                }
+
+                if (e.Key == Key.Back && SelectedItems.Count > 0)
+                {
+                    SelectedItems.RemoveAt(SelectedItems.Count - 1);
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            base.OnKeyDown(e);
         }
         private void OnSearchTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
@@ -300,6 +461,15 @@ namespace Antd.Wpf.Controls
             _popup = popup;
             if (_popup != null) _popup.Closed += OnPopupClosedReset;
 
+            if (_popup != null)
+            {
+                _popup.Opened -= OnPopupOpenedHookClicks;
+                _popup.Opened += OnPopupOpenedHookClicks;
+            }
+
+            _tagHost = GetTemplateChild("PART_TagHost") as System.Windows.Controls.Panel;
+            RebuildTags();
+
             if (_searchBox != null)
             {
                 _searchBox.TextChanged -= OnSearchTextChanged;
@@ -328,7 +498,16 @@ namespace Antd.Wpf.Controls
 
         private void OnClearClicked(object sender, RoutedEventArgs e)
         {
-            SetCurrentValue(SelectedIndexProperty, -1);
+            if (IsMultiple)
+            {
+                SelectedItems.Clear();
+                SetCurrentValue(SelectedIndexProperty, -1);
+            }
+            else
+            {
+                SetCurrentValue(SelectedIndexProperty, -1);
+            }
+
             e.Handled = true;
         }
 
@@ -346,7 +525,7 @@ namespace Antd.Wpf.Controls
             else if (IsMouseOver) borderKey = "colorPrimaryHover";
             else borderKey = "colorBorder";
 
-            bool hasSelection = SelectedIndex >= 0;
+            bool hasSelection = IsMultiple ? SelectedItems.Count > 0 : SelectedIndex >= 0;
 
             SetCurrentValue(BackgroundProperty, snapshot.Brush(IsEnabled ? "colorBgContainer" : "colorBgContainerDisabled"));
             SetCurrentValue(ForegroundProperty, snapshot.Brush(IsEnabled ? "colorText" : "colorTextDisabled"));
@@ -376,6 +555,7 @@ namespace Antd.Wpf.Controls
             SetCurrentValue(PaddingProperty, new Thickness(Metrics.InputPaddingInline(Size), block,
                 Metrics.InputPaddingInline(Size), block));
 
+            RebuildTags();
             SetValue(HasSelectionKey, hasSelection);
             SetValue(CanClearSelectionKey, AllowClear && hasSelection && IsEnabled);
             SetValue(PlaceholderBrushKey, snapshot.Brush("colorTextPlaceholder"));

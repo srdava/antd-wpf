@@ -1231,6 +1231,9 @@
                                                   ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                                                   VerticalAlignment="Center" />
 
+                                <StackPanel x:Name="PART_TagHost" Grid.Column="0" Orientation="Horizontal"
+                                            Visibility="Collapsed" Margin="0,3,0,3" />
+
                                 <TextBlock x:Name="PlaceholderHost" Grid.Column="0"
                                            Text="{TemplateBinding Placeholder}"
                                            Foreground="{TemplateBinding PlaceholderBrush}"
@@ -1297,6 +1300,11 @@
                         <Trigger Property="HasSelection" Value="True">
                             <Setter TargetName="PlaceholderHost" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="SelectionHost" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- Declared after HasSelection so it wins: tags replace the single-value presenter. -->
+                        <Trigger Property="IsMultiple" Value="True">
+                            <Setter TargetName="SelectionHost" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_TagHost" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="CanClearSelection" Value="True">
                             <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Visible" />
@@ -1687,17 +1695,26 @@
                                     CornerRadius="{theme:CornerRadius borderRadiusLG}"
                                                                         Padding="8">
                                 <StackPanel>
-                                    <antd:Calendar x:Name="PART_Calendar"
-                                                   Background="Transparent"
-                                                   BorderThickness="0"
-                                                   Padding="8"
-                                                   Width="264" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <antd:Calendar x:Name="PART_Calendar"
+                                                       Background="Transparent"
+                                                       BorderThickness="0"
+                                                       Padding="8"
+                                                       Width="264" />
+                                        <antd:Calendar x:Name="PART_EndCalendar"
+                                                       Background="Transparent"
+                                                       BorderThickness="0"
+                                                       Padding="8"
+                                                       Width="264"
+                                                       Margin="8,0,0,0"
+                                                       Visibility="Collapsed" />
+                                    </StackPanel>
                                     <Border BorderBrush="{DynamicResource Antd.colorSplit}"
                                             BorderThickness="0,1,0,0"
                                             Margin="0,8,0,0"
                                             Padding="0,4,0,0">
                                         <antd:Button x:Name="PART_Today"
-                                                     Content="Today"
+                                                     Content=""
                                                      HorizontalAlignment="Right"
                                                      Variant="Link"
                                                      Size="Small" />

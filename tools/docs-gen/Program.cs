@@ -271,9 +271,9 @@ namespace Antd.Wpf.DocsGen
             sb.AppendLine("<h2>能力边界</h2>");
             sb.AppendLine("<p>“已实现”指基础版本：属性、外观与常用交互可用。以下差距已知，接入前请确认：</p>");
             sb.AppendLine("<table><thead><tr><th>需求</th><th>组件</th><th>现状</th></tr></thead><tbody>");
-            sb.AppendLine("<tr><td>下拉搜索 / 多选 / 标签折叠</td><td>Select</td><td>只有单选</td></tr>");
-            sb.AppendLine("<tr><td>日期区间 / 快捷选项</td><td>DatePicker</td><td>只有单日期</td></tr>");
-            sb.AppendLine("<tr><td>固定列 / 展开行</td><td>Table</td><td>DataGrid 适配，无固定列</td></tr>");
+            sb.AppendLine("<tr><td>远程搜索 / 万项虚拟化</td><td>Select</td><td>单选、多选（+N 折叠）、本地搜索都已支持</td></tr>");
+            sb.AppendLine("<tr><td>禁用日期 / 快捷选项</td><td>DatePicker</td><td>单日期与双月区间已支持</td></tr>");
+            sb.AppendLine("<tr><td>展开行 / 树形行</td><td>Table</td><td>固定列用 DataGrid 的 FrozenColumnCount，已可用</td></tr>");
             sb.AppendLine("<tr><td>异步校验 / 跨字段联动</td><td>Form</td><td>同步校验</td></tr>");
             sb.AppendLine("<tr><td>上传队列 / 进度</td><td>Upload</td><td>只收集文件，不做传输</td></tr>");
             sb.AppendLine("<tr><td>树异步加载 / 拖拽</td><td>Tree</td><td>静态数据</td></tr>");

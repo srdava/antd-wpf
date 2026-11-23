@@ -3,7 +3,7 @@
 Ant Design 规范的 WPF 实现，目标同时运行于 **.NET Framework 4.8+** 与 **.NET 8+**。
 
 当前状态：M1–M4 的**基础版本**全部落地（69/71 组件）。**能力完成度以 `docs/progress.md` 为准**——
-组件数量不等于能力齐全（Select 无多选、DatePicker 无区间、Table 无固定列等），接入前请先看那份能力表。
+组件数量不等于能力齐全（Select 无远程搜索、Table 无展开行、Form 只有同步校验等），接入前请先看那份能力表。
 M5 打磨已完成：无障碍 Peer 与焦点环、`AntdLocale` 中英文案、入退场动效与减动效开关、弹窗/抽屉/Toast/浮层的阴影分层。
 **1.0.0 已于 2026-11-20 发布到 nuget.org**：[Controls](https://www.nuget.org/packages/Antd.Wpf.Controls) · [Theme](https://www.nuget.org/packages/Antd.Wpf.Theme) · [Icons](https://www.nuget.org/packages/Antd.Wpf.Icons) · [Tokens](https://www.nuget.org/packages/Antd.Wpf.Tokens)（MIT）。发行版附件（8 个包 + 校验和）见 [Gitee Releases](https://gitee.com/davva/antd.-wpf.-tokens/releases/tag/v1.0.0)；组件文档站见 `docs/site/index.html`，迁移指南见 `docs/migration.md`。
 每个组件的能力边界都写在 `docs/progress.md` 里，避免把「能跑」当成「对齐 antd」。
