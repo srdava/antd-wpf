@@ -4,7 +4,9 @@
 >
 > [中文](README.md) | English
 >
-> **GitHub** · https://github.com/srdava/antd-wpf ｜ **Gitee** · https://gitee.com/davva/antd.-wpf.-tokens
+> **GitHub (primary)** · https://github.com/srdava/antd-wpf ｜ **Gitee (mirror)** · https://gitee.com/davva/antd.-wpf.-tokens
+>
+> Issues and pull requests live on GitHub; Gitee is a synced mirror for mainland China (the 1.0.0 release assets currently sit in Gitee Releases).
 
 [Handbook](docs/manual.en.md) · [Component site](docs/site/index.html) · [Migration](docs/migration.md) · [Capability notes](docs/progress.md) · [Overview](docs/intro.md)
 

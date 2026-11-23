@@ -4,7 +4,9 @@
 >
 > 中文 | [English](README.en.md)
 >
-> **GitHub** · https://github.com/srdava/antd-wpf ｜ **Gitee** · https://gitee.com/davva/antd.-wpf.-tokens
+> **GitHub（主仓库）** · https://github.com/srdava/antd-wpf ｜ **Gitee（镜像）** · https://gitee.com/davva/antd.-wpf.-tokens
+>
+> Issue 与 PR 走 GitHub；Gitee 是同步镜像，仅供国内访问（1.0.0 的发行版附件目前也在 Gitee Releases）。
 
 [使用手册](docs/manual.zh.md) · [组件文档站](docs/site/index.html) · [迁移指南](docs/migration.md) · [能力边界](docs/progress.md) · [项目简介](docs/intro.md)
 
