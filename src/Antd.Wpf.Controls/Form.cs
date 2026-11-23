@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
@@ -80,6 +81,21 @@ namespace Antd.Wpf.Controls
             return valid;
         }
 
+        /// <summary>
+        /// Validates every item including async validators. Items run one after another so a
+        /// remote check does not stampede the server; the first failure still blocks submit.
+        /// </summary>
+        public async Task<bool> ValidateAsync()
+        {
+            bool valid = true;
+            foreach (UIElement child in InternalChildren)
+            {
+                var item = child as FormItem;
+                if (item == null) continue;
+                if (!await item.ValidateAsync().ConfigureAwait(true)) valid = false;
+            }
+            return valid;
+        }
         public void ResetErrors()
         {
             foreach (UIElement child in InternalChildren)
@@ -232,6 +248,27 @@ namespace Antd.Wpf.Controls
 
         /// <summary>Optional custom rule. Return null when valid, or the message to show.</summary>
         public Func<object, string> Validator { get; set; }
+
+        /// <summary>
+        /// Optional async check (uniqueness, server-side rules). Runs only after the synchronous
+        /// required/custom checks pass; a null result means valid.
+        /// </summary>
+        public Func<object, Task<string>> AsyncValidator { get; set; }
+
+        private static readonly DependencyPropertyKey IsValidatingKey = DependencyProperty.RegisterReadOnly(
+            "IsValidating", typeof(bool), typeof(FormItem), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty IsValidatingProperty = IsValidatingKey.DependencyProperty;
+
+        /// <summary>True while <see cref="AsyncValidator"/> is in flight; the demo shows a spinner.</summary>
+        public bool IsValidating
+        {
+            get { return (bool)GetValue(IsValidatingProperty); }
+            private set { SetValue(IsValidatingKey, value); }
+        }
+
+        private int _validationToken;
+
 
         private static readonly DependencyPropertyKey LabelBrushKey = DependencyProperty.RegisterReadOnly(
             "LabelBrush", typeof(Brush), typeof(FormItem), new FrameworkPropertyMetadata(Brushes.Gray));
@@ -389,6 +426,49 @@ namespace Antd.Wpf.Controls
             return message == null;
         }
 
+        /// <summary>
+        /// Synchronous rules first, then the optional async validator. A newer call supersedes an
+        /// older in-flight one, so fast typing cannot leave a stale error behind.
+        /// </summary>
+        public async Task<bool> ValidateAsync()
+        {
+            string message = null;
+
+            if (Required && IsEmpty(Content))
+            {
+                message = AntdLocale.Current.RequiredField;
+            }
+            else if (Validator != null)
+            {
+                message = Validator(Content);
+            }
+
+            if (message != null || AsyncValidator == null)
+            {
+                _validationToken++;
+                SetValue(IsValidatingKey, false);
+                SetCurrentValue(ErrorProperty, message);
+                return message == null;
+            }
+
+            int token = ++_validationToken;
+            SetValue(IsValidatingKey, true);
+
+            try
+            {
+                message = await AsyncValidator(Content).ConfigureAwait(true);
+            }
+            catch (Exception error)
+            {
+                message = error.Message;
+            }
+
+            if (token != _validationToken) return false;
+
+            SetValue(IsValidatingKey, false);
+            SetCurrentValue(ErrorProperty, message);
+            return message == null;
+        }
         private static bool IsEmpty(object content)
         {
             if (content == null) return true;

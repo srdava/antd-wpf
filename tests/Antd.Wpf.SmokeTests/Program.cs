@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Automation;
@@ -114,6 +115,9 @@ namespace Antd.Wpf.SmokeTests
             CheckTableFrozenColumns();
             CheckSelectMultiple();
             CheckDateRange();
+            CheckFormAsync();
+            CheckTableRowDetails();
+            CheckRemoteSearch();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2785,6 +2789,151 @@ namespace Antd.Wpf.SmokeTests
             Check("clearing resets both ends",
                 !picker.RangeStart.HasValue && !picker.RangeEnd.HasValue && picker.DisplayText == string.Empty,
                 picker.DisplayText + "/" + picker.RangeStart + "/" + picker.RangeEnd);
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- async form validation
+
+        private static void CheckFormAsync()
+        {
+            var form = new Form();
+            var item = new FormItem { Required = true, Content = new AntdInput { Text = "alpha" } };
+            var gate = new TaskCompletionSource<string>();
+            item.AsyncValidator = delegate { return gate.Task; };
+            form.Children.Add(item);
+
+            var host = new Window
+            {
+                Width = 420, Height = 260, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = form
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            Task<bool> run = form.ValidateAsync();
+            DoEvents();
+            Check("async validation flags the item as busy", item.IsValidating, item.IsValidating.ToString());
+
+            gate.SetResult("这个名字已被占用");
+            PumpUntil(delegate { return run.IsCompleted; }, 2000);
+            DoEvents();
+
+            Check("async validation surfaces the message",
+                run.IsCompleted && !run.Result && item.Error == "这个名字已被占用",
+                (run.IsCompleted ? run.Result.ToString() : "running") + "/" + item.Error);
+            Check("busy flag clears when the check finishes", !item.IsValidating, item.IsValidating.ToString());
+
+            var gate2 = new TaskCompletionSource<string>();
+            item.AsyncValidator = delegate { return gate2.Task; };
+            Task<bool> second = form.ValidateAsync();
+            DoEvents();
+            gate2.SetResult(null);
+            PumpUntil(delegate { return second.IsCompleted; }, 2000);
+            DoEvents();
+            Check("a clean async check passes",
+                second.IsCompleted && second.Result && item.Error == null,
+                (second.IsCompleted ? second.Result.ToString() : "running") + "/" + item.Error);
+
+            host.Close();
+        }
+
+        private static void PumpUntil(Func<bool> condition, int timeoutMs)
+        {
+            var started = Environment.TickCount;
+            while (!condition() && Environment.TickCount - started < timeoutMs)
+            {
+                Pump(10);
+            }
+        }
+
+        // ---------------------------------------------------------------- table row details
+
+        private static void CheckTableRowDetails()
+        {
+            var table = new Antd.Wpf.Controls.Table();
+            table.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Name",
+                Binding = new System.Windows.Data.Binding("[name]")
+            });
+
+            var factory = new FrameworkElementFactory(typeof(TextBlock));
+            factory.SetValue(TextBlock.TextProperty, "details body");
+            table.RowDetailsTemplate = new DataTemplate { VisualTree = factory };
+            table.ShowRowDetails = true;
+
+            var rows = new List<object>();
+            rows.Add(new Dictionary<string, string> { { "name", "alpha" } });
+            rows.Add(new Dictionary<string, string> { { "name", "beta" } });
+            table.ItemsSource = rows;
+            table.Height = 220;
+
+            var host = new Window
+            {
+                Width = 480, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = table
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            Check("table switches row details on",
+                table.RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Visible,
+                table.RowDetailsVisibilityMode.ToString());
+
+            var row = table.ItemContainerGenerator.ContainerFromIndex(0) as DataGridRow;
+            Check("a realised row shows its details",
+                row != null && row.DetailsVisibility == Visibility.Visible,
+                row == null ? "no row" : row.DetailsVisibility.ToString());
+
+            table.ShowRowDetails = false;
+            DoEvents();
+            Check("switching details off collapses them",
+                table.RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.Collapsed,
+                table.RowDetailsVisibilityMode.ToString());
+
+            host.Close();
+        }
+
+        // ---------------------------------------------------------------- select remote search
+
+        private static void CheckRemoteSearch()
+        {
+            var select = new Select { Filterable = true, FilterLocally = false, Width = 240 };
+            select.Items.Add("Paris");
+            select.Items.Add("Berlin");
+
+            string lastQuery = null;
+            select.SearchTextChanged += delegate(object s, string text) { lastQuery = text; };
+
+            var host = new Window
+            {
+                Width = 380, Height = 240, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = select
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            select.IsDropDownOpen = true;
+            DoEvents();
+            Pump(80);
+
+            var search = select.Template.FindName("PART_SearchBox", select) as System.Windows.Controls.TextBox;
+            if (search != null) search.Text = "pa";
+            DoEvents();
+
+            Check("remote search reports the query", lastQuery == "pa", "" + lastQuery);
+            Check("remote search leaves filtering to the host",
+                select.Items.Count == 2, select.Items.Count.ToString());
+
+            var panel = select.ItemsPanel;
+            Check("select list is virtualised",
+                panel != null && System.Windows.Controls.VirtualizingPanel.GetIsVirtualizing(select),
+                panel == null ? "no panel" : "panel ok");
 
             host.Close();
         }

@@ -51,6 +51,27 @@ namespace Antd.Wpf.Controls
             }
             _localizedEmpty = text;
         }
+        public static readonly DependencyProperty ShowRowDetailsProperty = DependencyProperty.Register(
+            "ShowRowDetails", typeof(bool), typeof(Table),
+            new FrameworkPropertyMetadata(false, OnShowRowDetailsChanged));
+
+        /// <summary>
+        /// antd's expandable row: shows <see cref="System.Windows.Controls.DataGrid.RowDetailsTemplate"/>
+        /// under every row. DataGrid keeps the per-row visibility state, this just drives the mode.
+        /// </summary>
+        public bool ShowRowDetails
+        {
+            get { return (bool)GetValue(ShowRowDetailsProperty); }
+            set { SetValue(ShowRowDetailsProperty, value); }
+        }
+
+        private static void OnShowRowDetailsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var table = (Table)d;
+            table.RowDetailsVisibilityMode = table.ShowRowDetails
+                ? DataGridRowDetailsVisibilityMode.Visible
+                : DataGridRowDetailsVisibilityMode.Collapsed;
+        }
         public static readonly DependencyProperty BorderedProperty = DependencyProperty.Register(
             "Bordered", typeof(bool), typeof(Table), new FrameworkPropertyMetadata(true));
 

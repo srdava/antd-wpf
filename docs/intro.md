@@ -27,7 +27,7 @@ WPF 项目想用 antd 的样子，通常只有三条路：照着图抄样式（�
 组件数量不等于能力齐全。这是**基础版本**，以下是明确没有做的：
 
 - Select 支持本地搜索（`Filterable`）与多选（`IsMultiple` + `MaxTagCount` 折叠）；DatePicker 支持区间但没有禁用日期与快捷选项
-- Table 基于 DataGrid 适配，没有固定列、展开行
+- Table 基于 DataGrid 适配，固定列与展开行可用，但没有树形行与可编辑
 - Form 只有同步校验；Upload 只收集文件，不做传输队列
 - Tree 只吃静态数据；twotone 图标合并为单色
 
@@ -74,7 +74,7 @@ ThemeManager.Current.Apply(ThemeConfig.CreateDefault());
 - 需要无障碍与键盘可达（政企、医疗、工业软件常有的硬要求）
 - 不想要第三方依赖的供应链风险
 
-不适合：需要 antd 全量能力（固定列、多选、异步校验）的项目；需要 Web 组件生态的项目；非 antd 设计语言的项目。
+不适合：需要树形表格、跨字段联动校验、Web 组件生态的项目；非 antd 设计语言的项目。
 
 ## 结构
 

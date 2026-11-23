@@ -1208,6 +1208,13 @@
         <Setter Property="FontFamily" Value="{DynamicResource Antd.FontFamily}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource Antd.Select.Item}" />
         <Setter Property="MaxDropDownHeight" Value="256" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type antd:Select}">
@@ -1281,7 +1288,10 @@
                                     </Grid>
 
                                     <ScrollViewer Grid.Row="1" MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                                  VerticalScrollBarVisibility="Auto">
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  CanContentScroll="True"
+                                                  VirtualizingPanel.IsVirtualizing="True"
+                                                  VirtualizingPanel.VirtualizationMode="Recycling">
                                         <ItemsPresenter />
                                     </ScrollViewer>
                                 </Grid>

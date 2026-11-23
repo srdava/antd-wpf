@@ -9,7 +9,7 @@
 | 你的情况 | 结论 |
 |---|---|
 | WPF 项目，需要 antd 的视觉与交互，且要跑 net48 | 适合 |
-| 需要 antd 的**全部**能力（Table 展开行、Form 异步校验、Select 远程搜索） | 暂不适合，见 `docs/progress.md` 能力边界 |
+| 需要 antd 的**全部**能力（Table 树形行、Form 跨字段联动、Select 分组） | 暂不适合，见 `docs/progress.md` 能力边界 |
 | 需要 Vue/React 那套受控组件心智 | 需要调整：这里是 WPF 双向绑定 |
 | 需要第三方依赖为零 | 适合，本库不引用任何 NuGet 包 |
 

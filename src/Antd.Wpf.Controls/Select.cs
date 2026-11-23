@@ -201,6 +201,21 @@ namespace Antd.Wpf.Controls
         private System.Windows.Controls.Panel _tagHost;
         private string _tagSignature;
         private bool _suppressSelection;
+        public static readonly DependencyProperty FilterLocallyProperty = DependencyProperty.Register(
+            "FilterLocally", typeof(bool), typeof(Select), new FrameworkPropertyMetadata(true));
+
+        /// <summary>
+        /// When false the search box only reports text: the host listens to
+        /// <see cref="SearchTextChanged"/> and swaps ItemsSource itself (remote search).
+        /// </summary>
+        public bool FilterLocally
+        {
+            get { return (bool)GetValue(FilterLocallyProperty); }
+            set { SetValue(FilterLocallyProperty, value); }
+        }
+
+        /// <summary>Raised on every keystroke in the search box (remote search hook).</summary>
+        public event EventHandler<string> SearchTextChanged;
         private System.Windows.Controls.TextBox _searchBox;
         private FrameworkElement _searchHost;
         private System.Windows.Controls.TextBlock _searchWatermark;
@@ -366,6 +381,9 @@ namespace Antd.Wpf.Controls
         {
             ApplyFilter(_searchBox.Text);
 
+            EventHandler<string> handler = SearchTextChanged;
+            if (handler != null) handler(this, _searchBox.Text);
+
             if (_searchWatermark != null)
             {
                 _searchWatermark.Visibility = string.IsNullOrEmpty(_searchBox.Text)
@@ -422,6 +440,7 @@ namespace Antd.Wpf.Controls
             }
 
             string needle = text == null ? string.Empty : text.Trim();
+            if (!FilterLocally) { Items.Filter = null; return; }
             if (needle.Length == 0)
             {
                 Items.Filter = null;
