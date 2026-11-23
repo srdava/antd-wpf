@@ -1,6 +1,6 @@
 # Antd.Wpf Handbook
 
-> Ant Design for WPF · 1.1.2 · **English** · [中文](manual.zh.md)
+> Ant Design for WPF · 1.2.0 · **English** · [中文](manual.zh.md)
 
 Property tables in this handbook are generated from the compiled assembly (`tools/docs-gen`), so they cannot drift from the code.
 
@@ -20,7 +20,7 @@ Controls read colours and metrics from the same design tokens as antd, so switch
 ## Getting started
 
 ```bash
-dotnet add package Antd.Wpf.Controls --version 1.1.2
+dotnet add package Antd.Wpf.Controls --version 1.2.0
 ```
 
 Merge the resource dictionary so the control templates can resolve tokens:

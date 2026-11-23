@@ -78,6 +78,21 @@ namespace Antd.Wpf.Controls
             return ToastHost.ForMessage(window).AddMessage(content, type, duration);
         }
 
+        /// <summary>
+        /// Keyed toast: showing the same key again rewrites the row and restarts its countdown,
+        /// which is how "上传中 30% → 60% → 完成" is expressed.
+        /// </summary>
+        public static ToastHandle Show(string key, string content, MessageType type, double duration)
+        {
+            Window window = ToastWindow.Resolve(Owner);
+            if (window == null) return new ToastHandle(null);
+            return ToastHost.ForMessage(window).AddMessage(content, type, duration, key);
+        }
+
+        public static ToastHandle Show(string key, string content)
+        {
+            return Show(key, content, MessageType.Info, 3);
+        }
         public static ToastHandle Info(string content) { return Show(content, MessageType.Info, 3); }
         public static ToastHandle Success(string content) { return Show(content, MessageType.Success, 3); }
         public static ToastHandle Error(string content) { return Show(content, MessageType.Error, 3); }
@@ -341,8 +356,32 @@ namespace Antd.Wpf.Controls
 
         public ToastHandle AddMessage(string content, MessageType type, double duration)
         {
+            return AddMessage(content, type, duration, null);
+        }
+
+        /// <summary>
+        /// <paramref name="key"/> makes the toast addressable: showing it again rewrites the row and
+        /// restarts its countdown instead of stacking a duplicate (antd's key behaviour).
+        /// </summary>
+        public ToastHandle AddMessage(string content, MessageType type, double duration, string key)
+        {
+            if (!string.IsNullOrEmpty(key))
+            {
+                for (int i = 0; i < _entries.Count; i++)
+                {
+                    ToastEntry live = _entries[i];
+                    if (live.Removed || live.Key != key) continue;
+
+                    if (live.Text != null) live.Text.Text = content;
+                    live.Duration = duration;
+                    StartTimer(live);
+                    return new ToastHandle(delegate { RemoveEntry(live); });
+                }
+            }
+
             ThemeSnapshot snapshot = ThemeManager.Current.Snapshot;
-            FrameworkElement item = BuildMessage(content, type, snapshot);
+            TextBlock text;
+            FrameworkElement item = BuildMessage(content, type, snapshot, out text);
 
             if (_messageStack.Children.Count >= MaxMessages)
             {
@@ -353,7 +392,7 @@ namespace Antd.Wpf.Controls
             _messageStack.Children.Add(item);
             Show();
 
-            ToastEntry entry = Track(item, duration, delegate { });
+            ToastEntry entry = Track(item, duration, delegate { }, key, text);
             return new ToastHandle(delegate { RemoveEntry(entry); });
         }
 
@@ -385,20 +424,44 @@ namespace Antd.Wpf.Controls
 
         private ToastEntry Track(FrameworkElement item, double duration, Action closed)
         {
-            var entry = new ToastEntry { Element = item, Closed = closed };
-            if (duration > 0)
+            return Track(item, duration, closed, null, null);
+        }
+
+        private ToastEntry Track(FrameworkElement item, double duration, Action closed, string key, TextBlock text)
+        {
+            var entry = new ToastEntry { Element = item, Closed = closed, Key = key, Text = text, Duration = duration };
+            StartTimer(entry);
+
+            // antd pauses the countdown while the pointer is over the toast, so a long message can be read.
+            item.MouseEnter += delegate { StopTimer(entry); };
+            item.MouseLeave += delegate { if (!entry.Removed) StartTimer(entry); };
+
+            _entries.Add(entry);
+            return entry;
+        }
+
+        private void StartTimer(ToastEntry entry)
+        {
+            if (entry.Duration <= 0 || entry.Removed) return;
+
+            if (entry.Timer == null)
             {
-                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(duration) };
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(entry.Duration) };
                 timer.Tick += delegate
                 {
                     timer.Stop();
                     RemoveEntry(entry);
                 };
-                timer.Start();
                 entry.Timer = timer;
             }
-            _entries.Add(entry);
-            return entry;
+
+            entry.Timer.Stop();
+            entry.Timer.Start();
+        }
+
+        private void StopTimer(ToastEntry entry)
+        {
+            if (entry.Timer != null) entry.Timer.Stop();
         }
 
         private void RemoveEntry(ToastEntry entry)
@@ -460,7 +523,7 @@ namespace Antd.Wpf.Controls
 
         // ------------------------------------------------------------ item visuals
 
-        private static FrameworkElement BuildMessage(string content, MessageType type, ThemeSnapshot snapshot)
+        private static FrameworkElement BuildMessage(string content, MessageType type, ThemeSnapshot snapshot, out TextBlock textBlock)
         {
             AliasToken t = snapshot.Tokens;
 
@@ -485,6 +548,7 @@ namespace Antd.Wpf.Controls
                 VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
+            textBlock = text;
 
             row.Children.Add(icon);
             row.Children.Add(text);
@@ -637,6 +701,14 @@ namespace Antd.Wpf.Controls
             public DispatcherTimer Timer;
             public Action Closed;
             public bool Removed;
+
+            /// <summary>antd's key: re-showing the same key updates the row instead of stacking one.</summary>
+            public string Key;
+
+            /// <summary>Live copy of the row, so a keyed update can rewrite it in place.</summary>
+            public TextBlock Text;
+
+            public double Duration;
         }
     }
 }
