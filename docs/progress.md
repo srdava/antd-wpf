@@ -89,12 +89,11 @@ dotnet pack src/Antd.Wpf.Tokens   -c Release -o artifacts/packages
 Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少数几个算对齐了 antd。
 接入业务前请先看下面的清单，不要按组件名假设能力：
 
+**1.1.0 已补齐**：Select 的多选/标签折叠/本地与远程搜索/虚拟化、DatePicker 的双月区间、
+Table 的固定列与展开行、Form 的异步校验。下面是**仍然缺**的部分：
+
 | 业务常见需求 | 涉及组件 | 现状 |
 |---|---|---|
-| 自定义搜索节流、分组 | Select | 单选/多选（+N 折叠）、本地与远程搜索（`FilterLocally=false` + `SearchTextChanged`）、虚拟化都已支持 |
-| 快捷选项、禁用日期 | DatePicker | 单日期 + 区间（双月面板）已支持 |
-| 树形行、分页器 | Table | 固定列与展开行（`ShowRowDetails` + `RowDetailsTemplate`）已可用 |
-| 跨字段联动 | Form | 同步 `Validator` + 异步 `AsyncValidator` / `ValidateAsync()` 已支持 |
 | 上传队列、进度、取消 | Upload | 只收集文件，不做网络传输 |
 | 树异步加载、拖拽排序 | Tree / TreeSelect | 静态数据 |
 | 输入框 addon、多行、字数统计 | Input | 单行 |
