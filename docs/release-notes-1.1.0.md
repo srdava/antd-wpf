@@ -116,10 +116,10 @@ upload.Uploader = async (file, progress, token) => await api.UploadAsync(file.Pa
 
 | 文件 | 大小 | SHA-256 |
 |---|---|---|
-| Antd.Wpf.Controls.1.1.0.nupkg | 257 KB | `710f0425d289316f067ea32f17d1dd5f6a814fe61bd03e066298b29fc0470dbc` |
-| Antd.Wpf.Icons.1.1.0.nupkg | 483 KB | `9af161f6f49aa5f1b53e47a2b541c3a7c48439526dc851dfa8d15621ec29a7ad` |
-| Antd.Wpf.Theme.1.1.0.nupkg | 21 KB | `684f4d268d3832be4bec12e591c20cfdb7f366fa6f7fce3913103b6bc657e438` |
-| Antd.Wpf.Tokens.1.1.0.nupkg | 25 KB | `e04b389be26dab533f5eb92d32eb023417dbb0b05dc22849be0353cfd87fe0cb` |
+| Antd.Wpf.Controls.1.1.0.nupkg | 257 KB | `74b2927e9af7d3f99b9d044bcd4ea1efa2ab693ddb76dc0b2127512cc448222e` |
+| Antd.Wpf.Icons.1.1.0.nupkg | 483 KB | `b4e16598dfa72ee3afe656b4421f6325b926031ba2969ff795eb4c62094fc72c` |
+| Antd.Wpf.Theme.1.1.0.nupkg | 22 KB | `81ee4a992d0e3d86ad932db2a470a935c49e4594cbf569f4838cf56fbab9da6f` |
+| Antd.Wpf.Tokens.1.1.0.nupkg | 25 KB | `2aeb1cd23aefc45fe05b057300e8d6b3d9889c451fd43fdfdbc4049d0c59652a` |
 
 ## 已知边界（未在本版处理）
 

@@ -9,7 +9,7 @@
     <Copyright>Copyright (c) Antd.Wpf contributors</Copyright>
     <PackageTags>wpf;antd;ant-design;design-system;ui;net48;dotnet</PackageTags>
     <PackageProjectUrl>https://gitee.com/davva/antd.-wpf.-tokens</PackageProjectUrl>
-    <RepositoryUrl>https://gitee.com/davva/antd.-wpf.-tokens.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/srdava/antd-wpf.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
