@@ -1235,7 +1235,7 @@
                                 <!-- ComboBox opens from a ToggleButton in WPF's default template; a custom
                                      template has to provide one or clicking the field does nothing. -->
                                 <ToggleButton x:Name="PART_Toggle" Grid.ColumnSpan="3"
-                                              Focusable="False" ClickMode="Press"
+                                              Focusable="False" ClickMode="Release"
                                               IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="{x:Type ToggleButton}">
