@@ -19,6 +19,7 @@ namespace Antd.Wpf.Controls
             Close = "Close";
             Ok = "OK";
             Cancel = "Cancel";
+            Search = "Search";
         }
 
         /// <summary>Validation message for a required <see cref="FormItem"/> that is empty.</summary>
@@ -42,6 +43,9 @@ namespace Antd.Wpf.Controls
         /// <summary>Default dismiss button of Modal and Popconfirm.</summary>
         public string Cancel { get; set; }
 
+        /// <summary>Placeholder of the Select search box.</summary>
+        public string Search { get; set; }
+
         public static AntdStrings CreateEnglish()
         {
             return new AntdStrings();
@@ -57,6 +61,7 @@ namespace Antd.Wpf.Controls
             strings.Close = "关闭";
             strings.Ok = "确定";
             strings.Cancel = "取消";
+            strings.Search = "搜索";
             return strings;
         }
 
@@ -70,7 +75,8 @@ namespace Antd.Wpf.Controls
                 AllFiles = AllFiles,
                 Close = Close,
                 Ok = Ok,
-                Cancel = Cancel
+                Cancel = Cancel,
+                Search = Search
             };
         }
     }

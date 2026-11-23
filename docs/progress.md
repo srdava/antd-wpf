@@ -91,7 +91,7 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 
 | 业务常见需求 | 涉及组件 | 现状 |
 |---|---|---|
-| 下拉搜索、多选、标签折叠 | Select | 只有单选 |
+| 多选、标签折叠 | Select | 单选 + 本地搜索（Filterable）已支持，无多选 |
 | 日期区间、快捷选项、禁用日期 | DatePicker | 只有单日期 |
 | 固定列、展开行、分页器 | Table | DataGrid 适配，无固定列/展开行 |
 | 异步校验、跨字段联动 | Form | 同步校验（`Validator` 委托） |
@@ -105,7 +105,7 @@ Button / Input（单行）/ Tag / Divider / Alert / Result / Popconfirm 等少�
 
 | 组件 | 现状 | antd 完整能力 |
 |---|---|---|
-| Select | 单选、无搜索、无虚拟化 | 多选、搜索、标签折叠、万项虚拟化 |
+| Select | 单选、本地搜索（Filterable）、无虚拟化 | 多选、标签折叠、远程搜索、万项虚拟化 |
 | Table | DataGrid 适配：虚拟化、排序、选择、列宽 | 固定列、树形行、展开行、可编辑、分页器 |
 | DatePicker | 单日期 | 区间、禁用日期、周/月/季/年 |
 | Slider | 单值 | 双值、刻度、竖向、带输入框 |

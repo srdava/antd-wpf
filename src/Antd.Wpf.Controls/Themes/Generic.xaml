@@ -19,6 +19,14 @@
                       Color="#000000"
                       RenderingBias="Quality" />
 
+    <DropShadowEffect x:Key="Antd.Effect.Popup"
+                      BlurRadius="14"
+                      ShadowDepth="3"
+                      Direction="270"
+                      Opacity="0.16"
+                      Color="#000000"
+                      RenderingBias="Quality" />
+
     <!-- Shared keyboard focus ring: an adorner, so any control can use it without editing its
          template. Input and Button draw their own ring inside the template and keep it off. -->
     <Style x:Key="Antd.FocusVisual">
@@ -1238,22 +1246,50 @@
                             </Grid>
                         </Border>
 
+                        <!-- 16px shadow gutter: the offset gives the 4px gap back, so the panel still
+                             sits 4px under the field. -->
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
                                Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"
                                Focusable="False" StaysOpen="False"
-                               VerticalOffset="4">
-                            <Border Background="{DynamicResource Antd.colorBgElevated}"
+                               VerticalOffset="-12">
+                            <Border Margin="16"
+                                    Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1" CornerRadius="{theme:CornerRadius borderRadiusLG}"
-                                    Padding="4">
-                                <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                              VerticalScrollBarVisibility="Auto">
-                                    <ItemsPresenter />
-                                </ScrollViewer>
+                                    Padding="4"
+                                    Effect="{StaticResource Antd.Effect.Popup}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid x:Name="SearchHost" Grid.Row="0" Visibility="Collapsed" Margin="2,2,2,4">
+                                        <TextBox x:Name="PART_SearchBox"
+                                                 BorderThickness="0"
+                                                 Background="Transparent"
+                                                 VerticalContentAlignment="Center" />
+                                        <TextBlock x:Name="PART_SearchWatermark"
+                                                   IsHitTestVisible="False"
+                                                   VerticalAlignment="Center"
+                                                   Margin="6,0,0,0"
+                                                   Visibility="Collapsed"
+                                                   Foreground="{DynamicResource Antd.colorTextPlaceholder}" />
+                                    </Grid>
+
+                                    <ScrollViewer Grid.Row="1" MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Grid>
                             </Border>
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Filterable" Value="True">
+                            <Setter TargetName="SearchHost" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_SearchWatermark" Property="Visibility" Value="Visible" />
+                        </Trigger>
                         <Trigger Property="HasSelection" Value="False">
                             <Setter TargetName="PlaceholderHost" Property="Visibility" Value="Visible" />
                             <Setter TargetName="SelectionHost" Property="Visibility" Value="Collapsed" />

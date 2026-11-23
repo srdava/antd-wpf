@@ -110,6 +110,7 @@ namespace Antd.Wpf.SmokeTests
             CheckAutomationCoverage();
             CheckIcons();
             CheckKeyboardAndFocus();
+            CheckSelectFiltering();
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2540,6 +2541,62 @@ namespace Antd.Wpf.SmokeTests
 
             quietHost.Close();
             AntdMotion.UseSystemDefault();
+        }
+
+        // ---------------------------------------------------------------- select filtering
+
+        private static void CheckSelectFiltering()
+        {
+            var select = new Select { Filterable = true, Width = 220 };
+            select.Items.Add("Apple");
+            select.Items.Add("Banana");
+            select.Items.Add("Apricot");
+
+            var host = new Window
+            {
+                Width = 360, Height = 240, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = select
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+
+            var search = select.Template.FindName("PART_SearchBox", select) as System.Windows.Controls.TextBox;
+            Check("filterable select renders a search box", search != null,
+                search == null ? "missing" : "ok");
+
+            select.Focus();
+            select.IsDropDownOpen = true;
+            DoEvents();
+            var probe = select.Template.FindName("PART_Popup", select) as System.Windows.Controls.Primitives.Popup;
+            Check("filterable select opens its dropdown", probe != null && probe.IsOpen, probe == null ? "missing" : probe.IsOpen.ToString());
+
+            if (search != null)
+            {
+                search.Text = "ap";
+                DoEvents();
+            }
+            Check("typing filters the dropdown", select.Items.Count == 2, select.Items.Count.ToString());
+
+            select.SelectedIndex = 0;
+            Check("filtered item can be selected",
+                (select.SelectedItem as string) == "Apple", "" + select.SelectedItem);
+
+            select.IsDropDownOpen = false;
+            DoEvents();
+            Check("closing the dropdown clears the filter", select.Items.Count == 3,
+                select.Items.Count + " filter=" + (select.Items.Filter != null));
+
+            var popup = select.Template.FindName("PART_Popup", select) as System.Windows.Controls.Primitives.Popup;
+            var panel = popup == null ? null : popup.Child as FrameworkElement;
+            Check("select panel has a shadow gutter",
+                panel != null && Math.Abs(panel.Margin.Left - 16) < 0.01 && panel.Effect != null,
+                panel == null ? "missing" : panel.Margin.Left + "/" + (panel.Effect == null ? "no effect" : "effect"));
+            Check("select panel keeps its 4px gap",
+                popup != null && Math.Abs(popup.VerticalOffset - (-12)) < 0.01,
+                popup == null ? "missing" : popup.VerticalOffset.ToString());
+
+            host.Close();
         }
 
         private static void DoEvents()

@@ -139,6 +139,8 @@ namespace Antd.Wpf.DocsGen
         private static string Build(string root)
         {
             Assembly assembly = typeof(Button).Assembly;
+            Version version = assembly.GetName().Version;
+            string versionText = version.Major + "." + version.Minor + "." + version.Build;
             var byName = assembly.GetExportedTypes()
                 .Where(t => typeof(FrameworkElement).IsAssignableFrom(t))
                 .ToDictionary(t => t.Name, t => t);
@@ -149,13 +151,13 @@ namespace Antd.Wpf.DocsGen
             sb.AppendLine("<head>");
             sb.AppendLine("<meta charset=\"utf-8\">");
             sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            sb.AppendLine("<title>Ant Design for WPF · 1.0.0</title>");
+            sb.AppendLine("<title>Ant Design for WPF · " + versionText + "</title>");
             sb.Append(Styles());
             sb.AppendLine("</head>");
             sb.AppendLine("<body>");
 
             sb.AppendLine("<aside class=\"nav\">");
-            sb.AppendLine("<div class=\"brand\"><strong>Ant Design for WPF</strong><span>1.0.0 · 69 个组件</span></div>");
+            sb.AppendLine("<div class=\"brand\"><strong>Ant Design for WPF</strong><span>" + versionText + " · 69 个组件</span></div>");
             sb.AppendLine("<a class=\"nav-link\" href=\"#start\">快速开始</a>");
             foreach (var group in Catalogue.GroupBy(d => d.Category))
             {
@@ -179,7 +181,7 @@ namespace Antd.Wpf.DocsGen
 
             sb.AppendLine("<section id=\"start\">");
             sb.AppendLine("<h2>快速开始</h2>");
-            sb.AppendLine("<pre><code>dotnet add package Antd.Wpf.Controls --version 1.0.0</code></pre>");
+            sb.AppendLine("<pre><code>dotnet add package Antd.Wpf.Controls</code></pre>");
             sb.AppendLine("<pre><code>&lt;Application.Resources&gt;\n  &lt;ResourceDictionary&gt;\n    &lt;ResourceDictionary.MergedDictionaries&gt;\n      &lt;ResourceDictionary Source=\"pack://application:,,,/Antd.Wpf.Controls;component/Themes/Framework.xaml\" /&gt;\n    &lt;/ResourceDictionary.MergedDictionaries&gt;\n  &lt;/ResourceDictionary&gt;\n&lt;/Application.Resources&gt;</code></pre>");
             sb.AppendLine("<pre><code>ThemeManager.Current.Attach(Application.Current.Resources);\nThemeManager.Current.Apply(ThemeConfig.CreateDefault());\n\n// 中文文案 + 跟随系统的减动效\nAntdLocale.UseCulture(\"zh-CN\");\nAntdMotion.UseSystemDefault();</code></pre>");
             sb.AppendLine(EmbedScreenshot(root));

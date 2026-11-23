@@ -26,7 +26,7 @@ WPF 项目想用 antd 的样子，通常只有三条路：照着图抄样式（�
 
 组件数量不等于能力齐全。这是**基础版本**，以下是明确没有做的：
 
-- Select 没有搜索、多选、标签折叠；DatePicker 没有区间与快捷选项
+- Select 支持本地搜索（`Filterable`），但没有多选与标签折叠；DatePicker 没有区间与快捷选项
 - Table 基于 DataGrid 适配，没有固定列、展开行
 - Form 只有同步校验；Upload 只收集文件，不做传输队列
 - Tree 只吃静态数据；twotone 图标合并为单色
