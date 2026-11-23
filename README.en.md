@@ -3,6 +3,8 @@
 > Ant Design for WPF · runs on **.NET Framework 4.8** and **.NET 8** · zero third-party dependencies
 >
 > [中文](README.md) | English
+>
+> **GitHub** · https://github.com/srdava/antd-wpf ｜ **Gitee** · https://gitee.com/davva/antd.-wpf.-tokens
 
 [Handbook](docs/manual.en.md) · [Component site](docs/site/index.html) · [Migration](docs/migration.md) · [Capability notes](docs/progress.md) · [Overview](docs/intro.md)
 

@@ -3,6 +3,8 @@
 > Ant Design 规范的 WPF 实现 · 同时支持 **.NET Framework 4.8** 与 **.NET 8** · 零第三方依赖
 >
 > 中文 | [English](README.en.md)
+>
+> **GitHub** · https://github.com/srdava/antd-wpf ｜ **Gitee** · https://gitee.com/davva/antd.-wpf.-tokens
 
 [使用手册](docs/manual.zh.md) · [组件文档站](docs/site/index.html) · [迁移指南](docs/migration.md) · [能力边界](docs/progress.md) · [项目简介](docs/intro.md)
 
