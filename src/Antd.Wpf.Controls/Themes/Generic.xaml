@@ -1275,13 +1275,20 @@
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
                                Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"
                                Focusable="False" StaysOpen="False"
-                               VerticalOffset="-12">
+                               VerticalOffset="4">
+                            <!-- The 16px margin reserves room for the shadow; the transform cancels it so the
+                                 panel still lines up with the field instead of drifting right and down. -->
                             <Border Margin="16"
+                                    RenderTransformOrigin="0,0"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                     Background="{DynamicResource Antd.colorBgElevated}"
                                     BorderBrush="{DynamicResource Antd.colorBorderSecondary}"
                                     BorderThickness="1" CornerRadius="{theme:CornerRadius borderRadiusLG}"
                                     Padding="4"
                                     Effect="{StaticResource Antd.Effect.Popup}">
+                                <Border.RenderTransform>
+                                    <TranslateTransform X="-16" Y="-16" />
+                                </Border.RenderTransform>
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />

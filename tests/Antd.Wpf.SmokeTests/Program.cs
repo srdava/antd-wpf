@@ -124,6 +124,8 @@ namespace Antd.Wpf.SmokeTests
             CheckTreeTable();
             CheckUploadQueue();
             CheckSelectClickPath();
+            CheckSelectPopupGeometry();
+            if (Environment.GetCommandLineArgs().Contains("--shots")) DumpSelectPopup(System.IO.Path.Combine("artifacts", "select-popup.png"));
 
             if (shotDir != null) CaptureGallery(shotDir);
 
@@ -2605,9 +2607,6 @@ namespace Antd.Wpf.SmokeTests
             Check("select panel has a shadow gutter",
                 panel != null && Math.Abs(panel.Margin.Left - 16) < 0.01 && panel.Effect != null,
                 panel == null ? "missing" : panel.Margin.Left + "/" + (panel.Effect == null ? "no effect" : "effect"));
-            Check("select panel keeps its 4px gap",
-                popup != null && Math.Abs(popup.VerticalOffset - (-12)) < 0.01,
-                popup == null ? "missing" : popup.VerticalOffset.ToString());
 
             host.Close();
         }
@@ -3303,6 +3302,115 @@ namespace Antd.Wpf.SmokeTests
                 if (control.ItemContainerGenerator.ContainerFromIndex(i) != null) count++;
             }
             return count;
+        }
+
+        // ---------------------------------------------------------------- select popup geometry
+
+        private static void CheckSelectPopupGeometry()
+        {
+            var select = new Select { Width = 260, Placeholder = "请选择" };
+            for (int i = 0; i < 20; i++) select.Items.Add("选项 " + i);
+
+            var stack = new StackPanel { Margin = new Thickness(60, 40, 0, 0), HorizontalAlignment = HorizontalAlignment.Left };
+            stack.Children.Add(select);
+
+            var host = new Window
+            {
+                Width = 700, Height = 560, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = stack
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(120);
+
+            var toggle = select.Template.FindName("PART_Toggle", select) as System.Windows.Controls.Primitives.ToggleButton;
+            if (toggle != null) toggle.IsChecked = true;
+            DoEvents();
+            Pump(300);
+
+            var popup = select.Template.FindName("PART_Popup", select) as System.Windows.Controls.Primitives.Popup;
+            var panel = popup == null ? null : popup.Child as FrameworkElement;
+            Check("popup panel exists", panel != null, panel == null ? "missing" : "ok");
+            if (panel == null)
+            {
+                host.Close();
+                return;
+            }
+
+            Point field = select.PointToScreen(new Point(0, 0));
+            Point origin = panel.PointToScreen(new Point(0, 0));
+
+            Check("dropdown matches the field width",
+                Math.Abs(panel.ActualWidth - select.ActualWidth) < 1.5,
+                panel.ActualWidth + " vs " + select.ActualWidth);
+            Check("dropdown left edge aligns with the field",
+                Math.Abs(origin.X - field.X) < 1.5, (origin.X - field.X).ToString());
+            Check("dropdown sits 4px under the field",
+                Math.Abs((origin.Y - (field.Y + select.ActualHeight)) - 4) < 2.5,
+                (origin.Y - (field.Y + select.ActualHeight)).ToString());
+
+            var scroller = FindScrollViewer(panel);
+            Check("long lists scroll instead of growing",
+                scroller != null && scroller.ScrollableHeight > 0,
+                scroller == null ? "no scroller" : scroller.ScrollableHeight.ToString());
+            Check("panel height stays near MaxDropDownHeight",
+                panel.ActualHeight <= select.MaxDropDownHeight + 40,
+                panel.ActualHeight + " / " + select.MaxDropDownHeight);
+
+            host.Close();
+        }
+
+        private static void DumpSelectPopup(string path)
+        {
+            var select = new Select { Width = 260, Placeholder = "请选择" };
+            select.Items.Add("运行中");
+            select.Items.Add("已停止");
+            select.Items.Add("维护中");
+            select.Items.Add("已下线");
+
+            var stack = new StackPanel { Margin = new Thickness(20) };
+            stack.Children.Add(select);
+
+            var host = new Window
+            {
+                Width = 360, Height = 300, ShowInTaskbar = false, WindowStyle = WindowStyle.None,
+                Content = stack
+            };
+            host.Show();
+            DoEvents();
+            host.UpdateLayout();
+            Pump(150);
+
+            var toggle = select.Template.FindName("PART_Toggle", select) as System.Windows.Controls.Primitives.ToggleButton;
+            if (toggle != null) toggle.IsChecked = true;
+            DoEvents();
+            Pump(300);
+
+            var popup = select.Template.FindName("PART_Popup", select) as System.Windows.Controls.Primitives.Popup;
+            var panel = popup == null ? null : popup.Child as FrameworkElement;
+            if (panel == null) { host.Close(); return; }
+
+            const double pad = 28;
+            var visual = new DrawingVisual();
+            using (DrawingContext dc = visual.RenderOpen())
+            {
+                dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(240, 242, 245)), null,
+                    new Rect(0, 0, panel.ActualWidth + pad * 2, panel.ActualHeight + pad * 2));
+                dc.DrawRectangle(new VisualBrush(panel) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top },
+                    null, new Rect(pad, pad, panel.ActualWidth, panel.ActualHeight));
+            }
+
+            var bitmap = new RenderTargetBitmap(
+                (int)((panel.ActualWidth + pad * 2) * 2), (int)((panel.ActualHeight + pad * 2) * 2), 192, 192, PixelFormats.Pbgra32);
+            bitmap.Render(visual);
+
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            using (System.IO.FileStream stream = System.IO.File.Create(path)) encoder.Save(stream);
+
+            Console.WriteLine("dumped " + path);
+            host.Close();
         }
 
         private static void DoEvents()

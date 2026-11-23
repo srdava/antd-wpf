@@ -1,6 +1,6 @@
 # Antd.Wpf 使用手册
 
-> Ant Design 规范的 WPF 实现 · 1.1.1 · **中文** · [English](manual.en.md)
+> Ant Design 规范的 WPF 实现 · 1.1.2 · **中文** · [English](manual.en.md)
 
 本手册的参数表由 `tools/docs-gen` 从编译后的程序集生成，不会与代码脱节。
 
@@ -20,7 +20,7 @@ Ant Design 的 WPF 实现，同时支持 .NET Framework 4.8 与 .NET 8，零第�
 ## 快速开始
 
 ```bash
-dotnet add package Antd.Wpf.Controls --version 1.1.1
+dotnet add package Antd.Wpf.Controls --version 1.1.2
 ```
 
 合并资源字典，让控件模板能取到 token：

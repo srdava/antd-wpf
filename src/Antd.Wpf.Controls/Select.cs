@@ -201,6 +201,7 @@ namespace Antd.Wpf.Controls
         private System.Windows.Controls.Panel _tagHost;
         private string _tagSignature;
         private bool _suppressSelection;
+        private int _alignPass;
         public static readonly DependencyProperty FilterLocallyProperty = DependencyProperty.Register(
             "FilterLocally", typeof(bool), typeof(Select), new FrameworkPropertyMetadata(true));
 
@@ -319,6 +320,42 @@ namespace Antd.Wpf.Controls
 
         /// <summary>Clicking a row toggles it and keeps the dropdown open, like antd's multiple mode.</summary>
         /// <summary>Hooks the popup content once it exists (Child is not ready during ApplyTemplate).</summary>
+        /// <summary>
+        /// The panel reserves 16px on every side for its shadow and WPF's placement ignores that,
+        /// so the panel ends up shifted. Instead of guessing the correction, the first open
+        /// measures the real offset and folds it back into the popup offsets.
+        /// </summary>
+        private void AlignPopupToField()
+        {
+            if (_popup == null || _popup.Child == null) return;
+
+            var panel = _popup.Child as FrameworkElement;
+            if (panel == null || ActualHeight <= 0) return;
+
+            const double targetGap = 4;
+            Point fieldOrigin = PointToScreen(new Point(0, 0));
+            Point panelOrigin = panel.PointToScreen(new Point(0, 0));
+
+            double dx = panelOrigin.X - fieldOrigin.X;
+            double dy = panelOrigin.Y - (fieldOrigin.Y + ActualHeight);
+
+            if (Math.Abs(dx) < 0.5 && Math.Abs(dy - targetGap) < 0.5) return;
+
+            _popup.HorizontalOffset -= dx;
+            _popup.VerticalOffset -= dy - targetGap;
+
+            // The residual is not linear (the shadow bounds are recomputed), so measure once more.
+            if (++_alignPass < 3)
+            {
+                Dispatcher.BeginInvoke(new Action(AlignPopupToField), System.Windows.Threading.DispatcherPriority.Render);
+            }
+        }
+
+        private void OnPopupOpenedAlign(object sender, EventArgs e)
+        {
+            _alignPass = 0;
+            Dispatcher.BeginInvoke(new Action(AlignPopupToField), System.Windows.Threading.DispatcherPriority.Loaded);
+        }
         private void OnPopupOpenedHookClicks(object sender, EventArgs e)
         {
             if (_popup == null) return;
@@ -484,6 +521,8 @@ namespace Antd.Wpf.Controls
             {
                 _popup.Opened -= OnPopupOpenedHookClicks;
                 _popup.Opened += OnPopupOpenedHookClicks;
+                _popup.Opened -= OnPopupOpenedAlign;
+                _popup.Opened += OnPopupOpenedAlign;
             }
 
             _tagHost = GetTemplateChild("PART_TagHost") as System.Windows.Controls.Panel;
