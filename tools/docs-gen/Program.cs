@@ -16,94 +16,604 @@ namespace Antd.Wpf.DocsGen
     /// </summary>
     internal static class Program
     {
-        private sealed class Doc
+        internal static readonly DocInfo[] Catalogue =
         {
-            public string Name;
-            public string Title;
-            public string Category;
-            public string Summary;
-        }
+            new DocInfo
+            {
+                Name = "Button",
+                Title = "按钮", TitleEn = "Button",
+                Category = "通用",
+                Summary = "主/默认/虚线/文本/链接五种变体，含危险态、图标与加载态。",
+                SummaryEn = "Five variants (default/primary/dashed/text/link) with danger, icon and loading states."
+            },
+            new DocInfo
+            {
+                Name = "Icon",
+                Title = "图标", TitleEn = "Icon",
+                Category = "通用",
+                Summary = "用 Geometry 绘制，颜色跟随 Foreground；847 个图标可用 AntdIcons.ByName 取。",
+                SummaryEn = "Drawn as Geometry and tinted by Foreground; 847 glyphs via AntdIcons.ByName."
+            },
+            new DocInfo
+            {
+                Name = "Input",
+                Title = "输入框", TitleEn = "Input",
+                Category = "数据录入",
+                Summary = "单行输入，带清除按钮与三种尺寸。",
+                SummaryEn = "Single-line input with a clear button and three sizes."
+            },            new DocInfo
+            {
+                Name = "Text",
+                Title = "文本", TitleEn = "Text",
+                Category = "通用",
+                Summary = "Typography 的正文，支持次要/成功/警告/危险语义色。",
+                SummaryEn = "Body copy with secondary/success/warning/danger tones."
+            },
+            new DocInfo
+            {
+                Name = "Title",
+                Title = "标题", TitleEn = "Title",
+                Category = "通用",
+                Summary = "Typography 的标题，1–5 级。",
+                SummaryEn = "Heading levels 1-5."
+            },
+            new DocInfo
+            {
+                Name = "Paragraph",
+                Title = "段落", TitleEn = "Paragraph",
+                Category = "通用",
+                Summary = "多行正文，可带省略与复制。",
+                SummaryEn = "Multi-line body copy with ellipsis and copy support."
+            },
+            new DocInfo
+            {
+                Name = "Link",
+                Title = "链接", TitleEn = "Link",
+                Category = "通用",
+                Summary = "带下划线与悬停态的文本链接。",
+                SummaryEn = "Text link with underline and hover states."
+            },
+            new DocInfo
+            {
+                Name = "Divider",
+                Title = "分割线", TitleEn = "Divider",
+                Category = "通用",
+                Summary = "水平/垂直分割，可带文字。",
+                SummaryEn = "Horizontal or vertical rule, optionally with a caption."
+            },
+            new DocInfo
+            {
+                Name = "Space",
+                Title = "间距", TitleEn = "Space",
+                Category = "通用",
+                Summary = "统一间距排列子元素，边缘不会多出一份。",
+                SummaryEn = "Even gaps between children without a trailing edge."
+            },
+            new DocInfo
+            {
+                Name = "Flex",
+                Title = "弹性布局", TitleEn = "Flex",
+                Category = "通用",
+                Summary = "一维排布，支持对齐、换行与间隔。",
+                SummaryEn = "One-dimensional layout with alignment, wrapping and gaps."
+            },
+            new DocInfo
+            {
+                Name = "Watermark",
+                Title = "水印", TitleEn = "Watermark",
+                Category = "通用",
+                Summary = "在内容上叠加倾斜文字或图片水印。",
+                SummaryEn = "Tilted text or image watermark over the content."
+            },
+            new DocInfo
+            {
+                Name = "BorderBeam",
+                Title = "边框光效", TitleEn = "Border beam",
+                Category = "通用",
+                Summary = "沿边框流动的高亮描边，用于强调卡片。",
+                SummaryEn = "Highlight travelling along a card border."
+            },
 
-        private static readonly Doc[] Catalogue =
-        {
-            new Doc { Name = "Button", Title = "按钮", Category = "通用", Summary = "主/默认/虚线/文本/链接五种变体，含危险态、图标与加载态。" },
-            new Doc { Name = "Icon", Title = "图标", Category = "通用", Summary = "用 Geometry 绘制，颜色跟随 Foreground；847 个图标可用 AntdIcons.ByName 取。" },
-            new Doc { Name = "Text", Title = "文本", Category = "通用", Summary = "Typography 的正文，支持次要/成功/警告/危险语义色。" },
-            new Doc { Name = "Title", Title = "标题", Category = "通用", Summary = "Typography 的标题，1–5 级。" },
-            new Doc { Name = "Paragraph", Title = "段落", Category = "通用", Summary = "多行正文，可带省略与复制。" },
-            new Doc { Name = "Link", Title = "链接", Category = "通用", Summary = "带下划线与悬停态的文本链接。" },
-            new Doc { Name = "Divider", Title = "分割线", Category = "通用", Summary = "水平/垂直分割，可带文字。" },
-            new Doc { Name = "Space", Title = "间距", Category = "通用", Summary = "统一间距排列子元素，边缘不会多出一份。" },
-            new Doc { Name = "Flex", Title = "弹性布局", Category = "通用", Summary = "一维排布，支持对齐、换行与间隔。" },
-            new Doc { Name = "Watermark", Title = "水印", Category = "通用", Summary = "在内容上叠加倾斜文字或图片水印。" },
-            new Doc { Name = "BorderBeam", Title = "边框光效", Category = "通用", Summary = "沿边框流动的高亮描边，用于强调卡片。" },
+            new DocInfo
+            {
+                Name = "Layout",
+                Title = "布局容器", TitleEn = "Layout",
+                Category = "布局",
+                Summary = "页面骨架，配合 Sider / Header / Footer / Content 使用。",
+                SummaryEn = "Page shell used with Sider / Header / Footer / Content."
+            },
+            new DocInfo
+            {
+                Name = "Sider",
+                Title = "侧边栏", TitleEn = "Sider",
+                Category = "布局",
+                Summary = "可折叠侧边栏，折叠后保留图标区。",
+                SummaryEn = "Collapsible side bar that keeps an icon rail when collapsed."
+            },
+            new DocInfo
+            {
+                Name = "Header",
+                Title = "页头", TitleEn = "Header",
+                Category = "布局",
+                Summary = "顶部条，默认高度与内边距按 token。",
+                SummaryEn = "Top bar with token-driven height and padding."
+            },
+            new DocInfo
+            {
+                Name = "Footer",
+                Title = "页脚", TitleEn = "Footer",
+                Category = "布局",
+                Summary = "底部条。",
+                SummaryEn = "Bottom bar."
+            },
+            new DocInfo
+            {
+                Name = "Content",
+                Title = "内容区", TitleEn = "Content",
+                Category = "布局",
+                Summary = "主内容区，带 token 内边距。",
+                SummaryEn = "Main content area with token padding."
+            },
+            new DocInfo
+            {
+                Name = "Row",
+                Title = "行", TitleEn = "Row",
+                Category = "布局",
+                Summary = "24 栅格的行容器，配合 Col 使用。",
+                SummaryEn = "24-column grid row, used with Col."
+            },
+            new DocInfo
+            {
+                Name = "Col",
+                Title = "列", TitleEn = "Col",
+                Category = "布局",
+                Summary = "栅格列，支持 span / offset。",
+                SummaryEn = "Grid column with span and offset."
+            },
+            new DocInfo
+            {
+                Name = "Masonry",
+                Title = "瀑布流", TitleEn = "Masonry",
+                Category = "布局",
+                Summary = "按列高度自动分配的多列布局。",
+                SummaryEn = "Multi-column layout that fills the shortest column."
+            },
+            new DocInfo
+            {
+                Name = "Splitter",
+                Title = "分隔面板", TitleEn = "Splitter",
+                Category = "布局",
+                Summary = "可拖拽调整两栏尺寸。",
+                SummaryEn = "Draggable divider between two panes."
+            },
+            new DocInfo
+            {
+                Name = "Affix",
+                Title = "固钉", TitleEn = "Affix",
+                Category = "布局",
+                Summary = "滚动到阈值后把内容固定在顶部。",
+                SummaryEn = "Pins content to the top after a scroll threshold."
+            },
 
-            new Doc { Name = "Layout", Title = "布局容器", Category = "布局", Summary = "页面骨架，配合 Sider / Header / Footer / Content 使用。" },
-            new Doc { Name = "Sider", Title = "侧边栏", Category = "布局", Summary = "可折叠侧边栏，折叠后保留图标区。" },
-            new Doc { Name = "Header", Title = "页头", Category = "布局", Summary = "顶部条，默认高度与内边距按 token。" },
-            new Doc { Name = "Footer", Title = "页脚", Category = "布局", Summary = "底部条。" },
-            new Doc { Name = "Content", Title = "内容区", Category = "布局", Summary = "主内容区，带 token 内边距。" },
-            new Doc { Name = "Row", Title = "行", Category = "布局", Summary = "24 栅格的行容器，配合 Col 使用。" },
-            new Doc { Name = "Col", Title = "列", Category = "布局", Summary = "栅格列，支持 span / offset。" },
-            new Doc { Name = "Masonry", Title = "瀑布流", Category = "布局", Summary = "按列高度自动分配的多列布局。" },
-            new Doc { Name = "Splitter", Title = "分隔面板", Category = "布局", Summary = "可拖拽调整两栏尺寸。" },
-            new Doc { Name = "Affix", Title = "固钉", Category = "布局", Summary = "滚动到阈值后把内容固定在顶部。" },
+            new DocInfo
+            {
+                Name = "Anchor",
+                Title = "锚点", TitleEn = "Anchor",
+                Category = "导航",
+                Summary = "页面内跳转，滚动时高亮当前段落。",
+                SummaryEn = "In-page navigation that highlights the current section."
+            },
+            new DocInfo
+            {
+                Name = "Breadcrumb",
+                Title = "面包屑", TitleEn = "Breadcrumb",
+                Category = "导航",
+                Summary = "层级路径，自动插入分隔符。",
+                SummaryEn = "Hierarchy trail with automatic separators."
+            },
+            new DocInfo
+            {
+                Name = "Dropdown",
+                Title = "下拉菜单", TitleEn = "Dropdown",
+                Category = "导航",
+                Summary = "点击/悬停触发，菜单项复用 MenuNode 数据。",
+                SummaryEn = "Click or hover trigger whose rows reuse MenuNode data."
+            },
+            new DocInfo
+            {
+                Name = "Menu",
+                Title = "导航菜单", TitleEn = "Menu",
+                Category = "导航",
+                Summary = "垂直或水平菜单，支持多级与选中态；方向键可操作。",
+                SummaryEn = "Vertical or horizontal menu with nesting and selection; arrow keys work."
+            },
+            new DocInfo
+            {
+                Name = "Pagination",
+                Title = "分页", TitleEn = "Pagination",
+                Category = "导航",
+                Summary = "页码、上一页/下一页与总数，超出时折叠省略号。",
+                SummaryEn = "Page numbers with prev/next and an ellipsis for long ranges."
+            },
+            new DocInfo
+            {
+                Name = "Steps",
+                Title = "步骤条", TitleEn = "Steps",
+                Category = "导航",
+                Summary = "流程进度，支持当前步与状态色。",
+                SummaryEn = "Process progress with a current step and status colours."
+            },
+            new DocInfo
+            {
+                Name = "Tabs",
+                Title = "标签页", TitleEn = "Tabs",
+                Category = "导航",
+                Summary = "横向切换内容区，支持卡片式与居中。",
+                SummaryEn = "Horizontal tab strip, line or centred style."
+            },
+            new DocInfo
+            {
+                Name = "Tree",
+                Title = "树形控件", TitleEn = "Tree",
+                Category = "导航",
+                Summary = "层级数据展示与选择，键盘可导航。",
+                SummaryEn = "Hierarchical display and selection, keyboard navigable."
+            },
 
-            new Doc { Name = "Anchor", Title = "锚点", Category = "导航", Summary = "页面内跳转，滚动时高亮当前段落。" },
-            new Doc { Name = "Breadcrumb", Title = "面包屑", Category = "导航", Summary = "层级路径，自动插入分隔符。" },
-            new Doc { Name = "Dropdown", Title = "下拉菜单", Category = "导航", Summary = "点击/悬停触发，菜单项复用 MenuNode 数据。" },
-            new Doc { Name = "Menu", Title = "导航菜单", Category = "导航", Summary = "垂直或水平菜单，支持多级与选中态；方向键可操作。" },
-            new Doc { Name = "Pagination", Title = "分页", Category = "导航", Summary = "页码、上一页/下一页与总数，超出时折叠省略号。" },
-            new Doc { Name = "Steps", Title = "步骤条", Category = "导航", Summary = "流程进度，支持当前步与状态色。" },
-            new Doc { Name = "Tabs", Title = "标签页", Category = "导航", Summary = "横向切换内容区，支持卡片式与居中。" },
-            new Doc { Name = "Tree", Title = "树形控件", Category = "导航", Summary = "层级数据展示与选择，键盘可导航。" },
+            new DocInfo
+            {
+                Name = "AutoComplete",
+                Title = "自动完成", TitleEn = "AutoComplete",
+                Category = "数据录入",
+                Summary = "输入时给出候选，上下键选择。",
+                SummaryEn = "Suggests entries while typing; arrow keys pick."
+            },
+            new DocInfo
+            {
+                Name = "Cascader",
+                Title = "级联选择", TitleEn = "Cascader",
+                Category = "数据录入",
+                Summary = "多级联动选择，逐列展开。",
+                SummaryEn = "Cascading picker, one column per level."
+            },
+            new DocInfo
+            {
+                Name = "Checkbox",
+                Title = "复选框", TitleEn = "Checkbox",
+                Category = "数据录入",
+                Summary = "支持半选（IsThreeState）与禁用。",
+                SummaryEn = "Checkbox with an indeterminate state and disabled support."
+            },
+            new DocInfo
+            {
+                Name = "ColorPicker",
+                Title = "颜色选择", TitleEn = "ColorPicker",
+                Category = "数据录入",
+                Summary = "预设色板 + 常用颜色，弹出面板选择。",
+                SummaryEn = "Preset swatches plus a hue strip in a popup."
+            },
+            new DocInfo
+            {
+                Name = "DatePicker",
+                Title = "日期选择", TitleEn = "DatePicker",
+                Category = "数据录入",
+                Summary = "单日期选择，面板与输入框联动。",
+                SummaryEn = "Single date, or a two-month range with DisabledDate rules."
+            },
+            new DocInfo
+            {
+                Name = "Form",
+                Title = "表单", TitleEn = "Form",
+                Category = "数据录入",
+                Summary = "标签布局、必填校验与错误提示；支持横向布局与标签列宽。",
+                SummaryEn = "Label layout, required rules and error text; horizontal mode and label width."
+            },
+            new DocInfo
+            {
+                Name = "InputNumber",
+                Title = "数字输入框", TitleEn = "InputNumber",
+                Category = "数据录入",
+                Summary = "带步进按钮，外部赋值也会收敛到声明范围。",
+                SummaryEn = "Stepper input that clamps even when the value is set from code."
+            },
+            new DocInfo
+            {
+                Name = "Mentions",
+                Title = "@提及", TitleEn = "Mentions",
+                Category = "数据录入",
+                Summary = "输入 @ 触发候选。",
+                SummaryEn = "Mention suggestions triggered by @."
+            },
+            new DocInfo
+            {
+                Name = "Radio",
+                Title = "单选框", TitleEn = "Radio",
+                Category = "数据录入",
+                Summary = "同组互斥选择。",
+                SummaryEn = "Mutually exclusive choice inside a group."
+            },
+            new DocInfo
+            {
+                Name = "Rate",
+                Title = "评分", TitleEn = "Rate",
+                Category = "数据录入",
+                Summary = "星级评分，支持半星；方向键可调。",
+                SummaryEn = "Star rating with half stars; arrow keys adjust."
+            },
+            new DocInfo
+            {
+                Name = "Select",
+                Title = "选择器", TitleEn = "Select",
+                Category = "数据录入",
+                Summary = "单选下拉，支持清除与占位。",
+                SummaryEn = "Single or multiple selection with tag folding, local/remote search and virtualisation."
+            },
+            new DocInfo
+            {
+                Name = "Slider",
+                Title = "滑动输入条", TitleEn = "Slider",
+                Category = "数据录入",
+                Summary = "连续或分段取值。",
+                SummaryEn = "Continuous or stepped value picker."
+            },
+            new DocInfo
+            {
+                Name = "Switch",
+                Title = "开关", TitleEn = "Switch",
+                Category = "数据录入",
+                Summary = "两种状态的即时切换。",
+                SummaryEn = "Immediate two-state toggle."
+            },
+            new DocInfo
+            {
+                Name = "TimePicker",
+                Title = "时间选择", TitleEn = "TimePicker",
+                Category = "数据录入",
+                Summary = "时分秒选择面板。",
+                SummaryEn = "Hour / minute / second panel."
+            },
+            new DocInfo
+            {
+                Name = "Transfer",
+                Title = "穿梭框", TitleEn = "Transfer",
+                Category = "数据录入",
+                Summary = "两栏列表之间移动条目。",
+                SummaryEn = "Move items between two lists."
+            },
+            new DocInfo
+            {
+                Name = "TreeSelect",
+                Title = "树选择", TitleEn = "TreeSelect",
+                Category = "数据录入",
+                Summary = "下拉里的树形选择。",
+                SummaryEn = "Tree picker inside a dropdown."
+            },
+            new DocInfo
+            {
+                Name = "Upload",
+                Title = "上传", TitleEn = "Upload",
+                Category = "数据录入",
+                Summary = "拖拽/点选收集文件并列出，传输由宿主完成；拖拽区键盘可操作。",
+                SummaryEn = "Collects files by drop or pick with a queue, progress and cancel; transport comes from the host."
+            },
+            new DocInfo
+            {
+                Name = "Segmented",
+                Title = "分段控制器", TitleEn = "Segmented",
+                Category = "数据录入",
+                Summary = "多选项的紧凑切换。",
+                SummaryEn = "Compact multi-option switch."
+            },
 
-            new Doc { Name = "AutoComplete", Title = "自动完成", Category = "数据录入", Summary = "输入时给出候选，上下键选择。" },
-            new Doc { Name = "Cascader", Title = "级联选择", Category = "数据录入", Summary = "多级联动选择，逐列展开。" },
-            new Doc { Name = "Checkbox", Title = "复选框", Category = "数据录入", Summary = "支持半选（IsThreeState）与禁用。" },
-            new Doc { Name = "ColorPicker", Title = "颜色选择", Category = "数据录入", Summary = "预设色板 + 常用颜色，弹出面板选择。" },
-            new Doc { Name = "DatePicker", Title = "日期选择", Category = "数据录入", Summary = "单日期选择，面板与输入框联动。" },
-            new Doc { Name = "Form", Title = "表单", Category = "数据录入", Summary = "标签布局、必填校验与错误提示；支持横向布局与标签列宽。" },
-            new Doc { Name = "InputNumber", Title = "数字输入框", Category = "数据录入", Summary = "带步进按钮，外部赋值也会收敛到声明范围。" },
-            new Doc { Name = "Mentions", Title = "@提及", Category = "数据录入", Summary = "输入 @ 触发候选。" },
-            new Doc { Name = "Radio", Title = "单选框", Category = "数据录入", Summary = "同组互斥选择。" },
-            new Doc { Name = "Rate", Title = "评分", Category = "数据录入", Summary = "星级评分，支持半星；方向键可调。" },
-            new Doc { Name = "Select", Title = "选择器", Category = "数据录入", Summary = "单选下拉，支持清除与占位。" },
-            new Doc { Name = "Slider", Title = "滑动输入条", Category = "数据录入", Summary = "连续或分段取值。" },
-            new Doc { Name = "Switch", Title = "开关", Category = "数据录入", Summary = "两种状态的即时切换。" },
-            new Doc { Name = "TimePicker", Title = "时间选择", Category = "数据录入", Summary = "时分秒选择面板。" },
-            new Doc { Name = "Transfer", Title = "穿梭框", Category = "数据录入", Summary = "两栏列表之间移动条目。" },
-            new Doc { Name = "TreeSelect", Title = "树选择", Category = "数据录入", Summary = "下拉里的树形选择。" },
-            new Doc { Name = "Upload", Title = "上传", Category = "数据录入", Summary = "拖拽/点选收集文件并列出，传输由宿主完成；拖拽区键盘可操作。" },
-            new Doc { Name = "Segmented", Title = "分段控制器", Category = "数据录入", Summary = "多选项的紧凑切换。" },
+            new DocInfo
+            {
+                Name = "Avatar",
+                Title = "头像", TitleEn = "Avatar",
+                Category = "数据展示",
+                Summary = "图片、图标或文字头像，支持组。",
+                SummaryEn = "Image, icon or text avatar, groupable."
+            },
+            new DocInfo
+            {
+                Name = "Badge",
+                Title = "徽标数", TitleEn = "Badge",
+                Category = "数据展示",
+                Summary = "红点或数字角标，可独立展示。",
+                SummaryEn = "Dot or numeric badge, standalone too."
+            },
+            new DocInfo
+            {
+                Name = "Calendar",
+                Title = "日历", TitleEn = "Calendar",
+                Category = "数据展示",
+                Summary = "月视图，日期格可键盘导航。",
+                SummaryEn = "Month grid with keyboard navigation and DisabledDate."
+            },
+            new DocInfo
+            {
+                Name = "Card",
+                Title = "卡片", TitleEn = "Card",
+                Category = "数据展示",
+                Summary = "内容容器，带标题、额外操作与操作区。",
+                SummaryEn = "Content container with title, extra slot and actions."
+            },
+            new DocInfo
+            {
+                Name = "Carousel",
+                Title = "走马灯", TitleEn = "Carousel",
+                Category = "数据展示",
+                Summary = "轮播内容，可自动播放（减动效时停）。",
+                SummaryEn = "Sliding carousel; autoplay stops under reduced motion."
+            },
+            new DocInfo
+            {
+                Name = "Collapse",
+                Title = "折叠面板", TitleEn = "Collapse",
+                Category = "数据展示",
+                Summary = "手风琴式展开；头部可聚焦，空格/回车切换。",
+                SummaryEn = "Accordion; the header is focusable and toggles with Space or Enter."
+            },
+            new DocInfo
+            {
+                Name = "Descriptions",
+                Title = "描述列表", TitleEn = "Descriptions",
+                Category = "数据展示",
+                Summary = "键值对信息展示，支持多列。",
+                SummaryEn = "Key/value pairs in one or more columns."
+            },
+            new DocInfo
+            {
+                Name = "Empty",
+                Title = "空状态", TitleEn = "Empty",
+                Category = "数据展示",
+                Summary = "占位插图与说明文案。",
+                SummaryEn = "Placeholder illustration with a caption."
+            },
+            new DocInfo
+            {
+                Name = "Image",
+                Title = "图片", TitleEn = "Image",
+                Category = "数据展示",
+                Summary = "带预览的图片。",
+                SummaryEn = "Image with a preview overlay."
+            },
+            new DocInfo
+            {
+                Name = "List",
+                Title = "列表", TitleEn = "List",
+                Category = "数据展示",
+                Summary = "纵向条目，支持标题、描述与操作。",
+                SummaryEn = "Vertical rows with title, description and actions."
+            },
+            new DocInfo
+            {
+                Name = "QRCode",
+                Title = "二维码", TitleEn = "QRCode",
+                Category = "数据展示",
+                Summary = "生成二维码图形，可设颜色与纠错级别。",
+                SummaryEn = "Byte-mode QR symbol with adjustable colour and error correction."
+            },
+            new DocInfo
+            {
+                Name = "Statistic",
+                Title = "统计数值", TitleEn = "Statistic",
+                Category = "数据展示",
+                Summary = "大字号数值 + 前缀/后缀。",
+                SummaryEn = "Large numeric value with prefix and suffix."
+            },
+            new DocInfo
+            {
+                Name = "Table",
+                Title = "表格", TitleEn = "Table",
+                Category = "数据展示",
+                Summary = "基于 DataGrid 重绘，保留排序、列宽与虚拟化。",
+                SummaryEn = "DataGrid-derived grid: sorting, frozen columns, expandable rows and tree rows."
+            },
+            new DocInfo
+            {
+                Name = "Tag",
+                Title = "标签", TitleEn = "Tag",
+                Category = "数据展示",
+                Summary = "状态色标签，可关闭。",
+                SummaryEn = "Status tag, optionally closable."
+            },
+            new DocInfo
+            {
+                Name = "Timeline",
+                Title = "时间轴", TitleEn = "Timeline",
+                Category = "数据展示",
+                Summary = "纵向事件节点。",
+                SummaryEn = "Vertical event nodes."
+            },
+            new DocInfo
+            {
+                Name = "Tooltip",
+                Title = "文字提示", TitleEn = "Tooltip",
+                Category = "数据展示",
+                Summary = "悬停/聚焦时的简短说明，已带阴影。",
+                SummaryEn = "Short hint on hover or focus, with a shadow."
+            },
+            new DocInfo
+            {
+                Name = "Tour",
+                Title = "漫游式引导", TitleEn = "Tour",
+                Category = "数据展示",
+                Summary = "分步高亮目标元素。",
+                SummaryEn = "Step-by-step spotlight walkthrough."
+            },
 
-            new Doc { Name = "Avatar", Title = "头像", Category = "数据展示", Summary = "图片、图标或文字头像，支持组。" },
-            new Doc { Name = "Badge", Title = "徽标数", Category = "数据展示", Summary = "红点或数字角标，可独立展示。" },
-            new Doc { Name = "Calendar", Title = "日历", Category = "数据展示", Summary = "月视图，日期格可键盘导航。" },
-            new Doc { Name = "Card", Title = "卡片", Category = "数据展示", Summary = "内容容器，带标题、额外操作与操作区。" },
-            new Doc { Name = "Carousel", Title = "走马灯", Category = "数据展示", Summary = "轮播内容，可自动播放（减动效时停）。" },
-            new Doc { Name = "Collapse", Title = "折叠面板", Category = "数据展示", Summary = "手风琴式展开；头部可聚焦，空格/回车切换。" },
-            new Doc { Name = "Descriptions", Title = "描述列表", Category = "数据展示", Summary = "键值对信息展示，支持多列。" },
-            new Doc { Name = "Empty", Title = "空状态", Category = "数据展示", Summary = "占位插图与说明文案。" },
-            new Doc { Name = "Image", Title = "图片", Category = "数据展示", Summary = "带预览的图片。" },
-            new Doc { Name = "List", Title = "列表", Category = "数据展示", Summary = "纵向条目，支持标题、描述与操作。" },
-            new Doc { Name = "QRCode", Title = "二维码", Category = "数据展示", Summary = "生成二维码图形，可设颜色与纠错级别。" },
-            new Doc { Name = "Statistic", Title = "统计数值", Category = "数据展示", Summary = "大字号数值 + 前缀/后缀。" },
-            new Doc { Name = "Table", Title = "表格", Category = "数据展示", Summary = "基于 DataGrid 重绘，保留排序、列宽与虚拟化。" },
-            new Doc { Name = "Tag", Title = "标签", Category = "数据展示", Summary = "状态色标签，可关闭。" },
-            new Doc { Name = "Timeline", Title = "时间轴", Category = "数据展示", Summary = "纵向事件节点。" },
-            new Doc { Name = "Tooltip", Title = "文字提示", Category = "数据展示", Summary = "悬停/聚焦时的简短说明，已带阴影。" },
-            new Doc { Name = "Tour", Title = "漫游式引导", Category = "数据展示", Summary = "分步高亮目标元素。" },
-
-            new Doc { Name = "Alert", Title = "警告提示", Category = "反馈", Summary = "四种语义状态，可带标题、描述与关闭。" },
-            new Doc { Name = "Drawer", Title = "抽屉", Category = "反馈", Summary = "从四边滑出，入退场带方向滑动。" },
-            new Doc { Name = "Modal", Title = "对话框", Category = "反馈", Summary = "遮罩 + 卡片，焦点循环、Esc 关闭、退场动效。" },
-            new Doc { Name = "Popconfirm", Title = "气泡确认", Category = "反馈", Summary = "行内二次确认，面板带阴影。" },
-            new Doc { Name = "Popover", Title = "气泡卡片", Category = "反馈", Summary = "悬停/点击浮现的富内容面板。" },
-            new Doc { Name = "Progress", Title = "进度条", Category = "反馈", Summary = "线形与环形进度。" },
-            new Doc { Name = "Result", Title = "结果页", Category = "反馈", Summary = "操作结果的整页反馈，四种状态。" },
-            new Doc { Name = "Skeleton", Title = "骨架屏", Category = "反馈", Summary = "加载占位，支持头像与段落形态。" },
-            new Doc { Name = "Spin", Title = "加载中", Category = "反馈", Summary = "旋转指示器，可包裹内容。" }
+            new DocInfo
+            {
+                Name = "Alert",
+                Title = "警告提示", TitleEn = "Alert",
+                Category = "反馈",
+                Summary = "四种语义状态，可带标题、描述与关闭。",
+                SummaryEn = "Four semantic types with title, description and close."
+            },
+            new DocInfo
+            {
+                Name = "Drawer",
+                Title = "抽屉", TitleEn = "Drawer",
+                Category = "反馈",
+                Summary = "从四边滑出，入退场带方向滑动。",
+                SummaryEn = "Slides in from any edge with direction-aware motion."
+            },
+            new DocInfo
+            {
+                Name = "Modal",
+                Title = "对话框", TitleEn = "Modal",
+                Category = "反馈",
+                Summary = "遮罩 + 卡片，焦点循环、Esc 关闭、退场动效。",
+                SummaryEn = "Mask plus card with focus trap, Esc, exit motion and imperative Modal.Confirm."
+            },
+            new DocInfo
+            {
+                Name = "Popconfirm",
+                Title = "气泡确认", TitleEn = "Popconfirm",
+                Category = "反馈",
+                Summary = "行内二次确认，面板带阴影。",
+                SummaryEn = "Inline confirmation bubble with a shadow."
+            },
+            new DocInfo
+            {
+                Name = "Popover",
+                Title = "气泡卡片", TitleEn = "Popover",
+                Category = "反馈",
+                Summary = "悬停/点击浮现的富内容面板。",
+                SummaryEn = "Rich content panel on hover or click."
+            },
+            new DocInfo
+            {
+                Name = "Progress",
+                Title = "进度条", TitleEn = "Progress",
+                Category = "反馈",
+                Summary = "线形与环形进度。",
+                SummaryEn = "Linear and circular progress."
+            },
+            new DocInfo
+            {
+                Name = "Result",
+                Title = "结果页", TitleEn = "Result",
+                Category = "反馈",
+                Summary = "操作结果的整页反馈，四种状态。",
+                SummaryEn = "Full-page outcome screen with five states."
+            },
+            new DocInfo
+            {
+                Name = "Skeleton",
+                Title = "骨架屏", TitleEn = "Skeleton",
+                Category = "反馈",
+                Summary = "加载占位，支持头像与段落形态。",
+                SummaryEn = "Loading placeholder with avatar and paragraph shapes."
+            },
+            new DocInfo
+            {
+                Name = "Spin",
+                Title = "加载中", TitleEn = "Spin",
+                Category = "反馈",
+                Summary = "旋转指示器，可包裹内容。",
+                SummaryEn = "Spinner that can wrap its content."
+            }
         };
 
         private static int Main(string[] args)
@@ -162,13 +672,15 @@ namespace Antd.Wpf.DocsGen
             foreach (var group in Catalogue.GroupBy(d => d.Category))
             {
                 sb.AppendLine("<div class=\"nav-group\">" + Escape(group.Key) + "</div>");
-                foreach (var doc in group)
+                foreach (DocInfo doc in group)
                 {
                     sb.AppendLine("<a href=\"#" + doc.Name + "\">" + Escape(doc.Title) + " <em>" + Escape(doc.Name) + "</em></a>");
                 }
             }
             sb.AppendLine("<div class=\"nav-group\">参考</div>");
             sb.AppendLine("<a href=\"#gaps\">能力边界</a>");
+            sb.AppendLine("<a href=\"../manual.zh.md\">使用手册（中）</a>");
+            sb.AppendLine("<a href=\"../manual.en.md\">Handbook (EN)</a>");
             sb.AppendLine("<a href=\"#a11y\">无障碍与 i18n</a>");
             sb.AppendLine("</aside>");
 
@@ -190,12 +702,13 @@ namespace Antd.Wpf.DocsGen
             foreach (var group in Catalogue.GroupBy(d => d.Category))
             {
                 sb.AppendLine("<h2 class=\"section\">" + Escape(group.Key) + "</h2>");
-                foreach (var doc in group)
+                foreach (DocInfo doc in group)
                 {
                     AppendComponent(sb, doc, byName);
                 }
             }
 
+            ManualWriter.Write(root, Catalogue, byName, versionText);
             AppendGaps(sb);
             AppendA11y(sb);
 
@@ -206,7 +719,7 @@ namespace Antd.Wpf.DocsGen
             return sb.ToString();
         }
 
-        private static void AppendComponent(StringBuilder sb, Doc doc, Dictionary<string, Type> byName)
+        private static void AppendComponent(StringBuilder sb, DocInfo doc, Dictionary<string, Type> byName)
         {
             Type type;
             if (!byName.TryGetValue(doc.Name, out type))
